@@ -1,0 +1,90 @@
+## Bash_Functions
+## All general purpose .bashrc functions go here.
+
+## Git Functions
+GitAdd()
+{
+    if [ "$1" = "-f" ]; then
+        git add $(find . | fzf -m);
+    else
+        git add "$1";
+    fi
+}
+show_git_head() {
+    pretty_git_log -1
+    git show -p --pretty="tformat:"
+}
+pretty_git_log() {
+    git log --pretty=format:'%Cred%h%Creset - %Cblue%an%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' $* |
+        # Replace (2 years ago) with (2 years)
+        sed -Ee 's/(^[^<]*) ago\)/\1)/' |
+        # Replace (2 years, 5 months) with (2 years)
+        sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
+        # Line columns up based on } delimiter
+        # Page only if we need to
+        less -FXRS
+}
+# Link a local composer-package repo to another project for testing
+composer_link() {
+    composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
+}
+# Check if a program is installed
+is_installed()
+{
+    local program=${1}
+    if foobar_loc="$(type -p ${program})" || [ -z $foobar_loc ]; then
+        echo "${program} is installed";
+    else
+        echo "${program} is not installed";
+    fi
+}
+# copy and go to dir
+cpg()
+{
+  if [ -d "$2" ];then
+    cp $1 $2 && cd $2
+  else
+    cp $1 $2
+  fi
+}
+# move and go to dir
+mvg()
+{
+  if [ -d "$2" ];then
+    mv $1 $2 && cd $2
+  else
+    mv $1 $2
+  fi
+}
+# Handy Extract Program
+extract()
+{
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xvjf $1     ;;
+            *.tar.gz)    tar xvzf $1     ;;
+            *.bz2)       bunzip2 $1      ;;
+            *.rar)       unrar x $1      ;;
+            *.gz)        gunzip $1       ;;
+            *.tar)       tar xvf $1      ;;
+            *.tbz2)      tar xvjf $1     ;;
+            *.tgz)       tar xvzf $1     ;;
+            *.zip)       unzip $1        ;;
+            *.Z)         uncompress $1   ;;
+            *.7z)        7z x $1         ;;
+            *)           echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file!"
+    fi
+}
+# Creates an archive (*.tar.gz) from given directory.
+tarthis()
+{
+    tar cvzf "${1%%/}.tar.gz"  "${1%%/}/";
+}
+# Create a ZIP archive of a file or folder.
+zipthis()
+{
+    zip -r "${1%%/}.zip" "$1" ;
+}

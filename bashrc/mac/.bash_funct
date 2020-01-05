@@ -1,0 +1,156 @@
+## Bash Functions
+
+#
+# Sourcetoad docker functions
+#
+
+# bring up SIDTK -> https://github.com/sourcetoad/DevopsToolKit
+function dockerConnectToSidtkFunction()
+{
+    cwd=$(pwd)
+    trap "cd ${cwd}" RETURN
+    if [ ! -d ${HOME}/devop-tools/docker/data-source-services ]; then
+        echo "data source services not found... What are you trying to connect to?"
+        return 1
+    fi
+    cd ${HOME}/devop-tools/docker/data-source-services && docker-compose up --build
+}
+# bring up docker inside project
+function dockerUpFunction()
+{
+    cwd=$(pwd)
+    trap "cd ${cwd}" RETURN
+
+    if [ ! -d "./docker" ]; then
+        echo "No docker folder. Are you sure you're in the right place?"
+        return 1
+    fi
+
+    cd "./docker" && docker-compose up --build
+}
+# stop docker container inside project
+function dockerStopFunction()
+{
+    cwd=$(pwd)
+    trap "cd ${cwd}" RETURN
+
+    if [ ! -d "./docker" ]; then
+        echo "No docker folder. Are you sure you're in the right place?"
+        return 1
+    fi
+
+    cd "./docker" && docker-compose stop
+}
+# stop all docker containers
+function dockerStopAllContainersFunction()
+{
+    docker stop `docker ps -q`
+}
+# enter the specific container
+function dockerEnterContainerFunction()
+{
+    # TODO: add switch stament to do postfix "code|php" for the different docker containers 
+
+    instance=${1}
+
+    if [ -z $instance ]; then
+        echo "You must provide and instance."
+        return 1
+    fi
+    
+    echo "This command doesn't do anything for right now TODO: finish it :-)"
+    echo "docker exec -it sourcetoad_${instance}_code bash"
+}
+# try to do command inside docker container
+function dockerDoCommandInsideContainerFunction()
+{
+    # TODO: add switch stament to do postfix "code|php" for the different docker containers 
+    
+    instance=${1}
+    postfix="code"
+    command=${2}
+
+    if [ -z $instance ]; then
+        echo "You must provide and instance."
+        return 1
+    fi
+
+    if [ -z $command ]; then
+        echo "You must provide a command to give to the container"
+    fi
+
+    echo "This command doesn't do anything for right now TODO: finish it :-)"
+    echo "docker exec -it sourcetoad_${instance}_${postfix} ${command}"
+}
+
+#
+# Git Functions
+#
+
+## Git add with or without fzf
+function gitAdd()
+{
+    if [ "$1" = "-f" ]; then
+        git add $(find . | fzf -m);
+    else
+        git add "$1";
+    fi
+}
+# Clean up local brances
+function removeAllUnmergedLocalBranchesNoOnRemoteFunction()
+{
+    echo "Didn't do anything. TODO: finish this function :-)"
+    exit 0
+    
+    # TODO: make sure it is only deleting the branches you don't need. Maybe make it interactive? Check to make sure the user wants 
+    #       to delete the selected branches. Allow them to edit the to delete branch list and the execute.  
+    git fetch -p && git branch -vv | awk '{print $1, $4}' | grep 'gone]' | awk '{if ($1!="evolve-changes") print $1}' | xargs git branch -d
+}
+
+#
+# composer functions
+#
+
+# Link a local composer-package repo to another project for testing
+function ComposerLink()
+{
+    composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
+}
+
+#
+# Greenbar Git functions
+#
+
+function greenbar_newbranchfunction()
+{
+    git checkout develop && git pull upstream develop && git push && git checkout -b $1
+}
+function greenbar_prepbranchfunction()
+{
+    local branch_name
+
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "You must commit your changes first.";
+    else
+        branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
+        branch_name="(unnamed branch)"     # detached HEAD
+        branch_name=${branch_name##refs/heads/}
+
+        git checkout develop && git pull upstream develop && git push && git checkout $branch_name && git merge develop
+   fi
+}
+function greenbar_pushbranchfunction()
+{
+    local branch_name
+
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "You must commit your changes first.";
+    else
+        branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
+        branch_name="(unnamed branch)"     # detached HEAD
+        branch_name=${branch_name##refs/heads/}
+
+        git checkout develop && git merge $branch_name && git push
+    fi
+}
+

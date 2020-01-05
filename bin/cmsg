@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+## Can we use tput?
+tput_found=$(command -v tput)
+tput_status=$?
+
+if [ -n $tput_found ] && [ $tput_status -eq "0" ]; then
+    RESET=$(tput sgr0)
+    BOLD=$(tput bold)
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    BLUE=$(tput setaf 4)
+    CYAN=$(tput setaf 6)
+    MAGENTA=$(tput setaf 5)
+    YELLOW=$(tput setaf 3)
+    GRAY=$(tput setaf 7)
+else
+    RESET="\e[0m"
+    BOLD="\e[1m"
+    RED="\e[0;31m"
+    GREEN="\e[0;32m"
+    BLUE="\e[0;34m"
+    CYAN="\e[0;36m"
+    MAGENTA="\e[0;35m"
+    YELLOW="\e[0;33m"
+    GRAY="\e[39m\e[2m"
+fi
+
+## Functions
+usage() {
+    echo "Usage: $(basename ${0}) [options] [message] -- Adds color to a message."
+    echo ""
+    echo "Options:"
+    echo "  -n  no newline"
+    echo "  -b  bold the message"
+    echo "  -r  color message red"
+    echo "  -g  color message green"
+    echo "  -b  color message blue"
+    echo "  -c  color message cyan"
+    echo "  -y  color message yellow"
+    echo "  -m  color message magenta"
+    echo "  -a  color message gray"
+    exit 1
+}
+
+## Options
+OPTIND=1
+newline="1"
+CHOSEN_COLOR=""
+
+while getopts ":ndrgbcmya" o; do
+    case "${o}" in
+        n) newline="0" ;; # no new line
+        d) CHOSEN_COLOR=$BOLD    ;;
+        r) CHOSEN_COLOR=$RED     ;;
+        g) CHOSEN_COLOR=$GREEN   ;;
+        b) CHOSEN_COLOR=$BLUE    ;;
+        c) CHOSEN_COLOR=$CYAN    ;;
+        m) CHOSEN_COLOR=$MAGENTA ;;
+        y) CHOSEN_COLOR=$YELLOW  ;;
+        a) CHOSEN_COLOR=$GRAY    ;;
+        \?) echo "Invalid option -- '${OPTARG}'"; usage ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+## Print the message
+if [ ! -z $CHOSEN_COLOR ] && [ $newline == "1" ]; then
+    echo -e "${CHOSEN_COLOR}${1}${RESET}"
+elif [ ! -z $CHOSEN_COLOR ] && [ $newline == "0" ]; then
+    echo -ne "${CHOSEN_COLOR}${1}${RESET}"
+elif [ -z $CHOSEN_COLOR ] && [ $newline == "0" ]; then
+    echo -n "${1}"
+else
+    echo "${1}"
+fi
+
+exit

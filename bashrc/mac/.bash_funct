@@ -153,4 +153,3 @@ function greenbar_pushbranchfunction()
         git checkout develop && git merge $branch_name && git push
     fi
 }
-

@@ -30,7 +30,7 @@ alias vm='vagrant ssh'
 ## Docker aliases
 alias dkrup=dockerUpFunction
 alias dkrstp=dockerStopFunction
-alias dkrstpall=stopAllDockerContainersFunction
+alias dkrstpall=dockerStopAllContainersFunction
 alias dkrconnect=dockerConnectToSidtkFunction
 #alias dkrvm=dockerEnterContainerFunction
 

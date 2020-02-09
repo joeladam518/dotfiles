@@ -1,8 +1,8 @@
 # Desktop Aliases
 
-# Import the gloabl aliases
+# Import the global aliases
 if [ -f "${bashrc_dir}/global/.bash_aliases" ]; then
-    source "${bashrc_dir}/global/.bash_aliases"
+    . "${bashrc_dir}/global/.bash_aliases"
 fi
 
 # Import the development aliases

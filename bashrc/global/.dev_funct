@@ -1,20 +1,12 @@
 # Development functions
 
 ## Git functions
-gitAdd()
-{
-    if [ "$1" = "-f" ]; then
-        git add $(find . | fzf -m);
-    else
-        git add "$1";
-    fi
-}
-showGitHead() 
+git_showHead() 
 {
     pretty_git_log -1
     git show -p --pretty="tformat:"
 }
-prettyGitLog() 
+git_prettyLog() 
 {
     git log --pretty=format:'%Cred%h%Creset - %Cblue%an%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' $* |
     # Replace (2 years ago) with (2 years)
@@ -25,7 +17,7 @@ prettyGitLog()
     # Page only if we need to
     less -FXRS
 }
-removeAllUnmergedLocalBranchesNotOnRemoteFunction()
+git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 {
     echo "Didn't do anything. TODO: finish this function :-)"
     exit 0

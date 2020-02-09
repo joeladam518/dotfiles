@@ -5,12 +5,12 @@ if [ -f "${bashrc_dir}/global/.bash_aliases" ]; then
     . "${bashrc_dir}/global/.bash_aliases"
 fi
 
-# Import the global aliases
+# Import the development aliases
 if [ -f "${bashrc_dir}/global/.dev_aliases" ]; then
     . "${bashrc_dir}/global/.dev_aliases"
 fi
 
-# Reload the .bash_profile
+# Reload .bash_profile
 alias breload='source ~/.bash_profile; echo bash config reloaded;'
 
 # Flush dns cache

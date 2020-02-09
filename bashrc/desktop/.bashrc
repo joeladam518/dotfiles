@@ -6,16 +6,13 @@ case $- in
       *) return;;
 esac
 
-# bashrc files directory
-bashrc_dir="${HOME}/repos/dotfiles/bashrc/desktop"
+# bashrc directory
+bashrc_dir="${HOME}/repos/dotfiles/bashrc"
+sub_dir="desktop"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
-
-# Check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
 
 # Append to the history file, don't overwrite it
 shopt -s histappend
@@ -24,14 +21,18 @@ shopt -s histappend
 HISTSIZE=100000
 HISTFILESIZE=200000
 
+# Check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-shopt -s globstar
+#shopt -s globstar
 
 # Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# Set variable identifying the chroot you work in (used in the prompt below)
+# Set variable identifying the chroot you workserverin (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
@@ -63,22 +64,12 @@ else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 
+unset color_prompt force_color_prompt
+
 # Colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-## Enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# Add an "alert" alias for long running commands.  Use like so:
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Tilix terminal
+# Tilix
 if [ $TILIX_ID ] && [ $VTE_VERSION ] && [ -e /etc/profile.d/vte.sh ]; then
     source /etc/profile.d/vte.sh
 elif [ $TILIX_ID ] && [ $VTE_VERSION ] && [ -f /etc/profile.d/vte-2.91.sh ]; then
@@ -88,7 +79,7 @@ fi
 # Bash-Git-Prompt
 if [ -f ~/.bash-git-prompt/gitprompt.sh ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
-    GIT_PROMPT_FETCH_REMOTE_STATUS=0
+    GIT_PROMPT_FETCH_REMOTE_STATUS=1
     #GIT_PROMPT_SHOW_UPSTREAM=1
     #GIT_PROMPT_SHOW_UNTRACKED_FILES=all
     #GIT_PROMPT_SHOW_CHANGED_FILES_COUNT=0
@@ -96,6 +87,31 @@ if [ -f ~/.bash-git-prompt/gitprompt.sh ]; then
     #GIT_PROMPT_THEME_FILE=~/.git-prompt-colors.sh
     #GIT_PROMPT_THEME=Solarize
     source ~/.bash-git-prompt/gitprompt.sh
+fi
+
+# .fzf command line fuzzy finder
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Load functions file
+if [ -f "${bashrc_dir}/${sub_dir}/.bash_funct" ]; then
+    . "${bashrc_dir}/${sub_dir}/.bash_funct"
+fi
+
+# Enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Load alias definitions
+if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
+    . "${bashrc_dir}/${sub_dir}/.bash_aliases"
 fi
 
 # Enable programmable completion features (you don't need to enable
@@ -109,21 +125,4 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# FZF Command Line Fuzzy Finder
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-# Bash functions File
-# If file exists, load .bash_funct for all .bashrc functions
-if [ -f "$bashrc_dir"/.bash_funct ]; then
-    . "$bashrc_dir"/.bash_funct
-fi
-
-# Alias definitions.
-# If the file exists, load .bash_aliases for bash aliases
-if [ -f "$bashrc_dir"/.bash_aliases ]; then
-    . "$bashrc_dir"/.bash_aliases
-fi
-
-# Unset any variables that were used in this script
-unset color_prompt force_color_prompt bashrc_dir
-
+unset bashrc_dir sub_dir

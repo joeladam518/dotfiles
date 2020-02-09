@@ -1,0 +1,52 @@
+# Global Bash Functions
+
+# Check if a program is installed
+isInstalled()
+{
+    local program_name=$1
+    
+    if [ -z "$program_name" ]; then
+        echo "You must provide a program name to check against."
+        return 1
+    fi
+    
+    if command -v ${1} >/dev/null 2>&1; then
+        echo "\"${program_name}\" is installed."
+    else 
+        echo "\"${program_name}\" is not installed."
+    fi
+
+    return 0
+}
+# Creates an archive (*.tar.gz) from given directory.
+tarthis()
+{
+    tar -cvzf "${1%%/}.tar.gz" "${1%%/}/";
+}
+# Create a ZIP archive of a file or folder.
+zipthis()
+{
+    zip -r "${1%%/}.zip" "$1" ;
+}
+# Handy Extract function
+extract()
+{
+    if [ -f $1 ]; then
+        case $1 in
+            *.tar.bz2) tar -xvjf $1 ;;
+            *.tar.gz)  tar -xvzf $1 ;;
+            *.bz2)     bunzip2 $1 ;;
+            *.rar)     unrar -x $1 ;;
+            *.gz)      gunzip $1 ;;
+            *.tar)     tar -xvf $1 ;;
+            *.tbz2)    tar -xvjf $1 ;;
+            *.tgz)     tar -xvzf $1 ;;
+            *.zip)     unzip $1 ;;
+            *.Z)       uncompress $1 ;;
+            *.7z)      7z -x $1 ;;
+            *)         echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file!"
+    fi
+}

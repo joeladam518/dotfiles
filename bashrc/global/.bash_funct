@@ -1,7 +1,7 @@
 # Global Bash Functions
 
 # Check if a program is installed
-isInstalled()
+installed()
 {
     local program_name=$1
     

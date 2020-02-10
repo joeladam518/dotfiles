@@ -4,7 +4,7 @@
 tput_found=$(command -v tput)
 tput_status=$?
 
-if [ -n $tput_found ] && [ $tput_status -eq "0" ]; then
+if [ -n "$tput_found" ] && [ "$tput_status" -eq "0" ]; then
     RESET=$(tput sgr0)
     BOLD=$(tput bold)
     RED=$(tput setaf 1)

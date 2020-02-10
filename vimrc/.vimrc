@@ -78,7 +78,9 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " https://github.com/sheerun/vim-polygloti -> Comprehensive language pack 
 Plug 'sheerun/vim-polyglot' 
 " https://github.com/tpope/vim-commentary -> Commenting plugin 
-Plug 'tpope/vim-commentary' 
+Plug 'tpope/vim-commentary'
+" https://github.com/jiangmiao/auto-pairs
+Plug 'jiangmiao/auto-pairs'
 
 " End &&  Initialize plugin system
 call plug#end()

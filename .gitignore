@@ -1,9 +1,14 @@
-# Sublime Text
+# Editiors
+.idea
+.vscode
 .phpintel
-
-# Vim
 *.swp
 .netrwhist
+
+ide-helper.php
+_ide_helper.php
+config/ide-helper.php
+config/_ide_helper.php
 
 # Packages
 # it's better to unpack these files and commit the raw source

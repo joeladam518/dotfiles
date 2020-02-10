@@ -5,12 +5,12 @@
 bashrc_dir="${HOME}/repos/dotfiles/bashrc"
 sub_dir="mac"
 
+# Append to the history file, don't overwrite it
+shopt -s histappend
+
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth
-
-# Append to the history file, don't overwrite it
-shopt -s histappend
 
 # For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTSIZE=1000000
@@ -25,17 +25,16 @@ shopt -s checkwinsize
 # Cmdhist
 shopt -s cmdhist
 
-# Check for colored prompt shell
-if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# Colored prompt shell
-	export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
-else
-	# Normal prompt shell
-	export PS1="\A \w\\$ "
+# Prompt shell
+export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
+
+# if bin folder exists, add it to PATH
+if [ -d "${HOME}/bin" ]; then
+    export PATH="${HOME}/bin:${PATH}"
 fi
 
-# Consolidate all bash history from all terminals into one history
-export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
+# # Consolidate all bash history from all terminals into one history
+# export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
 
 # Bash-Git-Prompt
 if [ -f "/usr/local/opt/bash-git-prompt/share/gitprompt.sh" ]; then
@@ -61,8 +60,8 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if [ -f $(brew --prefix)/etc/bash_completion ]; then
-    . $(brew --prefix)/etc/bash_completion
+    source $(brew --prefix)/etc/bash_completion
 fi
 
-## Unset any variables that were used in this script
+# Unset any variables that were used in this script
 unset bashrc_dir sub_dir

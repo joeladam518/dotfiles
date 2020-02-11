@@ -1,23 +1,5 @@
 # Global Bash Functions
 
-# Check if a program is installed
-installed()
-{
-    local program_name=$1
-    
-    if [ -z "$program_name" ]; then
-        echo "You must provide a program name to check against."
-        return 1
-    fi
-    
-    if command -v ${1} >/dev/null 2>&1; then
-        echo "\"${program_name}\" is installed."
-    else 
-        echo "\"${program_name}\" is not installed."
-    fi
-
-    return 0
-}
 # Creates an archive (*.tar.gz) from given directory.
 tarthis()
 {

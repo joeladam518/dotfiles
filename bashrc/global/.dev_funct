@@ -5,24 +5,6 @@ composer_link()
 {
     composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
 }
-
-## Git functions
-git_pretty_log() 
-{
-    git log --pretty=format:'%Cred%h%Creset - %Cblue%an%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' $* |
-    # Replace (2 years ago) with (2 years)
-    sed -Ee 's/(^[^<]*) ago\)/\1)/' |
-    # Replace (2 years, 5 months) with (2 years)
-    sed -Ee 's/(^[^<]*), [[:digit:]]+ .*months?\)/\1)/' |
-    # Line columns up based on } delimiter
-    # Page only if we need to
-    less -FXRS
-}
-git_show_head() 
-{
-    git_pretty_log -1
-    git show -p --pretty="tformat:"
-}
 git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 {
     echo "Didn't do anything. TODO: finish this function :-)"

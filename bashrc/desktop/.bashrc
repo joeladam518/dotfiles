@@ -71,7 +71,7 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 
 # if the dotfiles bin folder exists, add it to PATH
 if [ -d "${HOME}/repos/dotfiles/bin" ]; then
-    export PATH="${PATH}:${HOME}/repos/dotfiles/bin"
+    PATH="${PATH}:${HOME}/repos/dotfiles/bin"
 fi
 
 # Tilix

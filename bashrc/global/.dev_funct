@@ -1,5 +1,11 @@
 # Development functions
 
+## Link a local composer-package repo to another project for testing
+composer_link() 
+{
+    composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
+}
+
 ## Git functions
 git_pretty_log() 
 {
@@ -27,16 +33,7 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
     git fetch -p && git branch -vv | awk '{print $1, $4}' | grep 'gone]' | awk '{if ($1!="evolve-changes") print $1}' | xargs git branch -d
 }
 
-## Link a local composer-package repo to another project for testing
-composerLink() 
-{
-    composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
-}
-
-#
-# Greenbar git functions
-#
-
+## Greenbar git functions
 greenbar_newBranchFunction()
 {
     git checkout develop && git pull upstream develop && git push && git checkout -b $1

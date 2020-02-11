@@ -69,6 +69,11 @@ unset color_prompt force_color_prompt
 # Colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# if the dotfiles bin folder exists, add it to PATH
+if [ -d "${HOME}/repos/dotfiles/bin" ]; then
+    export PATH="${PATH}:${HOME}/repos/dotfiles/bin"
+fi
+
 # Tilix
 if [ $TILIX_ID ] && [ $VTE_VERSION ] && [ -e /etc/profile.d/vte.sh ]; then
     source /etc/profile.d/vte.sh

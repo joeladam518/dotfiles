@@ -1,12 +1,7 @@
 # Development functions
 
 ## Git functions
-git_showHead() 
-{
-    pretty_git_log -1
-    git show -p --pretty="tformat:"
-}
-git_prettyLog() 
+git_pretty_log() 
 {
     git log --pretty=format:'%Cred%h%Creset - %Cblue%an%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' $* |
     # Replace (2 years ago) with (2 years)
@@ -16,6 +11,11 @@ git_prettyLog()
     # Line columns up based on } delimiter
     # Page only if we need to
     less -FXRS
+}
+git_show_head() 
+{
+    git_pretty_log -1
+    git show -p --pretty="tformat:"
 }
 git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 {

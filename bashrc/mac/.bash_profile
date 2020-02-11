@@ -38,8 +38,10 @@ if [ -d "${HOME}/bin" ]; then
     export PATH="${HOME}/bin:${PATH}"
 fi
 
-# # Consolidate all bash history from all terminals into one history
-# export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
+# if the dotfiles bin folder exists, add it to PATH
+if [ -d "${HOME}/repos/dotfiles/bin" ]; then
+    export PATH="${PATH}:${HOME}/repos/dotfiles/bin"
+fi
 
 # Bash-Git-Prompt
 if [ -f "/usr/local/opt/bash-git-prompt/share/gitprompt.sh" ]; then

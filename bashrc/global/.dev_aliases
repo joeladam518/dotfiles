@@ -1,12 +1,15 @@
 # Development aliases
 
 # Git Aliases
- alias st='git status'
+alias st='git status'
+alias gco='git checkout'
+alias newbr='git checkout -b'
 # "git add with fzf"
 alias ga='git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add'
 # "git unadd with fzf"
 alias gua='git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q'
-alias newbr='git checkout -b'
+# git commit --verbose 
+alias gcm='git cm'
 alias gp='git push'
 
 # Vagrant Aliases

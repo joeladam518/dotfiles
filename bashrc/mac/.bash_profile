@@ -33,7 +33,7 @@ if [ -d "${HOME}/repos/dotfiles/bin" ]; then
     export PATH="${HOME}/repos/dotfiles/bin:${PATH}"
 fi
 
-# if ~/bin exist, add it to PATH
+# if ~/bin exists, add it to PATH
 if [ -d "${HOME}/bin" ]; then
     export PATH="${HOME}/bin:${PATH}"
 fi

@@ -11,8 +11,12 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
     exit 0
     
     # TODO: make sure it is only deleting the branches you don't need. Maybe make it interactive? Check to make sure the user wants 
-    #       to delete the selected branches. Allow them to edit the to delete branch list and the execute.  
+    #       to delete the selected branches. Allow them to edit the to delete branch list and the execute.     
+    # Firs thought
     git fetch -p && git branch -vv | awk '{print $1, $4}' | grep 'gone]' | awk '{if ($1!="evolve-changes") print $1}' | xargs git branch -d
+
+    # Second thought (Seemed to work on 2019-02-28)  https://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
+    git branch -r | awk '{print $1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -d
 }
 
 ## Greenbar git functions

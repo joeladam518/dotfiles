@@ -4,11 +4,9 @@
 alias st='git status'
 alias gco='git checkout'
 alias newbr='git checkout -b'
-# "git add with fzf"
-alias ga='git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add'
-# "git unadd with fzf"
-alias gua='git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q'
-# git commit --verbose 
+# "git add/unadd with fzf"
+#alias gstg='git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add'
+#alias gunstg='git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q'
 alias gcm='git cm'
 alias gp='git push'
 

@@ -19,13 +19,19 @@ dockerConnectToSidtkFunction()
 {
     cwd=$(pwd)
     sdtk_dir="${HOME}/devop-tools/docker/data-source-services"
+    st_dtools_dir="${HOME}/devop-tools/docker/data-source-tools"
     if [ ! -d "$sdtk_dir" ]; then
         echo "data source services not found... What are you trying to connect to?"
         return 1
     fi
     
-    trap "cd ${cwd}" RETURN
-    cd "$sdtk_dir" && docker-compose up --build
+    if [ ! -d "$st_dtools_dir" ]; then
+        echo "data source tools not found... "
+        return 1
+    fi
+
+    # trap "cd ${cwd}" RETURN
+    cd "$sdtk_dir" && docker-compose up --build -d && cd "$st_dtools_dir" && docker-compose up --build -d && cd "$cwd"
 }
 # Bring up docker container inside repo
 dockerUpFunction()
@@ -55,3 +61,4 @@ dockerStopAllContainersFunction()
 {
     docker stop `docker ps -q`
 }
+

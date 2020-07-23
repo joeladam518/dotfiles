@@ -35,7 +35,8 @@ alias dkrstpall=dockerStopAllContainersFunction
 # Sourcetoad repo aliases
 alias nadmin="cd ~/repos/ACHLink-Admin"
 alias nadmin-exec="docker exec -it sourcetoad_nuggetadmin_code"
-alias nadmin-test="docker exec -it sourcetoad_nuggetadmin_code ./vendor/bin/phpunit"
 alias nvault="cd ~/repos/ACHLink-Vault"
 alias nvault-exec="docker exec -it sourcetoad_nuggetvault_code"
-alias nvault-test="docker exec -it sourcetoad_nuggetvault_code ./vendor/bin/phpunit"
+alias nqa="cd ~/repos/ACHLink-QA-Site"
+alias nqa-exec="docker exec -it sourcetoad_nuggetqa_code"
+

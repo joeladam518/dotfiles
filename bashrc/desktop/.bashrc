@@ -120,18 +120,18 @@ if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
 fi
 
 # Load the bash completion script for .ssh 
-if [ -f "~/repos/dotfiles/bash_completion/ssh" ]; then
-    . "~/repos/dotfiles/bash_completion/ssh"
+if [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ] && [ -f "${HOME}/.ssh/config" ]; then
+    . "${HOME}/repos/dotfiles/bash-completion/ssh"
 fi
 
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
+  if [ -f "/usr/share/bash-completion/completions" ]; then
+    . "/usr/share/bash-completion/completions"
+  elif [ -f "/etc/bash_completion" ]; then
+    . "/etc/bash_completion"
   fi
 fi
 

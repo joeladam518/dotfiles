@@ -53,7 +53,7 @@ fi
 cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf.tmp2 .tmux.conf"
 
 # Add git config 
-if [ "$system" == "desktop"] && [ "$system" == "mac"]; then
+if [ "$system" == "desktop" ] && [ "$system" == "mac" ]; then
     cd "$HOME" && ln -s "${repos_dir}/dotfiles/git/.gitconfig"
 fi
 

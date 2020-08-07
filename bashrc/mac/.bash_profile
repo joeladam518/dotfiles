@@ -20,6 +20,9 @@ shopt -s histappend
 # double ** search !
 # shopt -s globstar
 
+# gpg signing
+export GPG_TTY=$(tty)
+
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth

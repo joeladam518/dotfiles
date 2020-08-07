@@ -1,8 +1,8 @@
 # Server Aliases
 
 # Import the global aliases
-if [ -f "${bashrc_dir}/global/.bash_aliases" ]; then
-    . "${bashrc_dir}/global/.bash_aliases"
+if [ -f "${bashrc_dir}/shared/.bash_aliases" ]; then
+    . "${bashrc_dir}/shared/.bash_aliases"
 fi
 
 # Reload .bashrc

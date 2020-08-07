@@ -1,13 +1,13 @@
 # Mac Aliases
 
 # Import the global aliases
-if [ -f "${bashrc_dir}/global/.bash_aliases" ]; then
-    . "${bashrc_dir}/global/.bash_aliases"
+if [ -f "${bashrc_dir}/shared/.bash_aliases" ]; then
+    . "${bashrc_dir}/shared/.bash_aliases"
 fi
 
 # Import the development aliases
-if [ -f "${bashrc_dir}/global/.dev_aliases" ]; then
-    . "${bashrc_dir}/global/.dev_aliases"
+if [ -f "${bashrc_dir}/shared/.dev_aliases" ]; then
+    . "${bashrc_dir}/shared/.dev_aliases"
 fi
 
 # Reload .bash_profile

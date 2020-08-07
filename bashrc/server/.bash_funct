@@ -1,6 +1,6 @@
 # Server functions
 
 # Import the global bash functions
-if [ -f "${bashrc_dir}/global/.bash_funct" ]; then
-    . "${bashrc_dir}/global/.bash_funct"
+if [ -f "${bashrc_dir}/shared/.bash_funct" ]; then
+    . "${bashrc_dir}/shared/.bash_funct"
 fi

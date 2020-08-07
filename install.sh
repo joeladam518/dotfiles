@@ -32,10 +32,13 @@ else
 fi
 
 # Symlink the bashrc files
-if [ -L "${HOME}/${rcfile}" ] && [ -f "${HOME}/${rcfile}.old" ]; then
-    cmsg -y "The dotfiles .bashrc symlink already exists"
-elif [ -f "${HOME}/${rcfile}" ]; then
+if [ -f "${HOME}/${rcfile}" ] && [ ! -L "${HOME}/${rcfile}" ]; then
     cd "$HOME" && mv "$rcfile" "${rcfile}.old"
+fi
+
+if [ -L "${HOME}/${rcfile}" ]; then
+    cmsg -y "The dotfiles .bashrc symlink already exists"
+else
     cd "$HOME" && ln -s "${repos_dir}/dotfiles/bashrc/${system}/${rcfile}" .
 fi
 
@@ -50,11 +53,19 @@ fi
 # TODO: intall the rest of the dotfiles
 
 # Add Tmux config
-cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf.tmp2" ".tmux.conf"
+if [ -L "${HOME}/.tmux.conf" ]; then
+    cmsg -y "The dotfiles .tmux.conf symlink already exists"
+else
+    cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf.tmp2" ".tmux.conf"
+fi
 
 # Add git config 
 if [ "$system" == "desktop" ] && [ "$system" == "mac" ]; then
-    cd "$HOME" && ln -s "${repos_dir}/dotfiles/git/.gitconfig"
+    if [ -L "${HOME}/.tmux.conf" ]; then
+        cmsg -y "The dotfiles .gitconfigsymlink already exists"
+    else
+        cd "$HOME" && ln -s "${repos_dir}/dotfiles/git/.gitconfig" .
+    fi
 fi
 
 cd "$CWD" || exit

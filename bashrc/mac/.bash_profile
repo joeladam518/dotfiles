@@ -30,8 +30,10 @@ export HISTCONTROL=ignoreboth
 # For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTSIZE=1000000
 export HISTFILESIZE=2000000
-# export HISTIGNORE="&:[ ]*:exit"
+export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit:* --help"
 # export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S : "
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "

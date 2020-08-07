@@ -5,8 +5,20 @@
 bashrc_dir="${HOME}/repos/dotfiles/bashrc"
 sub_dir="mac"
 
+# Shell options!
+
+# Check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Cmdhist
+shopt -s cmdhist
+
 # Append to the history file, don't overwrite it
 shopt -s histappend
+
+# double ** search !
+# shopt -s globstar
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -17,13 +29,6 @@ export HISTSIZE=1000000
 export HISTFILESIZE=2000000
 # export HISTIGNORE="&:[ ]*:exit"
 # export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S : "
-
-# Check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# Cmdhist
-shopt -s cmdhist
 
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "

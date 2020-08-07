@@ -68,6 +68,11 @@ if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
     . "${bashrc_dir}/${sub_dir}/.bash_aliases"
 fi
 
+# Load the bash completion script for .ssh 
+if [ -f "${HOME}/.ssh/config" ] && [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ]; then
+    . "${HOME}/repos/dotfiles/bash-completion/ssh"
+fi
+
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).

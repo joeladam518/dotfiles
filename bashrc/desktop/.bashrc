@@ -128,7 +128,7 @@ if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
 fi
 
 # Load the bash completion script for .ssh 
-if [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ] && [ -f "${HOME}/.ssh/config" ]; then
+if [ -f "${HOME}/.ssh/config" ] && [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ]; then
     . "${HOME}/repos/dotfiles/bash-completion/ssh"
 fi
 

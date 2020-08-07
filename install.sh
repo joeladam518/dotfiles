@@ -50,7 +50,7 @@ fi
 # TODO: intall the rest of the dotfiles
 
 # Add Tmux config
-cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf.tmp2 .tmux.conf"
+cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf.tmp2" ".tmux.conf"
 
 # Add git config 
 if [ "$system" == "desktop" ] && [ "$system" == "mac" ]; then

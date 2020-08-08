@@ -1,6 +1,6 @@
 # Global aliases
 
-# Reload .bash_profile
+# Reload shell
 alias reload_shell='exec ${SHELL}; echo shell reloaded;'
 
 # Upgrade fzf

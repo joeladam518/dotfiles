@@ -5,9 +5,6 @@ if [ -f "${bashrc_dir}/shared/.bash_aliases" ]; then
     . "${bashrc_dir}/shared/.bash_aliases"
 fi
 
-# Reload .bashrc
-alias breload='source ~/.bashrc; echo bash config reloaded;'
-
 # ls aliases
 alias ls='ls -h --color'
 alias lx='ls -lXB'         #  Sort by extension.

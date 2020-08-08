@@ -10,9 +10,6 @@ if [ -f "${bashrc_dir}/shared/.dev_aliases" ]; then
     . "${bashrc_dir}/shared/.dev_aliases"
 fi
 
-# Reload .bashrc
-alias breload='source ~/.bashrc; echo bash config reloaded;'
-
 # ls aliases
 alias ls='ls -h --color'
 alias lx='ls -lXB'         #  Sort by extension
@@ -39,6 +36,7 @@ alias psg="ps aux | grep -v grep | grep -i -e VSZ -e"
 
 # fzf aliases
 alias subit='subl $(fzf -m);'
+alias codeit='code $(fzf -m);'
 
 # apt-get aliases
 alias auu='sudo apt-get update && sudo apt-get upgrade -y && sudo apt autoremove -y'

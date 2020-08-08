@@ -1,5 +1,8 @@
 # Global aliases
 
+# Reload .bash_profile
+alias reload_shell='exec ${SHELL}; echo shell reloaded;'
+
 # Upgrade fzf
 alias updatefzf='cd ~/.fzf && git pull && ./install && cd ~'
 

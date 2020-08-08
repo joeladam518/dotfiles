@@ -7,7 +7,9 @@ case $- in
 esac
 
 # bashrc directory
-bashrc_dir="${HOME}/repos/dotfiles/bashrc"
+dotfiles_dir="${HOME}/repos/dotfiles"
+bashrc_dir="${dotfiles_dir}/bashrc"
+bin_dir="${dotfiles_dir}/bin"
 sub_dir="server"
 
 # Shel Options!
@@ -78,12 +80,12 @@ unset color_prompt force_color_prompt
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # if the dotfiles bin folder exists, add it to PATH
-if [ -d "${HOME}/repos/dotfiles/bin" ]; then
-    PATH="${PATH}:${HOME}/repos/dotfiles/bin"
+if [[ ! "$PATH" =~ (^|:)"${bin_dir}"(:|$) ]]; then
+    PATH="${PATH}:${bin_dir}"
 fi
 
 # Bash-Git-Prompt
-if [ -f ~/.bash-git-prompt/gitprompt.sh ]; then
+if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_FETCH_REMOTE_STATUS=1
     #GIT_PROMPT_SHOW_UPSTREAM=1
@@ -92,7 +94,7 @@ if [ -f ~/.bash-git-prompt/gitprompt.sh ]; then
     #GIT_PROMPT_THEME=Custom     # use theme specified in file GIT_PROMPT_THEME_FILE (default ~/.git-prompt-colors.sh)
     #GIT_PROMPT_THEME_FILE=~/.git-prompt-colors.sh
     #GIT_PROMPT_THEME=Solarize
-    source ~/.bash-git-prompt/gitprompt.sh
+    . "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
 
 # .fzf command line fuzzy finder

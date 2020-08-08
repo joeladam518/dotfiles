@@ -10,9 +10,6 @@ if [ -f "${bashrc_dir}/shared/.dev_aliases" ]; then
     . "${bashrc_dir}/shared/.dev_aliases"
 fi
 
-# Reload .bash_profile
-alias breload='source ~/.bash_profile; echo bash config reloaded;'
-
 # Flush dns cache
 alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder && say flushed'
 
@@ -23,8 +20,8 @@ alias lll='ls -Fl'
 alias lr='ll -R'
 
 # fzf aliases
-alias subit='sublime $(fzf -m)'
-alias mvimit='mvim -p --remote-tab-silent $(fzf -m)'
+alias mvimit='mvim -p --remote-tab-silent $(fzf -m);'
+alias codeit='code $(fzf -m);'
 
 # Docker aliases
 alias dkrconnect=dockerConnectToSidtkFunction

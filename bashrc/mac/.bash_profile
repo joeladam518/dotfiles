@@ -2,7 +2,9 @@
 # Last edited on 08/10/17
 
 # bashrc directory
-bashrc_dir="${HOME}/repos/dotfiles/bashrc"
+dotfiles_dir="${HOME}/repos/dotfiles"
+bashrc_dir="${dotfiles_dir}/bashrc"
+bin_dir="${dotfiles_dir}/bin"
 sub_dir="mac"
 
 # Shell options!
@@ -57,7 +59,7 @@ fi
 if [ -f "/usr/local/opt/bash-git-prompt/share/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     __GIT_PROMPT_DIR="/usr/local/opt/bash-git-prompt/share"
-    source "/usr/local/opt/bash-git-prompt/share/gitprompt.sh"
+    . "/usr/local/opt/bash-git-prompt/share/gitprompt.sh"
 fi
 
 # .fzf command line fuzzy finder
@@ -81,8 +83,8 @@ fi
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-    source $(brew --prefix)/etc/bash_completion
+if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+    . "$(brew --prefix)/etc/bash_completion"
 fi
 
 # Unset any variables that were used in this script

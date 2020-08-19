@@ -36,4 +36,6 @@ alias nvault="cd ~/repos/ACHLink-Vault"
 alias nvault-exec="docker exec -it sourcetoad_nuggetvault_code"
 alias nqa="cd ~/repos/ACHLink-QA-Site"
 alias nqa-exec="docker exec -it sourcetoad_nuggetqa_code"
+alias cpartnav="cd ~/repos/CreativePinellas_ArtsNavigator"
+alias cpartnav-exec="docker exec -it sourcetoad_arts_code"
 

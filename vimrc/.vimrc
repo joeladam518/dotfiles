@@ -199,8 +199,11 @@ set hidden
 " set confirm
 " set autowriteall
 
-" Disable Alt key mnemonics
-if !IsOS("mac")
+if IsOS("mac")
+    " set auto change dir
+    set autochdir
+else
+    " Disable Alt key mnemonics
     set winaltkeys=no
 endif
 

@@ -19,3 +19,36 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
     git branch -r | awk '{print $1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -d
 }
 
+## Greenbar git functions
+greenbar_newBranchFunction()
+{
+    git checkout develop && git pull upstream develop && git push && git checkout -b $1
+}
+greenbar_prepBranchFunction()
+{
+    local branch_name
+
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "You must commit your changes first.";
+    else
+        branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
+        branch_name="(unnamed branch)" # detached HEAD
+        branch_name=${branch_name##refs/heads/}
+
+        git checkout develop && git pull upstream develop && git push && git checkout $branch_name && git merge develop
+    fi
+}
+greenbar_pushBranchFunction()
+{
+    local branch_name
+
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "You must commit your changes first.";
+    else
+        branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
+        branch_name="(unnamed branch)"     # detached HEAD
+        branch_name=${branch_name##refs/heads/}
+
+        git checkout develop && git merge $branch_name && git push
+    fi
+}

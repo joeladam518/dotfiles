@@ -6,38 +6,15 @@ if [ -f "${bashrc_dir}/shared/.bash_aliases" ]; then
 fi
 
 # Import the development aliases
-if [ -f "${bashrc_dir}/shared/.dev_aliases" ]; then
-    . "${bashrc_dir}/shared/.dev_aliases"
+if [ -f "${bashrc_dir}/shared/.bash_dev_aliases" ]; then
+    . "${bashrc_dir}/shared/.bash_dev_aliases"
 fi
 
-# ls aliases
-alias ls='ls -h --color'
-alias lx='ls -lXB'         #  Sort by extension
-alias lk='ls -lSr'         #  Sort by size, biggest last
-alias lt='ls -ltr'         #  Sort by date, most recent last
-alias lc='ls -ltcr'        #  Sort by/show change time,most recent last
-alias lu='ls -ltur'        #  Sort by/show access time,most recent last
-alias ll='ls -Alpv --group-directories-first'
-alias lll='ls -lp --group-directories-first'
-alias lm='ll |more'        #  Pipe through 'more'
-#alias lr='ll -R'          #  Recursive ls
-
-# Display directory structure
-alias tree='tree -Csuh'    #  Nice alternative to 'recursive ls'
-
-# Prints disk usage in human readable form
-alias df='df -Tha --total'
-alias du='du -ach | sort -h'
-alias di="du -cBM -d1 2> >(grep -v 'Permission denied') | sort -n"
-
-# Process table
-alias ps="ps auxf"
-alias psg="ps aux | grep -v grep | grep -i -e VSZ -e"
+# Import ubunutu aliases
+if [ -f "${bashrc_dir}/shared/.bash_ubuntu_aliases" ]; then
+    . "${bashrc_dir}/shared/.bash_ubuntu_aliases"
+fi
 
 # fzf aliases
 alias subit='subl $(fzf -m);'
 alias codeit='code $(fzf -m);'
-
-# apt-get aliases
-alias auu='sudo apt-get update && sudo apt-get upgrade -y && sudo apt autoremove -y'
-alias aar='sudo apt -y autoremove'

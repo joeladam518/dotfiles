@@ -7,10 +7,16 @@ alias newbr='git checkout -b'
 # "git add/unadd with fzf"
 alias gstg='git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add'
 alias gunstg='git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q'
-alias gcm='git cm'
+alias gcm='git commit'
 alias gp='git push'
 
 # Vagrant Aliases
 alias vu='vagrant up'
 alias vh='vagrant halt'
 alias vm='vagrant ssh'
+
+# Docker aliases
+alias dkrconnect=docker_connectToSidtkFunction
+alias dkrup=docker_upFunction
+alias dkrstp=docker_stopFunction
+alias dkrstpall=docker_stopAllContainersFunction

@@ -6,8 +6,8 @@ if [ -f "${bashrc_dir}/shared/.bash_aliases" ]; then
 fi
 
 # Import the development aliases
-if [ -f "${bashrc_dir}/shared/.dev_aliases" ]; then
-    . "${bashrc_dir}/shared/.dev_aliases"
+if [ -f "${bashrc_dir}/shared/.bash_dev_aliases" ]; then
+    . "${bashrc_dir}/shared/.bash_dev_aliases"
 fi
 
 # Flush dns cache
@@ -23,12 +23,6 @@ alias lr='ll -R'
 alias mvimit='mvim -p --remote-tab-silent $(fzf -m);'
 alias codeit='code $(fzf -m);'
 
-# Docker aliases
-alias dkrconnect=dockerConnectToSidtkFunction
-alias dkrup=dockerUpFunction
-alias dkrstp=dockerStopFunction
-alias dkrstpall=dockerStopAllContainersFunction
-
 # Sourcetoad repo aliases
 alias nadmin="cd ~/repos/ACHLink-Admin"
 alias nadmin-exec="docker exec -it sourcetoad_nuggetadmin_code"
@@ -38,4 +32,3 @@ alias nqa="cd ~/repos/ACHLink-QA-Site"
 alias nqa-exec="docker exec -it sourcetoad_nuggetqa_code"
 alias cpartnav="cd ~/repos/CreativePinellas_ArtsNavigator"
 alias cpartnav-exec="docker exec -it sourcetoad_arts_code"
-

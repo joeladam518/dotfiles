@@ -6,59 +6,6 @@ if [ -f "${bashrc_dir}/shared/.bash_funct" ]; then
 fi
 
 # Import the dev bash function
-if [ -f "${bashrc_dir}/shared/.dev_funct" ]; then
-    . "${bashrc_dir}/shared/.dev_funct"
+if [ -f "${bashrc_dir}/shared/.bash_dev_funct" ]; then
+    . "${bashrc_dir}/shared/.bash_dev_funct"
 fi
-
-#
-# Sourcetoad docker functions
-#
-
-# Bring up SIDTK -> https://github.com/sourcetoad/DevopsToolKit
-dockerConnectToSidtkFunction()
-{
-    cwd=$(pwd)
-    sdtk_dir="${HOME}/devop-tools/docker/data-source-services"
-    st_dtools_dir="${HOME}/devop-tools/docker/data-source-tools"
-    if [ ! -d "$sdtk_dir" ]; then
-        echo "data source services not found... What are you trying to connect to?"
-        return 1
-    fi
-    
-    if [ ! -d "$st_dtools_dir" ]; then
-        echo "data source tools not found... "
-        return 1
-    fi
-
-    # trap "cd ${cwd}" RETURN
-    cd "$sdtk_dir" && docker-compose up --build -d && cd "$st_dtools_dir" && docker-compose up --build -d && cd "$cwd"
-}
-# Bring up docker container inside repo
-dockerUpFunction()
-{
-    cwd=$(pwd)
-    if [ ! -d "./docker" ]; then
-        echo "No docker folder. Are you sure you're in the right place?"
-        return 1
-    fi
-
-    trap "cd ${cwd}" RETURN
-    cd "./docker" && docker-compose up --build # -d makes it a backgroud process
-}
-# Stop docker container inside repo
-dockerStopFunction()
-{
-    cwd=$(pwd)
-    if [ ! -d "./docker" ]; then
-        echo "No docker folder. Are you sure you're in the right place?"
-        return 1
-    fi
-
-    cd "./docker" && docker-compose stop && cd "$cwd"
-}
-# Stop all docker containers
-dockerStopAllContainersFunction()
-{
-    docker stop `docker ps -q`
-}
-

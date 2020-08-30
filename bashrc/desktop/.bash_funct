@@ -6,6 +6,6 @@ if [ -f "${bashrc_dir}/shared/.bash_funct" ]; then
 fi
 
 # Import the dev bash function
-if [ -f "${bashrc_dir}/shared/.dev_funct" ]; then
-    . "${bashrc_dir}/shared/.dev_funct"
+if [ -f "${bashrc_dir}/shared/.bash_dev_funct" ]; then
+    . "${bashrc_dir}/shared/.bash_dev_funct"
 fi

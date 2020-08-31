@@ -2,28 +2,27 @@
 
 # ls aliases
 alias ls='ls --color --group-directories-first'
-alias lx='ls -lhXB'         #  Sort by extension
-alias lk='ls -lhSr'         #  Sort by size, biggest last
-alias lt='ls -lhtr'         #  Sort by date, most recent last
-alias lc='ls -lhtcr'        #  Sort by/show change time,most recent last
-alias lu='ls -lhtur'        #  Sort by/show access time,most recent last
-alias ll='ls -laphv'
-alias lll='ls -lhpv'
-alias lm='ll | more'        #  Pipe through 'more'
-#alias lr='ll -R'          #  Recursive ls
+alias ll='ls -alphv'    # Detailed ls with hidden files/directories
+alias lll='ls -lhpv'    # ll without hidden files/directories 
+alias lm='ll | more'    # Pipe through 'more'
+alias lc='ls -lhtcr'    # Sort by/show change time,most recent last
+alias lk='ls -lhrS'     # Sort by size, biggest last
+alias lt='ls -lhrt'     # Sort by date, most recent last
+alias lu='ls -lhrtu'    # Sort by/show access time,most recent last
+alias lx='ls -BlhX'     # Sort by extension
 
 # Display directory structure
-alias tree='tree -Csuh'    #  Nice alternative to 'recursive ls'
+#alias lr='ll -R'       # Recursive ls
+alias lr='tree -Csh'    # Nice alternative to 'recursive ls'
 
 # Prints disk usage in human readable form
-alias dff='df -Tha --total'
+#alias df='df -Tha --total'
 alias duu='du -ach'
 alias ddu='du -ch -d1'
 alias ddus='ddu | sort -h'
 
 # Process table
-alias ps="ps auxf"
-alias psg="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias pst="ps auxf"
 
 # apt-get aliases
 alias auu='sudo apt-get update && sudo apt-get upgrade -y && sudo apt autoremove -y'

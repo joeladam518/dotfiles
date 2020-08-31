@@ -26,4 +26,5 @@ alias pst="ps auxf"
 
 # apt-get aliases
 alias auu='sudo apt-get update && sudo apt-get upgrade -y && sudo apt autoremove -y'
-alias aar='sudo apt -y autoremove'
+alias adu='sudo apt-get dist-upgrade -y'
+alias aar='sudo apt autoremove -y'

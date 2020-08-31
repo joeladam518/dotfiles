@@ -11,8 +11,8 @@ if [ -f "${bashrc_dir}/shared/.bash_dev_aliases" ]; then
 fi
 
 # Import ubunutu aliases
-if [ -f "${bashrc_dir}/shared/.bash_ubuntu_aliases" ]; then
-    . "${bashrc_dir}/shared/.bash_ubuntu_aliases"
+if [ -f "${bashrc_dir}/shared/.bash_debian_aliases" ]; then
+    . "${bashrc_dir}/shared/.bash_debian_aliases"
 fi
 
 # fzf aliases

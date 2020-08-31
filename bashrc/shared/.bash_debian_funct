@@ -1,0 +1,29 @@
+# Shared function between desktops and servers
+
+# Show the default gateway
+showdefaultgateway() 
+{
+    ip route | grep default | cut -d' ' -f3
+}
+# Show the current and closest dns resolver on the network 
+showdns() 
+{
+    local nameserver
+    
+    nameserver="$( ( nmcli dev list || nmcli dev show ) 2>/dev/null | grep DNS | tr -s '[:space:]' | cut -d' ' -f2 )"
+    
+    if [ -z "$nameserver" ]; then
+        nameserver="$(cat /etc/resolv.conf | grep 'nameserver' | head -1 |cut -d' ' -f2)"
+    fi
+
+    if [ -z "$nameserver" ] || [ "$nameserver" == "127.0.0.53" ]; then
+        nameserver="$(showdefaultgateway)"
+    fi
+    
+    if [ -z "$nameserver" ]; then
+        echo "Couldn't find nameserver" 1>&2
+        return 1
+    fi
+
+    echo "$nameserver"
+}

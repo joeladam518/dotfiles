@@ -4,3 +4,8 @@
 if [ -f "${bashrc_dir}/shared/.bash_funct" ]; then
     . "${bashrc_dir}/shared/.bash_funct"
 fi
+
+# Import the shared desktop/server functions
+if [ -f "${bashrc_dir}/shared/.bash_debian_funct" ]; then
+    . "${bashrc_dir}/shared/.bash_debian_funct"
+fi

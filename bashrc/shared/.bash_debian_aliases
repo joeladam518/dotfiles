@@ -1,4 +1,4 @@
-# Ubuntu Aliases
+# Shared desktop/server aliases
 
 # ls aliases
 alias ls='ls --color --group-directories-first'

@@ -10,7 +10,7 @@ if [ -f "${bashrc_dir}/shared/.bash_dev_aliases" ]; then
     . "${bashrc_dir}/shared/.bash_dev_aliases"
 fi
 
-# Import ubunutu aliases
+# Import aliases shared between desktop and servers
 if [ -f "${bashrc_dir}/shared/.bash_debian_aliases" ]; then
     . "${bashrc_dir}/shared/.bash_debian_aliases"
 fi

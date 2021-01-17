@@ -59,7 +59,7 @@ cmsg() { # Output messages in color! :-)
 cmsg -c "Setting webcam settings"
 
 # settings
-v4l2-ctl -d /dev/video4 --set-ctrl brightness=150
+v4l2-ctl -d /dev/video4 --set-ctrl brightness=145
 v4l2-ctl -d /dev/video4 --set-ctrl contrast=30
 v4l2-ctl -d /dev/video4 --set-ctrl saturation=45
 v4l2-ctl -d /dev/video4 --set-ctrl hue=400

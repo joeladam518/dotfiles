@@ -40,19 +40,24 @@ export LC_ALL="en_US.UTF-8"
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
 
-# if dotfiles/bin exists, add it to PATH
-if [ -d "${HOME}/repos/dotfiles/bin" ]; then
-    export PATH="${HOME}/repos/dotfiles/bin:${PATH}"
-fi
-
 # if ~/bin exists, add it to PATH
 if [ -d "${HOME}/bin" ]; then
     export PATH="${HOME}/bin:${PATH}"
 fi
 
-# if the dotfiles bin folder exists, add it to PATH
+# if dotfiles/bin exists, add it to PATH
 if [ -d "${HOME}/repos/dotfiles/bin" ]; then
-    export PATH="${PATH}:${HOME}/repos/dotfiles/bin"
+    export PATH="${HOME}/repos/dotfiles/bin:${PATH}"
+fi
+
+# Android Studio to Path
+if [ -d "${HOME}/Library/Android" ]; then
+    export ANDROID_HOME="${HOME}/Library/Android/sdk"
+    export PATH="${PATH}:${ANDROID_HOME}/tools"
+    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
+    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+
+    #export JAVA_HOME="/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home/"
 fi
 
 # Bash-Git-Prompt
@@ -87,5 +92,20 @@ if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
     . "$(brew --prefix)/etc/bash_completion"
 fi
 
+## Brew Section!
+
+# curl
+if [ -d "/usr/local/opt/curl/bin" ]; then
+    export PATH="/usr/local/opt/curl/bin:$PATH"
+fi
+
+# python
+if [ -d "/usr/local/opt/python@3.9/bin" ]; then
+    export PATH="/usr/local/opt/python@3.9/bin:$PATH"
+fi
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
 # Unset any variables that were used in this script
 unset bashrc_dir sub_dir
+

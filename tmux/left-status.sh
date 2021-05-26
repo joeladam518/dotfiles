@@ -89,8 +89,6 @@ _uptime() {
     if [ "${minutes}" -gt "0" ]; then
         printf "%s" " ${minutes}m"
     fi
-
-    printf "%s" " up"
 }
 uptime() {
     printf "%s " "$(section_start "colour222" "colour238")$(_uptime) $(section_end "colour238" "colour232")"

@@ -56,7 +56,7 @@ fi
 if [ -L "${HOME}/.tmux.conf" ]; then
     cmsg -y "The dotfiles .tmux.conf symlink already exists"
 else
-    cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf.tmp2" ".tmux.conf"
+    cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf" ".tmux.conf"
 fi
 
 # Add git config 

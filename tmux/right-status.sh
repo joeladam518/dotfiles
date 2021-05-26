@@ -18,7 +18,7 @@ section_start() {
 date_time() {
     local previous_bg="${previous}"
     previous="colour238"
-    printf "%s " "$(section_start "colour222" "colour238" "${previous_bg}")$(date +'%I:%M %P')"
+    printf "%s " "$(section_start "colour222" "colour238" "${previous_bg}")$(date +'%H:%M %Z')"
 }
 user() {
     local previous_bg="${previous}"

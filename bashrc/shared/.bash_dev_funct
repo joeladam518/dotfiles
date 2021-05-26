@@ -64,11 +64,6 @@ docker_stopFunction()
 
     cd "./docker" && docker-compose stop && cd "$cwd"
 }
-# Stop all docker containers
-docker_stopAllContainersFunction()
-{
-    docker stop `docker ps -q`
-}
 
 #
 # Greenbar git functions

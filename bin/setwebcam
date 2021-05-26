@@ -84,15 +84,15 @@ v4l2-ctl -d "${device}" --set-ctrl saturation=45
 v4l2-ctl -d "${device}" --set-ctrl hue=400
 v4l2-ctl -d "${device}" --set-ctrl white_balance_temperature_auto=1
 v4l2-ctl -d "${device}" --set-ctrl power_line_frequency=2
-#v4l2-ctl -d "${device}" --set-ctrl white_balance_temperature=5400
+# v4l2-ctl -d "${device}" --set-ctrl white_balance_temperature=5400
 v4l2-ctl -d "${device}" --set-ctrl sharpness=40
-v4l2-ctl -d "${device}" --set-ctrl backlight_compensation=62
+v4l2-ctl -d "${device}" --set-ctrl backlight_compensation=50
 v4l2-ctl -d "${device}" --set-ctrl exposure_auto=3
 #v4l2-ctl -d "${device}" --set-ctrl exposure_absolute=5467
 
 # focus controls
 v4l2-ctl -d "${device}" --set-ctrl focus_auto=0
-v4l2-ctl -d "${device}" --set-ctrl focus_absolute=155
+v4l2-ctl -d "${device}" --set-ctrl focus_absolute=145
 
 cmsg -c "Done!"
 

@@ -15,8 +15,14 @@ alias vu='vagrant up'
 alias vh='vagrant halt'
 alias vm='vagrant ssh'
 
+# sail aliases
+alias sail='bash vendor/bin/sail'
+
 # Docker aliases
 alias dkrconnect=docker_connectToSidtkFunction
 alias dkrup=docker_upFunction
 alias dkrstp=docker_stopFunction
-alias dkrstpall=docker_stopAllContainersFunction
+alias dkrstpall='docker stop $(docker ps -aq)'
+alias dkrrmall='docker rm $(docker ps -aq)'
+alias dkrrmallimages='docker rmi $(docker images -q)'
+

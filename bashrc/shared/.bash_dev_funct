@@ -15,7 +15,7 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
     # notes: https://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
     # Whats left TODO: take any branches that throw errors and list them out
 
-    git fetch -p && git branch -r | awk '{print $1}' | egrep -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -d
+    git fetch -p && git branch -r | awk '{print $1}' | grep -E -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -d
 }
 
 #
@@ -25,7 +25,7 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 # Bring up SIDTK -> https://github.com/sourcetoad/DevopsToolKit
 docker_connectToSidtkFunction()
 {
-    cwd=$(pwd)
+    cwd="$(pwd)"
     sdtk_dir="${HOME}/devop-tools/docker/data-source-services"
     st_dtools_dir="${HOME}/devop-tools/docker/data-source-tools"
     if [ ! -d "$sdtk_dir" ]; then
@@ -51,12 +51,12 @@ docker_upFunction()
     fi
 
     trap "cd ${cwd}" RETURN
-    cd "./docker" && docker-compose up --build # -d makes it a backgroud process
+    cd "./docker" && docker-compose up "$@" # -d makes it a backgroud process
 }
 # Stop docker container inside repo
 docker_stopFunction()
 {
-    cwd=$(pwd)
+    cwd="$(pwd)"
     if [ ! -d "./docker" ]; then
         echo "No docker folder. Are you sure you're in the right place?"
         return 1
@@ -71,7 +71,7 @@ docker_stopFunction()
 
 greenbar_newBranchFunction()
 {
-    git checkout develop && git pull upstream develop && git push && git checkout -b $1
+    git checkout develop && git pull upstream develop && git push && git checkout -b "$1"
 }
 greenbar_prepBranchFunction()
 {
@@ -82,9 +82,9 @@ greenbar_prepBranchFunction()
     else
         branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
         branch_name="(unnamed branch)" # detached HEAD
-        branch_name=${branch_name##refs/heads/}
+        branch_name="${branch_name##refs/heads/}"
 
-        git checkout develop && git pull upstream develop && git push && git checkout $branch_name && git merge develop
+        git checkout develop && git pull upstream develop && git push && git checkout "$branch_name" && git merge develop
     fi
 }
 greenbar_pushBranchFunction()
@@ -98,6 +98,6 @@ greenbar_pushBranchFunction()
         branch_name="(unnamed branch)"     # detached HEAD
         branch_name=${branch_name##refs/heads/}
 
-        git checkout develop && git merge $branch_name && git push
+        git checkout develop && git merge "$branch_name" && git push
     fi
 }

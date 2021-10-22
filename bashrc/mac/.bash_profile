@@ -104,6 +104,14 @@ if [ -d "/usr/local/opt/python@3.9/bin" ]; then
     export PATH="/usr/local/opt/python@3.9/bin:$PATH"
 fi
 
+# Andriod development
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+
+#yarn
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # Unset any variables that were used in this script

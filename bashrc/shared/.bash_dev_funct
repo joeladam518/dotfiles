@@ -18,6 +18,10 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
     git fetch -p && git branch -r | awk '{print $1}' | grep -E -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -d
 }
 
+next_release() {
+  git log ${2:-staging..master} --oneline --no-merges | grep -Eio "$1-([0-9]+)" | tr a-z A-Z | sort | uniq
+}
+
 #
 # Docker functions
 #

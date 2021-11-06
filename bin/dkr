@@ -220,34 +220,43 @@ if [ $# -gt 0 ]; then
         fi
 
     # Initiate a MySQL CLI terminal session within the "mysql" container...
-    elif [ "$1" == "mysql" ]; then
+    elif [[ "$1" == mysql* ]]; then
+        SERVICE="$1"
         shift 1
 
         if [ "$EXEC" == "yes" ]; then
-            docker-compose exec mysql bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+            docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
         else
             container_is_not_running
         fi
+
+        unset SERVICE
 
     # Initiate a MySQL CLI terminal session within the "mariadb" container...
-    elif [ "$1" == "mariadb" ]; then
+    elif [[ "$1" == mariadb* ]]; then
+        SERVICE="$1"
         shift 1
 
         if [ "$EXEC" == "yes" ]; then
-            docker-compose exec mariadb bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+            docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
         else
             container_is_not_running
         fi
+
+        unset SERVICE
 
     # Initiate a PostgreSQL CLI terminal session within the "pgsql" container...
-    elif [ "$1" == "psql" ]; then
+    elif [[ "$1" == psql* ]]; then
+        SERVICE="$1"
         shift 1
 
         if [ "$EXEC" == "yes" ]; then
-            docker-compose exec pgsql bash -c 'PGPASSWORD=${PGPASSWORD} psql -U ${POSTGRES_USER} ${POSTGRES_DB}'
+            docker-compose exec "$SERVICE" bash -c 'PGPASSWORD=${PGPASSWORD} psql -U ${POSTGRES_USER} ${POSTGRES_DB}'
         else
             container_is_not_running
         fi
+
+        unset SERVICE
 
     # Initiate a Bash shell within the application container...
     elif [ "$1" == "shell" ] || [ "$1" == "bash" ]; then

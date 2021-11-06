@@ -73,7 +73,8 @@ fi
 # Figure out the docker-compose.yml path
 if [ -f "./docker-compose.yml" ] || [ -f "./docker/docker-compose.yml" ]; then
     if [ -f "./docker/docker-compose.yml" ]; then
-        alias docker-compose='docker-compose -f "./docker/docker-compose.yml"'
+        shopt -s expand_aliases
+        alias docker-compose='docker-compose --file="./docker/docker-compose.yml"'
     fi
 else
     cmsg -y "Couldn't find your docker-compose.yml file. Are you sure your in the correct folder?" >&2
@@ -85,14 +86,8 @@ if [ -f "./.env" ]; then
     source "./.env"
 fi
 
-# Try to figure out the service container name
-if [ -z "$APP_SERVICE" ]; then
-    cmsg -y "Couldn't determine the service conatiner name." >&2
-    exit 1
-fi
-
 # Define environment variables...
-export APP_SERVICE="${APP_SERVICE}"
+export APP_SERVICE="${APP_SERVICE:-""}"
 export APP_USER="${APP_USER:-root}"
 export APP_PORT="${APP_PORT:-80}"
 export DB_PORT="${DB_PORT:-3306}"

@@ -87,12 +87,6 @@ fi
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_FETCH_REMOTE_STATUS=1
-    #GIT_PROMPT_SHOW_UPSTREAM=1
-    #GIT_PROMPT_SHOW_UNTRACKED_FILES=all
-    #GIT_PROMPT_SHOW_CHANGED_FILES_COUNT=0
-    #GIT_PROMPT_THEME=Custom     # use theme specified in file GIT_PROMPT_THEME_FILE (default ~/.git-prompt-colors.sh)
-    #GIT_PROMPT_THEME_FILE=~/.git-prompt-colors.sh
-    #GIT_PROMPT_THEME=Solarize
     . "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
 

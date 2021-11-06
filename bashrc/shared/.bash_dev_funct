@@ -1,7 +1,7 @@
 # Development functions
 
 # Link a local composer-package repo to another project for testing
-composer_link() 
+composer_link()
 {
     composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
 }
@@ -10,8 +10,8 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 {
     echo "Didn't do anything. TODO: finish this function :-)"
     exit 0
-    
-    # This seemed to work on 2019-02-28 and again on 2020-09-15 
+
+    # This seemed to work on 2019-02-28 and again on 2020-09-15
     # notes: https://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore
     # Whats left TODO: take any branches that throw errors and list them out
 
@@ -36,7 +36,7 @@ docker_connectToSidtkFunction()
         echo "data source services not found... What are you trying to connect to?"
         return 1
     fi
-    
+
     if [ ! -d "$st_dtools_dir" ]; then
         echo "data source tools not found... "
         return 1
@@ -45,33 +45,10 @@ docker_connectToSidtkFunction()
     # trap "cd ${cwd}" RETURN
     cd "$sdtk_dir" && docker-compose up --build -d && cd "$st_dtools_dir" && docker-compose up --build -d && cd "$cwd"
 }
-# Bring up docker container inside repo
-docker_upFunction()
-{
-    cwd=$(pwd)
-    if [ ! -d "./docker" ]; then
-        echo "No docker folder. Are you sure you're in the right place?"
-        return 1
-    fi
-
-    trap "cd ${cwd}" RETURN
-    cd "./docker" && docker-compose up "$@" # -d makes it a backgroud process
-}
-# Stop docker container inside repo
-docker_stopFunction()
-{
-    cwd="$(pwd)"
-    if [ ! -d "./docker" ]; then
-        echo "No docker folder. Are you sure you're in the right place?"
-        return 1
-    fi
-
-    cd "./docker" && docker-compose stop && cd "$cwd"
-}
 
 #
 # Greenbar git functions
-# 
+#
 
 greenbar_newBranchFunction()
 {

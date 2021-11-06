@@ -1,0 +1,290 @@
+#!/usr/bin/env bash
+
+set -Eeo pipefail
+
+# Functions
+cmsg() {
+    # Output messages in color! :-)
+    local CHOSEN_COLOR IS_BOLD NO_NEWLINE O OPTIND RESET
+    IS_BOLD="0"
+    NO_NEWLINE="0"
+    OPTIND=1
+    RESET="$(tput sgr0)"
+    while getopts ":ndrgbcmyaw" O; do
+        case "$O" in
+            n) NO_NEWLINE="1" ;; # no new line
+            d) IS_BOLD="1" ;; # bold
+            r) CHOSEN_COLOR="$(tput setaf 1)" ;; # color red
+            g) CHOSEN_COLOR="$(tput setaf 2)" ;; # color green
+            b) CHOSEN_COLOR="$(tput setaf 4)" ;; # color blue
+            c) CHOSEN_COLOR="$(tput setaf 6)" ;; # color cyan
+            m) CHOSEN_COLOR="$(tput setaf 5)" ;; # color magenta
+            y) CHOSEN_COLOR="$(tput setaf 3)" ;; # color yellow
+            a) CHOSEN_COLOR="$(tput setaf 7)" ;; # color gray
+            w) CHOSEN_COLOR="\033[1;37m"      ;; # color white
+            \? ) echo "cmsg() invalid option: -${OPTARG}" 1>&2; return 1; ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    local message="$*"
+    local message_cmd="echo -e"
+
+    # add -n flag if we want no new line
+    if [ "$NO_NEWLINE" == "1" ]; then
+        message_cmd="${message_cmd}n"
+    fi
+
+    # add color and bold
+    if [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
+        message_cmd="${message_cmd} \"${BOLD}${CHOSEN_COLOR}${message}${RESET}\""
+    elif [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "0" ]; then
+        message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
+    elif [ -z "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
+        message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
+    else
+        message_cmd="${message_cmd} \"${message}\""
+    fi
+
+    # Finally, print the message with color!
+    # echo "$echo_cmd"
+    eval "$message_cmd"
+    return 0
+}
+
+container_is_not_running() {
+    cmsg -y  "The container is not running." >&2
+    cmsg -yn "You may up the container using the following commands: " >&2
+    cmsg -wn  "'dkr up'"
+    cmsg -an " or "
+    cmsg -w "'dkr up -d'"
+    exit 1
+}
+
+# Fix for newer docker compose command
+if ! [ -x "$(command -v docker-compose)" ]; then
+    shopt -s expand_aliases
+    alias docker-compose='docker compose'
+fi
+
+# Figure out the docker-compose.yml path
+if [ -f "./docker-compose.yml" ] || [ -f "./docker/docker-compose.yml" ]; then
+    if [ -f "./docker/docker-compose.yml" ]; then
+        alias docker-compose='docker-compose -f "./docker/docker-compose.yml"'
+    fi
+else
+    cmsg -y "Couldn't find your docker-compose.yml file. Are you sure your in the correct folder?" >&2
+    exit 1
+fi
+
+# Source the ".env" file so the environment variables are available...
+if [ -f "./.env" ]; then
+    source "./.env"
+fi
+
+# Try to figure out the service container name
+if [ -z "$APP_SERVICE" ]; then
+    cmsg -y "Couldn't determine the service conatiner name." >&2
+    exit 1
+fi
+
+# Define environment variables...
+export APP_SERVICE="${APP_SERVICE}"
+export APP_USER="${APP_USER:-root}"
+export APP_PORT="${APP_PORT:-80}"
+export DB_PORT="${DB_PORT:-3306}"
+export WWWUSER="${WWWUSER:-"$UID"}"
+export WWWGROUP="${WWWGROUP:-"$(id -g)"}"
+
+if [ -z "$SKIP_CHECKS" ]; then
+    # Ensure that Docker is running...
+    if ! docker info > /dev/null 2>&1; then
+        cmsg -y "Docker is not running." >&2
+        exit 1
+    fi
+
+    # Determine if the container is currently up...
+    PSRESULT="$(docker-compose ps -q)"
+    if docker-compose ps | grep "$APP_SERVICE" | grep 'Exit'; then
+        cmsg -d "Shutting down old container processes..." >&2
+        docker-compose down > /dev/null 2>&1
+        EXEC="no"
+    elif [ -n "$PSRESULT" ]; then
+        EXEC="yes"
+    else
+        EXEC="no"
+    fi
+else
+    EXEC="yes"
+fi
+
+if [ $# -gt 0 ]; then
+    # Proxy PHP commands to the "php" binary on the application container...
+    if [ "$1" == "php" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" php "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Proxy Artisan commands to the "artisan" binary on the application container...
+    elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            # With xdebug enabled...
+            if [ -n "$1" ] && [ "$1" == "--debug" ]; then
+                shift 1
+                docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" php artisan "$@"
+            else
+                docker-compose exec -u "$APP_USER" "$APP_SERVICE" php artisan "$@"
+            fi
+        else
+            container_is_not_running
+        fi
+
+    # Proxy the "test" command to the "php artisan test" Artisan command...
+    elif [ "$1" == "test" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            # With xdebug enabled...
+            if [ -n "$1" ] && [ "$1" == "--debug" ]; then
+                shift 1
+                docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" ./vendor/bin/phpunit "$@"
+            else
+                docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/phpunit "$@"
+            fi
+        else
+            container_is_not_running
+        fi
+
+    # Proxy vendor binary commands on the application container...
+    elif [ "$1" == "bin" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/"$@"
+        else
+            container_is_not_running
+        fi
+
+    # Proxy Composer commands to the "composer" binary on the application container...
+    elif [ "$1" == "composer" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" composer "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Proxy Node commands to the "node" binary on the application container...
+    elif [ "$1" == "node" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" node "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Proxy NPM commands to the "npm" binary on the application container...
+    elif [ "$1" == "npm" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" npm "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Proxy NPX commands to the "npx" binary on the application container...
+    elif [ "$1" == "npx" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" npx "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Proxy YARN commands to the "yarn" binary on the application container...
+    elif [ "$1" == "yarn" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" yarn "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Initiate a MySQL CLI terminal session within the "mysql" container...
+    elif [ "$1" == "mysql" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec mysql bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+        else
+            container_is_not_running
+        fi
+
+    # Initiate a MySQL CLI terminal session within the "mariadb" container...
+    elif [ "$1" == "mariadb" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec mariadb bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+        else
+            container_is_not_running
+        fi
+
+    # Initiate a PostgreSQL CLI terminal session within the "pgsql" container...
+    elif [ "$1" == "psql" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec pgsql bash -c 'PGPASSWORD=${PGPASSWORD} psql -U ${POSTGRES_USER} ${POSTGRES_DB}'
+        else
+            container_is_not_running
+        fi
+
+    # Initiate a Bash shell within the application container...
+    elif [ "$1" == "shell" ] || [ "$1" == "bash" ]; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" bash "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Initiate a root user Bash shell within the application container...
+    elif [ "$1" == "root" ] ; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec "$APP_SERVICE" bash "$@"
+        else
+            container_is_not_running
+        fi
+
+    # Initiate a Redis CLI terminal session within the "redis" container...
+    elif [ "$1" == "redis" ] ; then
+        shift 1
+
+        if [ "$EXEC" == "yes" ]; then
+            docker-compose exec redis redis-cli
+        else
+            container_is_not_running
+        fi
+
+    # Pass unknown commands to the "docker-compose" binary...
+    else
+        docker-compose "$@"
+    fi
+else
+    docker-compose ps
+fi

@@ -28,7 +28,7 @@ fi
 
 ## Functions
 usage() {
-    echo "Usage: $(basename ${0}) [options] [message] -- Adds color to your output."
+    echo "Usage: $(basename "${0}") [options] [message] -- Adds color to your output."
     echo ""
     echo "Options:"
     echo "  -n  no newline"
@@ -46,7 +46,7 @@ invalid_option() {
     echo "Invalid option -- '-${1}'" 1>&2
     echo ""
     usage
-    exit 1 
+    exit 1
 }
 
 ## Options

@@ -1,13 +1,13 @@
 # Mac Aliases
 
 # Import the global aliases
-if [ -f "${bashrc_dir}/shared/.bash_aliases" ]; then
-    . "${bashrc_dir}/shared/.bash_aliases"
+if [ -f "${BASHRC_DIR}/shared/.bash_aliases" ]; then
+    . "${BASHRC_DIR}/shared/.bash_aliases"
 fi
 
 # Import the development aliases
-if [ -f "${bashrc_dir}/shared/.bash_dev_aliases" ]; then
-    . "${bashrc_dir}/shared/.bash_dev_aliases"
+if [ -f "${BASHRC_DIR}/shared/.bash_dev_aliases" ]; then
+    . "${BASHRC_DIR}/shared/.bash_dev_aliases"
 fi
 
 # Flush dns cache

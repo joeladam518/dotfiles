@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # This script is heavily inspired by Laravel Sail's bash script.
 # https://github.com/laravel/sail
 # I just added a few teaks for the projects I work on.
@@ -8,23 +9,23 @@ set -Eeo pipefail
 # Functions
 cmsg() {
     # Output messages in color! :-)
-    local CHOSEN_COLOR IS_BOLD NO_NEWLINE O OPTIND RESET
+    local CHOSEN_COLOR IS_BOLD NO_NEWLINE opt OPTIND RESET
     IS_BOLD="0"
     NO_NEWLINE="0"
     OPTIND=1
     RESET="$(tput sgr0)"
-    while getopts ":ndrgbcmyaw" O; do
-        case "$O" in
+    while getopts ":ndrgbcmyaw" opt; do
+        case "$opt" in
             n) NO_NEWLINE="1" ;; # no new line
             d) IS_BOLD="1" ;; # bold
-            r) CHOSEN_COLOR="$(tput setaf 1)" ;; # color red
-            g) CHOSEN_COLOR="$(tput setaf 2)" ;; # color green
-            b) CHOSEN_COLOR="$(tput setaf 4)" ;; # color blue
-            c) CHOSEN_COLOR="$(tput setaf 6)" ;; # color cyan
-            m) CHOSEN_COLOR="$(tput setaf 5)" ;; # color magenta
-            y) CHOSEN_COLOR="$(tput setaf 3)" ;; # color yellow
-            a) CHOSEN_COLOR="$(tput setaf 7)" ;; # color gray
-            w) CHOSEN_COLOR="\033[1;37m"      ;; # color white
+            r) CHOSEN_COLOR="$(tput setaf 1)"   ;; # color red
+            g) CHOSEN_COLOR="$(tput setaf 2)"   ;; # color green
+            b) CHOSEN_COLOR="$(tput setaf 4)"   ;; # color blue
+            c) CHOSEN_COLOR="$(tput setaf 6)"   ;; # color cyan
+            m) CHOSEN_COLOR="$(tput setaf 5)"   ;; # color magenta
+            y) CHOSEN_COLOR="$(tput setaf 3)"   ;; # color yellow
+            a) CHOSEN_COLOR="$(tput setaf 245)" ;; # color gray
+            w) CHOSEN_COLOR="$(tput setaf 7)"   ;; # color white
             \? ) echo "cmsg() invalid option: -${OPTARG}" 1>&2; return 1; ;;
         esac
     done
@@ -44,13 +45,12 @@ cmsg() {
     elif [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "0" ]; then
         message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
     elif [ -z "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
-        message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
+        message_cmd="${message_cmd} \"${BOLD}${message}${RESET}\""
     else
         message_cmd="${message_cmd} \"${message}\""
     fi
 
     # Finally, print the message with color!
-    # echo "$echo_cmd"
     eval "$message_cmd"
     return 0
 }

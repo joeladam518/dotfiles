@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Checks if a program is installed
 
 # Variables
@@ -39,12 +40,10 @@ if command -v "${program_name}" >/dev/null 2>&1; then
     else
         echo "${program_name} is installed."
     fi
-else 
+else
     if [ "$print_boolean" -eq "1" ]; then
         echo "0"
     else
         echo "${program_name} is not installed."
     fi
 fi
-
-exit 0

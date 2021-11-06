@@ -7,10 +7,9 @@ case $- in
 esac
 
 # bashrc directory
-dotfiles_dir="${HOME}/repos/dotfiles"
-bashrc_dir="${dotfiles_dir}/bashrc"
-bin_dir="${dotfiles_dir}/bin"
-sub_dir="desktop"
+DOTFILES_DIR="${HOME}/repos/dotfiles"
+BASHRC_DIR="${DOTFILES_DIR}/bashrc"
+DESKTOP_BASHRC_DIR="${BASHRC_DIR}/desktop"
 
 # Shell Options!
 
@@ -80,8 +79,8 @@ unset color_prompt force_color_prompt
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # if the dotfiles bin folder exists, add it to PATH
-if [[ ! "$PATH" =~ (^|:)"${bin_dir}"(:|$) ]]; then
-    PATH="${PATH}:${bin_dir}"
+if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
+    PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
 # Tilix
@@ -91,45 +90,27 @@ elif [ $TILIX_ID ] && [ $VTE_VERSION ] && [ -f /etc/profile.d/vte-2.91.sh ]; the
     source /etc/profile.d/vte-2.91.sh
 fi
 
+# .fzf command line fuzzy finder
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 # Bash-Git-Prompt
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_FETCH_REMOTE_STATUS=1
-    #GIT_PROMPT_SHOW_UPSTREAM=1
-    #GIT_PROMPT_SHOW_UNTRACKED_FILES=all
-    #GIT_PROMPT_SHOW_CHANGED_FILES_COUNT=0
-    #GIT_PROMPT_THEME=Custom     # use theme specified in file GIT_PROMPT_THEME_FILE (default ~/.git-prompt-colors.sh)
-    #GIT_PROMPT_THEME_FILE=~/.git-prompt-colors.sh
-    #GIT_PROMPT_THEME=Solarize
     . "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
 
-# .fzf command line fuzzy finder
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-# Load functions file
-if [ -f "${bashrc_dir}/${sub_dir}/.bash_funct" ]; then
-    . "${bashrc_dir}/${sub_dir}/.bash_funct"
+# Load functions
+if [ -f "${DESKTOP_BASHRC_DIR}/.bash_funct" ]; then
+    . "${DESKTOP_BASHRC_DIR}/.bash_funct"
 fi
 
-# Enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias dir='dir --color=auto'
-    alias vdir='vdir --color=auto'
-    
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+# Load aliases
+if [ -f "${DESKTOP_BASHRC_DIR}/.bash_aliases" ]; then
+    . "${DESKTOP_BASHRC_DIR}/.bash_aliases"
 fi
 
-# Load alias definitions
-if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
-    . "${bashrc_dir}/${sub_dir}/.bash_aliases"
-fi
-
-# Load the bash completion script for .ssh 
+# Load the bash completion script for .ssh
 if [ -f "${HOME}/.ssh/config" ] && [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ]; then
     . "${HOME}/repos/dotfiles/bash-completion/ssh"
 fi
@@ -137,19 +118,21 @@ fi
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-#if ! shopt -oq posix; then
+if ! shopt -oq posix; then
   if [ -f "/usr/share/bash-completion/bash_completion" ]; then
     . "/usr/share/bash-completion/bash_completion"
   elif [ -f "/etc/bash_completion" ]; then
     . "/etc/bash_completion"
   fi
-#fi
+fi
 
 # Andriod development
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
+if [ -d "${HOME}/Android/Sdk" ]; then
+    export ANDROID_HOME="${HOME}/Android/Sdk"
+    export PATH="${PATH}:${ANDROID_HOME}/emulator"
+    export PATH="${PATH}:${ANDROID_HOME}/tools"
+    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
+    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+fi
 
-unset bashrc_dir sub_dir
+unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR

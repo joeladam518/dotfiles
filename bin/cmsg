@@ -2,7 +2,7 @@
 
 ## Can we use tput?
 tput_found="$(command -v tput)"
-tput_status=$?
+tput_status="$?"
 
 if [ -n "$tput_found" ] && [ "$tput_status" == "0" ]; then
     RESET=$(tput sgr0)
@@ -13,7 +13,8 @@ if [ -n "$tput_found" ] && [ "$tput_status" == "0" ]; then
     CYAN=$(tput setaf 6)
     MAGENTA=$(tput setaf 5)
     YELLOW=$(tput setaf 3)
-    GRAY=$(tput setaf 7)
+    GRAY=$(tput setaf 245)
+    WHITE=$(tput setaf 15)
 else
     RESET="\e[0m"
     BOLD="\e[1m"
@@ -24,6 +25,7 @@ else
     MAGENTA="\e[0;35m"
     YELLOW="\e[0;33m"
     GRAY="\e[39m\e[2m"
+    WHITE="\033[1;37m"
 fi
 
 ## Functions
@@ -40,6 +42,7 @@ usage() {
     echo "  -y  color message yellow"
     echo "  -m  color message magenta"
     echo "  -a  color message gray"
+    echo "  -w  color message white"
 }
 
 invalid_option() {
@@ -51,48 +54,49 @@ invalid_option() {
 
 ## Options
 CHOSEN_COLOR=""
-no_newline="0"
-is_bold="0"
+NO_NEWLINE="0"
+IS_BOLD="0"
 OPTIND=1
 
-while getopts ":hndrgbcmya" o; do
-    case "${o}" in
+while getopts ":hndrgbcmyaw" opt; do
+    case "$opt" in
         h) usage; exit           ;; # print help
-        n) no_newline="1"        ;; # no new line
-        d) is_bold="1"           ;; # make it bold
-        r) CHOSEN_COLOR=$RED     ;;
-        g) CHOSEN_COLOR=$GREEN   ;;
-        b) CHOSEN_COLOR=$BLUE    ;;
-        c) CHOSEN_COLOR=$CYAN    ;;
-        m) CHOSEN_COLOR=$MAGENTA ;;
-        y) CHOSEN_COLOR=$YELLOW  ;;
-        a) CHOSEN_COLOR=$GRAY    ;;
+        n) NO_NEWLINE="1"        ;; # no new line
+        d) IS_BOLD="1"           ;; # make it bold
+        r) CHOSEN_COLOR="$RED"     ;;
+        g) CHOSEN_COLOR="$GREEN"   ;;
+        b) CHOSEN_COLOR="$BLUE"    ;;
+        c) CHOSEN_COLOR="$CYAN"    ;;
+        m) CHOSEN_COLOR="$MAGENTA" ;;
+        y) CHOSEN_COLOR="$YELLOW"  ;;
+        a) CHOSEN_COLOR="$GRAY"    ;;
+        w) CHOSEN_COLOR="$WHITE"   ;;
         \?) invalid_option "${OPTARG}" ;;
     esac
 done
 
 shift $((OPTIND-1))
 
-input="$*"
-echo_cmd="echo -e"
+INPUT="$*"
+CMD="echo -e"
 
 # add -n flag if we want no new line
-if [ "$no_newline" == "1" ]; then
-    echo_cmd="${echo_cmd}n"
+if [ "$NO_NEWLINE" == "1" ]; then
+    CMD="${CMD}n"
 fi
 
-# add color and bold
-if [ -n "$CHOSEN_COLOR" ] && [ "$is_bold" == "1" ]; then
-    echo_cmd="${echo_cmd} \"${BOLD}${CHOSEN_COLOR}${input}${RESET}\""
-elif [ -n "$CHOSEN_COLOR" ] && [ "$is_bold" == "0" ]; then
-    echo_cmd="${echo_cmd} \"${CHOSEN_COLOR}${input}${RESET}\""
-elif [ -z "$CHOSEN_COLOR" ] && [ "$is_bold" == "1" ]; then
-    echo_cmd="${echo_cmd} \"${CHOSEN_COLOR}${input}${RESET}\""
+# Add color and bold
+if [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
+    CMD="${CMD} \"${BOLD}${CHOSEN_COLOR}${INPUT}${RESET}\""
+elif [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "0" ]; then
+    CMD="${CMD} \"${CHOSEN_COLOR}${INPUT}${RESET}\""
+elif [ -z "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
+    CMD="${CMD} \"${BOLD}${INPUT}${RESET}\""
 else
-    echo_cmd="${echo_cmd} \"${input}\""
+    CMD="${CMD} \"${INPUT}\""
 fi
 
 # Finally, print the message with color!
-# echo "$echo_cmd"
-eval "$echo_cmd"
+#echo "$CMD"
+eval "$CMD"
 exit

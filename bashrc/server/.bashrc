@@ -7,10 +7,9 @@ case $- in
 esac
 
 # bashrc directory
-dotfiles_dir="${HOME}/repos/dotfiles"
-bashrc_dir="${dotfiles_dir}/bashrc"
-bin_dir="${dotfiles_dir}/bin"
-sub_dir="server"
+DOTFILES_DIR="${HOME}/repos/dotfiles"
+BASHRC_DIR="${DOTFILES_DIR}/bashrc"
+SERVER_BASHRC_DIR="${BASHRC_DIR}/server"
 
 # Shel Options!
 
@@ -80,8 +79,8 @@ unset color_prompt force_color_prompt
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # if the dotfiles bin folder exists, add it to PATH
-if [[ ! "$PATH" =~ (^|:)"${bin_dir}"(:|$) ]]; then
-    PATH="${PATH}:${bin_dir}"
+if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
+    PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
 # Bash-Git-Prompt
@@ -100,26 +99,14 @@ fi
 # .fzf command line fuzzy finder
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-# Load functions file
-if [ -f "${bashrc_dir}/${sub_dir}/.bash_funct" ]; then
-    . "${bashrc_dir}/${sub_dir}/.bash_funct"
+# Load functions
+if [ -f "${SERVER_BASHRC_DIR}/.bash_funct" ]; then
+    . "${SERVER_BASHRC_DIR}/.bash_funct"
 fi
 
-# Enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-    
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# Load alias definitions
-if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
-    . "${bashrc_dir}/${sub_dir}/.bash_aliases"
+# Load aliases
+if [ -f "${SERVER_BASHRC_DIR}/.bash_aliases" ]; then
+    . "${SERVER_BASHRC_DIR}/.bash_aliases"
 fi
 
 # Enable programmable completion features (you don't need to enable
@@ -133,4 +120,4 @@ if ! shopt -oq posix; then
   fi
 fi
 
-unset bashrc_dir sub_dir
+unset DOTFILES_DIR BASHRC_DIR SERVER_BASHRC_DIR

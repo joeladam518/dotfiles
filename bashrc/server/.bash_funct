@@ -1,11 +1,11 @@
 # Server functions
 
 # Import the global bash functions
-if [ -f "${bashrc_dir}/shared/.bash_funct" ]; then
-    . "${bashrc_dir}/shared/.bash_funct"
+if [ -f "${BASHRC_DIR}/shared/.bash_funct" ]; then
+    . "${BASHRC_DIR}/shared/.bash_funct"
 fi
 
 # Import the shared desktop/server functions
-if [ -f "${bashrc_dir}/shared/.bash_debian_funct" ]; then
-    . "${bashrc_dir}/shared/.bash_debian_funct"
+if [ -f "${BASHRC_DIR}/shared/.bash_debian_funct" ]; then
+    . "${BASHRC_DIR}/shared/.bash_debian_funct"
 fi

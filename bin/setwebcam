@@ -2,32 +2,29 @@
 
 set -Eeuo pipefail #fail fast
 
-# Setup
-CWD="$(pwd -P)"
-SCRIPTSDIR="$(cd "$(dirname "$0")" > /dev/null 2>&1 && pwd -P)"
-
 trap error_cleanup ERR
 
 # functions
-cmsg() { # Output messages in color! :-)
-    local OPTIND=1
-    local o
-    local NO_NEWLINE="0"
-    local IS_BOLD="0"
-    local CHOSEN_COLOR=""
-    local RESET="$(tput sgr0)"
-    while getopts ":ndrgbcmya" o; do
-        case "$o" in
+cmsg() {
+    # Output messages in color! :-)
+    local CHOSEN_COLOR IS_BOLD NO_NEWLINE opt OPTIND RESET
+    IS_BOLD="0"
+    NO_NEWLINE="0"
+    OPTIND=1
+    RESET="$(tput sgr0)"
+    while getopts ":ndrgbcmyaw" opt; do
+        case "$opt" in
             n) NO_NEWLINE="1" ;; # no new line
             d) IS_BOLD="1" ;; # bold
-            r) CHOSEN_COLOR="$(tput setaf 1)" ;; # color red
-            g) CHOSEN_COLOR="$(tput setaf 2)" ;; # color green
-            b) CHOSEN_COLOR="$(tput setaf 4)" ;; # color blue
-            c) CHOSEN_COLOR="$(tput setaf 6)" ;; # color cyan
-            m) CHOSEN_COLOR="$(tput setaf 5)" ;; # color magenta
-            y) CHOSEN_COLOR="$(tput setaf 3)" ;; # color yellow
-            a) CHOSEN_COLOR="$(tput setaf 7)" ;; # color gray
-            \? ) echo "msg_c() invalid option: -${OPTARG}" 1>&2; return 1; ;;
+            r) CHOSEN_COLOR="$(tput setaf 1)"   ;; # color red
+            g) CHOSEN_COLOR="$(tput setaf 2)"   ;; # color green
+            b) CHOSEN_COLOR="$(tput setaf 4)"   ;; # color blue
+            c) CHOSEN_COLOR="$(tput setaf 6)"   ;; # color cyan
+            m) CHOSEN_COLOR="$(tput setaf 5)"   ;; # color magenta
+            y) CHOSEN_COLOR="$(tput setaf 3)"   ;; # color yellow
+            a) CHOSEN_COLOR="$(tput setaf 245)" ;; # color gray
+            w) CHOSEN_COLOR="$(tput setaf 7)"   ;; # color white
+            \? ) echo "cmsg() invalid option: -${OPTARG}" 1>&2; return 1; ;;
         esac
     done
     shift $((OPTIND-1))
@@ -46,13 +43,12 @@ cmsg() { # Output messages in color! :-)
     elif [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "0" ]; then
         message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
     elif [ -z "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
-        message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
+        message_cmd="${message_cmd} \"${BOLD}${message}${RESET}\""
     else
         message_cmd="${message_cmd} \"${message}\""
     fi
 
     # Finally, print the message with color!
-    # echo "$echo_cmd"
     eval "$message_cmd"
     return 0
 }
@@ -69,7 +65,7 @@ error_cleanup() {
 
 re='^[0-9]+$'
 device="${1:-0}"
-if [[ "${device}" =~ "$re" ]]; then
+if [[ "${device}" =~ $re ]]; then
    device="0"
 fi
 
@@ -78,22 +74,26 @@ fi
 cmsg -c "Setting webcam settings for device /dev/video${device}"
 
 # settings
-v4l2-ctl -d "${device}" --set-ctrl brightness=145
-v4l2-ctl -d "${device}" --set-ctrl contrast=30
-v4l2-ctl -d "${device}" --set-ctrl saturation=45
-v4l2-ctl -d "${device}" --set-ctrl hue=400
+v4l2-ctl -d "${device}" --set-ctrl brightness=135
+v4l2-ctl -d "${device}" --set-ctrl contrast=128
+v4l2-ctl -d "${device}" --set-ctrl saturation=128
 v4l2-ctl -d "${device}" --set-ctrl white_balance_temperature_auto=1
-v4l2-ctl -d "${device}" --set-ctrl power_line_frequency=2
-# v4l2-ctl -d "${device}" --set-ctrl white_balance_temperature=5400
-v4l2-ctl -d "${device}" --set-ctrl sharpness=40
-v4l2-ctl -d "${device}" --set-ctrl backlight_compensation=50
+#v4l2-ctl -d "${device}" --set-ctrl white_balance_temperature=3800
+v4l2-ctl -d "${device}" --set-ctrl gain=0
+v4l2-ctl -d "${device}" --set-ctrl power_line_frequency=1
+v4l2-ctl -d "${device}" --set-ctrl sharpness=128
+v4l2-ctl -d "${device}" --set-ctrl backlight_compensation=0
 v4l2-ctl -d "${device}" --set-ctrl exposure_auto=3
-#v4l2-ctl -d "${device}" --set-ctrl exposure_absolute=5467
+#v4l2-ctl -d "${device}" --set-ctrl exposure_absolute=250
+v4l2-ctl -d "${device}" --set-ctrl exposure_auto_priority=0
 
 # focus controls
-v4l2-ctl -d "${device}" --set-ctrl focus_auto=0
-v4l2-ctl -d "${device}" --set-ctrl focus_absolute=145
+v4l2-ctl -d "${device}" --set-ctrl focus_auto=1
+v4l2-ctl -d "${device}" --set-ctrl pan_absolute=10000
+v4l2-ctl -d "${device}" --set-ctrl tilt_absolute=10000
+#v4l2-ctl -d "${device}" --set-ctrl focus_absolute=20
+
+# zoom?
+v4l2-ctl -d "${device}" --set-ctrl zoom_absolute=175
 
 cmsg -c "Done!"
-
-exit 0

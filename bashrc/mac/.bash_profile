@@ -2,10 +2,9 @@
 # Last edited on 08/10/17
 
 # bashrc directory
-dotfiles_dir="${HOME}/repos/dotfiles"
-bashrc_dir="${dotfiles_dir}/bashrc"
-bin_dir="${dotfiles_dir}/bin"
-sub_dir="mac"
+DOTFILES_DIR="${HOME}/repos/dotfiles"
+BASHRC_DIR="${DOTFILES_DIR}/bashrc"
+MAC_BASHRC_DIR="${BASHRC_DIR}/mac"
 
 # Shell options!
 
@@ -23,7 +22,7 @@ shopt -s histappend
 # shopt -s globstar
 
 # gpg signing
-export GPG_TTY=$(tty)
+export GPG_TTY="$(tty)"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -40,24 +39,14 @@ export LC_ALL="en_US.UTF-8"
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
 
+# if dotfiles/bin exists, add it to PATH
+if [ -d "${DOTFILES_DIR}/bin" ]; then
+    export PATH="${DOTFILES_DIR}/bin:${PATH}"
+fi
+
 # if ~/bin exists, add it to PATH
 if [ -d "${HOME}/bin" ]; then
     export PATH="${HOME}/bin:${PATH}"
-fi
-
-# if dotfiles/bin exists, add it to PATH
-if [ -d "${HOME}/repos/dotfiles/bin" ]; then
-    export PATH="${HOME}/repos/dotfiles/bin:${PATH}"
-fi
-
-# Android Studio to Path
-if [ -d "${HOME}/Library/Android" ]; then
-    export ANDROID_HOME="${HOME}/Library/Android/sdk"
-    export PATH="${PATH}:${ANDROID_HOME}/tools"
-    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
-    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
-
-    #export JAVA_HOME="/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home/"
 fi
 
 # Bash-Git-Prompt
@@ -71,16 +60,16 @@ fi
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Load functions file
-if [ -f "${bashrc_dir}/${sub_dir}/.bash_funct" ]; then
-    . "${bashrc_dir}/${sub_dir}/.bash_funct"
+if [ -f "${MAC_BASHRC_DIR}/.bash_funct" ]; then
+    . "${MAC_BASHRC_DIR}/.bash_funct"
 fi
 
 # Load alias definitions
-if [ -f "${bashrc_dir}/${sub_dir}/.bash_aliases" ]; then
-    . "${bashrc_dir}/${sub_dir}/.bash_aliases"
+if [ -f "${MAC_BASHRC_DIR}/.bash_aliases" ]; then
+    . "${MAC_BASHRC_DIR}/.bash_aliases"
 fi
 
-# Load the bash completion script for .ssh 
+# Load the bash completion script for .ssh
 if [ -f "${HOME}/.ssh/config" ] && [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ]; then
     . "${HOME}/repos/dotfiles/bash-completion/ssh"
 fi
@@ -92,28 +81,28 @@ if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
     . "$(brew --prefix)/etc/bash_completion"
 fi
 
-## Brew Section!
+# Andriod development
+if [ -d "${HOME}/Library/Android/sdk" ]; then
+    export ANDROID_HOME="${HOME}/Library/Android/sdk"
+    export PATH="${PATH}:${ANDROID_HOME}/emulator"
+    export PATH="${PATH}:${ANDROID_HOME}/tools"
+    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
+    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+fi
 
 # curl
 if [ -d "/usr/local/opt/curl/bin" ]; then
-    export PATH="/usr/local/opt/curl/bin:$PATH"
+    export PATH="/usr/local/opt/curl/bin:${PATH}"
 fi
 
 # python
 if [ -d "/usr/local/opt/python@3.9/bin" ]; then
-    export PATH="/usr/local/opt/python@3.9/bin:$PATH"
+    export PATH="/usr/local/opt/python@3.9/bin:${PATH}"
 fi
 
-# Andriod development
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-
-#yarn
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+# yarn
+export PATH="${HOME}/.yarn/bin:${HOME}/.config/yarn/global/node_modules/.bin:${PATH}"
 
 # Unset any variables that were used in this script
-unset bashrc_dir sub_dir
+unset DOTFILES_DIR BASHRC_DIR MAC_BASHRC_DIR
 

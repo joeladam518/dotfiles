@@ -1,5 +1,4 @@
 # .bash_profile for Joel's Mac Book Pro
-# Last edited on 08/10/17
 
 # bashrc directory
 DOTFILES_DIR="${HOME}/repos/dotfiles"

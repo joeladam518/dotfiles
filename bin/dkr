@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# This script is heavily inspired by Laravel Sail's bash script.
+# https://github.com/laravel/sail
+# I just added a few teaks for the projects I work on.
 
 set -Eeo pipefail
 

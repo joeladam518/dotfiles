@@ -18,7 +18,7 @@ shopt -s cmdhist
 shopt -s histappend
 
 # double ** search !
-# shopt -s globstar
+shopt -s globstar
 
 # gpg signing
 export GPG_TTY="$(tty)"

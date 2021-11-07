@@ -16,13 +16,14 @@ if [ -f "${BASHRC_DIR}/shared/.bash_dev_funct" ]; then
 fi
 
 # Show an alert notification :-)
-alert()
-{
-    local OPTIND=1; local o; local icon; local title="Alert!"; local body
+alert() {
+    local O OPTIND body icon title
+    OPTIND=1
+    title="Alert!"
 
-    while getopts ":fi:t:T" o; do
-        case "$o" in
-            f)  icon="$([ "$?" == 0 ] && echo terminal || echo error)"
+    while getopts ":fi:t:T" O; do
+        case "$O" in
+            f)  icon="$([ "$?" == "0" ] && echo terminal || echo error)"
                 title="$([ -n "$title" ] && echo "Command Finished" || echo " ")"
                 body="$(history | tail -n1 | sed -e 's/^\s*[0-9]\+\s*//' | sed -E 's/[;&|]+\s*alert.*$//')"
                 ;; # Alert you to the finished command. usage example: sleep 10; alert -f

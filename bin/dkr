@@ -269,7 +269,7 @@ if [ $# -gt 0 ]; then
         fi
 
     # Initiate a root user Bash shell within the application container...
-    elif [ "$1" == "root" ] ; then
+    elif [ "$1" == "root-shell" ] ; then
         shift 1
 
         if [ "$EXEC" == "yes" ]; then

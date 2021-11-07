@@ -1,0 +1,20 @@
+# -*- shell-script -*-
+# bash completions for the repo function
+
+# Load if the repo command exists and we have and aliases file
+if command -v "repo" >/dev/null 2>&1; then
+    __dkr() {
+        local CURRENT OPTS
+        CURRENT="${COMP_WORDS[COMP_CWORD]}"
+        # all dkr commands
+        OPTS="php artisan test bin composer node npm npx yarn mysql mariadb psql shell bash root-shell redis"
+        # all docker-compose commands
+        OPTS="${OPTS} build convert cp create down events exec images kill logs ls pause port ps pull push restart rm run start stop top unpause up"
+        COMPREPLY=( $(compgen -W "$OPTS" -- "$CURRENT") )
+
+        return 0
+    }
+
+    complete -F __dkr dkr
+fi
+

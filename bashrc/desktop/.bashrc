@@ -81,13 +81,6 @@ if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
-# Tilix
-if [ $TILIX_ID ] && [ $VTE_VERSION ] && [ -e /etc/profile.d/vte.sh ]; then
-    source /etc/profile.d/vte.sh
-elif [ $TILIX_ID ] && [ $VTE_VERSION ] && [ -f /etc/profile.d/vte-2.91.sh ]; then
-    source /etc/profile.d/vte-2.91.sh
-fi
-
 # .fzf command line fuzzy finder
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 

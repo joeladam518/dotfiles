@@ -12,14 +12,6 @@ alias clear='clear;pwd;'
 ## Use htop instead of top
 alias top='htop'
 
-## Will make any parent directories necessary
-#alias mkdir="mkdir -pv"
-
-## Make these general commands verbose and interactive
-#alias rm='rm -vi'
-#alias cp='cp -vi'
-#alias mv='mv -vi'
-
 ## Alias for fuzzy finder
 alias openit='open $(fzf -m);'
 alias vimit='vim $(fzf -m);'

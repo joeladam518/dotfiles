@@ -94,7 +94,9 @@ export DB_PORT="${DB_PORT:-3306}"
 export WWWUSER="${WWWUSER:-"$UID"}"
 export WWWGROUP="${WWWGROUP:-"$(id -g)"}"
 
-if [ -z "$SKIP_CHECKS" ]; then
+if [ -n "$SKIP_CHECKS" ]; then
+    EXEC="yes"
+else
     # Ensure that Docker is running...
     if ! docker info > /dev/null 2>&1; then
         cmsg -y "Docker is not running." >&2
@@ -112,8 +114,6 @@ if [ -z "$SKIP_CHECKS" ]; then
     else
         EXEC="no"
     fi
-else
-    EXEC="yes"
 fi
 
 if [ $# -gt 0 ]; then

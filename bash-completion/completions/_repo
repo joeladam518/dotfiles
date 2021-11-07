@@ -2,19 +2,26 @@
 # bash completions for the repo function
 
 # Load if the repo command exists and we have and aliases file
-if command -v "repo" >/dev/null 2>&1 && [ -f ~/.repo-aliases ] && [ -r ~/.repo-aliases ]; then
+if command -v "repo" >/dev/null 2>&1; then
     __repo() {
         local CURRENT OPTS aliased lines path
         CURRENT="${COMP_WORDS[COMP_CWORD]}"
-        # remove empty lines
-        lines="$(grep "\S" ~/.repo-aliases)"
-        # grab the keys in .repo-aliases for the first set of options
-        OPTS="$(echo "$lines" | cut -d '=' -f 1 | tr '\n' ' ')"
-        # then grab the values making sure to expand them so we know what we already have paths for
-        aliased="$(echo "$lines" | cut -d '=' -f 2 | xargs -n 1 -P 10 -I {} bash -c 'echo {}')"
+
+        if [ -f ~/.repos-aliases ] && [ -r ~/.repo-aliases ]; then
+            # remove empty lines
+            lines="$(grep "\S" ~/.repo-aliases)"
+            # grab the keys in .repo-aliases for the first set of options
+            OPTS="$(echo "$lines" | cut -d '=' -f 1 | tr '\n' ' ')"
+            # then grab the values making sure to expand them so we know what we already have paths for
+            aliased="$(echo "$lines" | cut -d '=' -f 2 | xargs -n 1 -P 10 -I {} bash -c 'echo {}')"
+        else
+            OPTS=""
+            aliased=""
+        fi 
+
         # add any dir names that we didn't define in our .repo-aliases file to our options
         for path in "${HOME}/repos/"*; do
-            if ! (echo "$aliased" | grep -xq "$path"); then
+            if [ -z "$aliased" ] || ! (echo "$aliased" | grep -xq "$path"); then
                 OPTS="${OPTS} $(basename "${path}")"
             fi
         done

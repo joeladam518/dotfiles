@@ -11,20 +11,17 @@ repo() {
     local repos lines line key aliased
     declare -A repos
 
-    if [ ! -f "${HOME}/.repo-aliases" ]; then
-        echo "You must specify a .repo-aliases file in your home directory." >&2
-        return 1
+    if [ -f "${HOME}/.repo-aliases" ] && [ -r "${HOME}/.repo-aliases" ]; then
+        # convert our .repo-aliases file into an associative array
+        readarray -t lines < "${HOME}/.repo-aliases"
+        for line in "${lines[@]}"; do
+            if [ -n "$line" ]; then
+                repos["${line%%=*}"]="$(eval "echo ${line#*=}")"
+            fi
+        done
     fi
 
-    # convert out .repo-aliases file to an associative array
-    readarray -t lines < "${HOME}/.repo-aliases"
-    for line in "${lines[@]}"; do
-        if [ -n "$line" ]; then
-            repos["${line%%=*}"]="$(eval "echo ${line#*=}")"
-        fi
-    done
-
-    # add any repo directories that we didn't define in out alias file to our array
+    # add repo directories that we didn't define in out aliases file to our array
     aliased="$(printf '%s\n' "${repos[@]}")"
     for line in "${HOME}/repos/"*; do
         if ! (echo "$aliased" | grep -xq "$line"); then

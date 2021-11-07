@@ -7,7 +7,7 @@ if command -v "repo" >/dev/null 2>&1; then
         local CURRENT OPTS aliased lines path
         CURRENT="${COMP_WORDS[COMP_CWORD]}"
 
-        if [ -f ~/.repos-aliases ] && [ -r ~/.repo-aliases ]; then
+        if [ -f ~/.repo-aliases ] && [ -r ~/.repo-aliases ]; then
             # remove empty lines
             lines="$(grep "\S" ~/.repo-aliases)"
             # grab the keys in .repo-aliases for the first set of options

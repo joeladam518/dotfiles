@@ -1,0 +1,15 @@
+# -*- shell-script -*-
+# bash compleation for ssh
+
+if [ -f "${HOME}/.ssh/config" ] && [ -r "${HOME}/.ssh/config" ]; then
+    __ssh() {
+        local CURRENT OPTS
+        CURRENT="${COMP_WORDS[COMP_CWORD]}"
+        OPTS="$(grep '^Host' ~/.ssh/config 2>/dev/null | grep -v '[?*]' | cut -d ' ' -f 2-)"
+        COMPREPLY=( $(compgen -W "$OPTS" -- "$CURRENT") )
+
+        return 0
+    }
+
+    complete -F __ssh ssh
+fi

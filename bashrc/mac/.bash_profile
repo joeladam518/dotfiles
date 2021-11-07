@@ -40,7 +40,7 @@ export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
 
 # if dotfiles/bin exists, add it to PATH
 if [ -d "${DOTFILES_DIR}/bin" ]; then
-    export PATH="${DOTFILES_DIR}/bin:${PATH}"
+    export PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
 # if ~/bin exists, add it to PATH

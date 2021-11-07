@@ -16,10 +16,9 @@ alias vh='vagrant halt'
 alias vm='vagrant ssh'
 
 # sail aliases
-alias sail='bash vendor/bin/sail'
+alias sail='./vendor/bin/sail'
 
 # Docker aliases
-alias dkrconnect=docker_connectToSidtkFunction
 alias dkrstpall='docker stop $(docker ps -aq)'
 alias dkrrmall='docker rm $(docker ps -aq)'
 alias dkrrmallimages='docker rmi $(docker images -q)'

@@ -3,8 +3,86 @@
 # Link a local composer-package repo to another project for testing
 composer_link()
 {
-    composer config repositories.local '{"type": "path", "url": "'$1'"}' --file composer.json
+    composer config repositories.local '{"type": "path", "url": "'${1}'"}' --file composer.json
 }
+
+# Change to a repo directory based on a alias file you define in your home directory
+repo() {
+    local repos lines line key aliased
+    declare -A repos
+
+    if [ ! -f "${HOME}/.repo-aliases" ]; then
+        echo "You must specify a .repo-aliases file in your home directory." >&2
+        return 1
+    fi
+
+    # convert out .repo-aliases file to an associative array
+    readarray -t lines < "${HOME}/.repo-aliases"
+    for line in "${lines[@]}"; do
+        if [ -n "$line" ]; then
+            repos["${line%%=*}"]="$(eval "echo ${line#*=}")"
+        fi
+    done
+
+    # add any repo directories that we didn't define in out alias file to our array
+    aliased="$(printf '%s\n' "${repos[@]}")"
+    for line in "${HOME}/repos/"*; do
+        if ! (echo "$aliased" | grep -xq "$line"); then
+            repos["$(basename "$line")"]="$line"
+        fi
+    done
+
+    key="${1}"
+    if [ -z "${key}" ]; then
+        echo "You must specify a key" >&2
+        return 1
+    fi
+
+    # Check if key exists in the array
+    if ! [ ${repos[$key]+bob} ]; then
+        echo "invalid option ${1}" >&2
+        return 1
+    fi
+
+    cd "${repos[$key]}" || return 1
+
+    return 0
+}
+
+#
+# Docker functions
+#
+
+# Bring up SIDTK -> https://github.com/sourcetoad/DevopsToolKit
+dkrconnect()
+{
+    local CWD ST_DSS_DIR ST_DST_DIR
+    CWD="$(pwd)"
+    ST_DSS_DIR="${HOME}/devop-tools/docker/data-source-services"
+    ST_DST_DIR="${HOME}/devop-tools/docker/data-source-tools"
+
+    if [ ! -d "$ST_DSS_DIR" ]; then
+        echo "data source services not found... What are you trying to connect to?"
+        return 1
+    fi
+
+    if [ ! -d "$ST_DST_DIR" ]; then
+        echo "data source tools not found... "
+        return 1
+    fi
+
+    # trap "cd ${cwd}" RETURN
+    cd "$ST_DSS_DIR" && docker-compose up --build -d && cd "$ST_DST_DIR" && docker-compose up --build -d && cd "$CWD"
+}
+
+#
+# Git functions
+#
+
+next_release() {
+    git log "${2:-"staging..master"}" --oneline --no-merges | grep -Eio "${1}-([0-9]+)" | tr a-z A-Z | sort | uniq
+}
+
 # Automatically try to delete dead baranches on local
 git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 {
@@ -16,34 +94,6 @@ git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
     # Whats left TODO: take any branches that throw errors and list them out
 
     git fetch -p && git branch -r | awk '{print $1}' | grep -E -v -f /dev/fd/0 <(git branch -vv | grep origin) | awk '{print $1}' | xargs git branch -d
-}
-
-next_release() {
-  git log ${2:-staging..master} --oneline --no-merges | grep -Eio "$1-([0-9]+)" | tr a-z A-Z | sort | uniq
-}
-
-#
-# Docker functions
-#
-
-# Bring up SIDTK -> https://github.com/sourcetoad/DevopsToolKit
-docker_connectToSidtkFunction()
-{
-    cwd="$(pwd)"
-    sdtk_dir="${HOME}/devop-tools/docker/data-source-services"
-    st_dtools_dir="${HOME}/devop-tools/docker/data-source-tools"
-    if [ ! -d "$sdtk_dir" ]; then
-        echo "data source services not found... What are you trying to connect to?"
-        return 1
-    fi
-
-    if [ ! -d "$st_dtools_dir" ]; then
-        echo "data source tools not found... "
-        return 1
-    fi
-
-    # trap "cd ${cwd}" RETURN
-    cd "$sdtk_dir" && docker-compose up --build -d && cd "$st_dtools_dir" && docker-compose up --build -d && cd "$cwd"
 }
 
 #

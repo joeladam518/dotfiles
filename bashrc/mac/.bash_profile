@@ -68,9 +68,9 @@ if [ -f "${MAC_BASHRC_DIR}/.bash_aliases" ]; then
     . "${MAC_BASHRC_DIR}/.bash_aliases"
 fi
 
-# Load the bash completion script for .ssh
-if [ -f "${HOME}/.ssh/config" ] && [ -f "${HOME}/repos/dotfiles/bash-completion/ssh" ]; then
-    . "${HOME}/repos/dotfiles/bash-completion/ssh"
+# Load custom bash completeions
+if [ -f "${HOME}/repos/dotfiles/bash-completion/bash_completion" ] && [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
+    . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
 fi
 
 # Enable programmable completion features (you don't need to enable

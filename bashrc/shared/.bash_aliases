@@ -2,6 +2,7 @@
 
 # Reload shell
 alias reload_shell='exec ${SHELL}; echo shell reloaded;'
+alias reload_bashrc='source ~/.bashrc;'
 
 # Upgrade fzf
 alias updatefzf='cd ~/.fzf && git pull && ./install && cd ~'

@@ -8,6 +8,7 @@ trap error_cleanup ERR
 cmsg() {
     # Output messages in color! :-)
     local CHOSEN_COLOR IS_BOLD NO_NEWLINE opt OPTIND RESET
+    CHOSEN_COLOR=""
     IS_BOLD="0"
     NO_NEWLINE="0"
     OPTIND=1
@@ -88,12 +89,12 @@ v4l2-ctl -d "${device}" --set-ctrl exposure_auto=3
 v4l2-ctl -d "${device}" --set-ctrl exposure_auto_priority=0
 
 # focus controls
-v4l2-ctl -d "${device}" --set-ctrl focus_auto=1
-v4l2-ctl -d "${device}" --set-ctrl pan_absolute=10000
-v4l2-ctl -d "${device}" --set-ctrl tilt_absolute=10000
+#v4l2-ctl -d "${device}" --set-ctrl focus_auto=1
+#v4l2-ctl -d "${device}" --set-ctrl pan_absolute=10000
+#v4l2-ctl -d "${device}" --set-ctrl tilt_absolute=10000
 #v4l2-ctl -d "${device}" --set-ctrl focus_absolute=20
 
 # zoom?
-v4l2-ctl -d "${device}" --set-ctrl zoom_absolute=175
+#v4l2-ctl -d "${device}" --set-ctrl zoom_absolute=175
 
 cmsg -c "Done!"

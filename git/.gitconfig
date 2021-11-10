@@ -8,8 +8,6 @@
     algorithm = patience
 [core]
     editor = /usr/bin/vim
-[pull]
-    rebase = true
 [init]
     templatedir = ./.git_template
 [merge]

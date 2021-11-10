@@ -2,6 +2,7 @@
 # source ompletion directory definitions
 
 completion_dir="${HOME}/repos/dotfiles/bash-completion/completions"
+
 if [ -d "$completion_dir" ] && [ -r "$completion_dir" ] && [ -x "$completion_dir" ]; then
     for i in "$completion_dir"/*; do
         [[ ${i##*/} != @(Makefile*) && -f $i && -r $i ]] && . "$i"

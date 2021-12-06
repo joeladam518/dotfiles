@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Variables
-CWD="$(pwd)"
 script_dir="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
 bin_dir="${script_dir}/bin"
 repos_dir="${HOME}/repos"
@@ -67,7 +66,3 @@ if [ "$system" == "desktop" ] && [ "$system" == "mac" ]; then
         cd "$HOME" && ln -s "${repos_dir}/dotfiles/git/.gitconfig" .
     fi
 fi
-
-cd "$CWD" || exit
-exit
-

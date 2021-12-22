@@ -75,8 +75,8 @@ def parse_script_args():
 
 
 if __name__ == '__main__':
-    if sys.version_info < (3, 8):
-        print('python 3.8 and above is required')
+    if sys.version_info < (3, 7):
+        print('python 3.7 and above is required')
         sys.exit(FAILURE)
 
     args = parse_script_args()

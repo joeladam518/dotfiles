@@ -3,50 +3,55 @@ import argparse
 import csv
 import platform
 import sys
+from os import path
+
 
 SUCCESS = 0
 FAILURE = 1
 
 
-def get_linux_distro() -> str:
-    return get_linux_release_info().get('ID', '')
+def get_distro() -> str:
+    return get_os_release_value('ID')
 
 
-def get_linux_like_distro() -> str:
-    return get_linux_release_info().get('ID_LIKE', '')
-
-
-def get_linux_release_info() -> dict:
-    release_data = {}
-
-    with open("/etc/os-release") as f:
-        reader = csv.reader(f, delimiter="=")
-        for row in reader:
-            if row:
-                release_data[row[0]] = row[1]
-
-    return release_data
+def get_distro_like() -> str:
+    return get_os_release_value('ID_LIKE')
 
 
 def get_os_distro() -> str:
-    os_type = get_os_type()
+    os_type = get_platform()
 
     if os_type == 'linux':
-        return get_linux_distro()
+        return get_distro()
 
     return os_type
 
 
-def get_os_like_distro() -> str:
-    os_type = get_os_type()
+def get_os_distro_like() -> str:
+    os_type = get_platform()
 
     if os_type == 'linux':
-        return get_linux_like_distro()
+        return get_distro_like()
 
     return os_type
 
 
-def get_os_type() -> str:
+def get_os_release() -> dict:
+    if not path.exists('/etc/os-release'):
+        return {}
+
+    with open('/etc/os-release') as f:
+        reader = csv.reader(f, delimiter="=")
+        data = {key: value for key, value in reader}
+
+    return data
+
+
+def get_os_release_value(key: str) -> str:
+    return get_os_release().get(key, '')
+
+
+def get_platform() -> str:
     if sys.platform in ['win32', 'win64', 'cygwin']:
         return 'windows'
 
@@ -82,9 +87,9 @@ if __name__ == '__main__':
     args = parse_script_args()
 
     if args.simplified:
-        print(get_os_type())
+        print(get_platform())
     elif args.like:
-        print(get_os_like_distro())
+        print(get_os_distro_like())
     else:
         print(get_os_distro())
 

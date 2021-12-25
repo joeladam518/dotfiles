@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+VERSION="${1:-16}"
+UNAME="$(uname -s)"
+
+case "${UNAME}" in
+    Darwin*) MACHINE="mac";;
+    Linux*)  MACHINE="linux";;
+    *)       MACHINE="UNKNOWN";;
+esac
+
+if [ "$MACHINE" == "linux" ]; then
+
+    if ! command -v 'lsb_release' > /dev/null 2>&1; then
+        sudo apt update
+        sudo apt install -y lsb-release
+    fi
+
+    DISTRO="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
+
+    case "$DISTRO" in
+        debian|ubuntu|raspbian)
+            # https://github.com/nodesource/distributions#debinstall
+            curl -sL "https://deb.nodesource.com/setup_${VERSION}.x" | sudo -E bash -
+            sudo apt install -y nodejs
+            ;;
+        *)
+            echo "Your distro is not supported..." 1>&2
+            exit 1
+            ;;
+    esac
+
+elif [ "$MACHINE" == "mac" ]; then
+
+    brew install node
+
+else
+
+    echo "Unsupported operating system [${UNAME}]. Currently this script only supports macOs and Linux." 1>&2
+    exit 1
+
+fi

@@ -64,11 +64,11 @@ php_extensions = {
 
 # functions
 def confirm(question: str, tries: int = 2) -> bool:
+    question = f"{question} [y/N] "
     valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-    prompt = " [y/N] "
 
     while tries > 0:
-        choice = input(question + prompt).lower()
+        choice = input(question).lower()
 
         if choice in valid:
             return valid[choice]
@@ -85,13 +85,10 @@ def extensionize(extension: str, version: str = '') -> str:
     return f"php{version}-{extension}"
 
 
-def get_installed_packages(version) -> list:
-    packages = run_command(
-        "dpkg -l | grep php%s | sed 's/\s\{3,\}.*$//' | sed 's/^ii  //' | tr '\n' ' '" % version,
-        capture_output=True
-    )
-    packages = packages.strip()
-    packages = packages.split(' ')
+def get_installed_packages(version: str) -> list:
+    cmd = "dpkg -l | grep php%s | sed 's/^ii\s*//' | sed 's/\s\{3,\}.*$//' | tr '\n' ' '"
+    packages = run_command(cmd % version, capture_output=True)
+    packages = packages.strip().split(' ')
 
     return list(filter(lambda package: bool(package), packages))
 

@@ -6,6 +6,28 @@ set -Eeuo pipefail
 trap error_cleanup ERR
 
 # Functions
+check_v4l_utils_is_installed() {
+    if ! is-installed "v4l2-ctl"; then
+        echo "v4l-utils is not installed." 1>&2
+        exit 1
+    fi
+}
+
+check_os() {
+    local MACHINE
+
+    case "$(uname -s)" in
+        Linux*)  MACHINE="linux";;
+        *)       MACHINE="UNKNOWN";;
+    esac
+
+    if [ "$MACHINE" != "linux" ]; then
+        echo "Unsupported operating system [${UNAME}]."
+        echo "Currently this script only supports Linux distributions." 1>&2
+        exit 1
+    fi
+}
+
 error_cleanup() {
     trap - ERR
     cmsg ""
@@ -33,17 +55,6 @@ usage() {
     echo "  -l              List all webcam devices"
 }
 
-case "$(uname -s)" in
-    Linux*)  MACHINE="linux";;
-    *)       MACHINE="UNKNOWN";;
-esac
-
-if [ "$MACHINE" != "linux" ]; then
-    echo "Unsupported operating system [${UNAME}]."
-    echo "Currently this script only supports Linux distributions." 1>&2
-    exit 1
-fi
-
 # Script options
 while getopts ":hl" o; do
     case "${o}" in
@@ -53,6 +64,8 @@ while getopts ":hl" o; do
             ;;
         l)
             echo ""
+            check_os
+            check_v4l_utils_is_installed
             v4l2-ctl --list-devices
             exit 0
             ;;
@@ -65,10 +78,14 @@ while getopts ":hl" o; do
 done
 shift $((OPTIND-1))
 
+# check to make sure we can run this script
+check_os
+check_v4l_utils_is_installed
+
 # Default device number
 device="${1:-0}"
 if ! is_int "${device}"; then
-    cmsg -r "Invalid device id" 1>&2
+    echo "Invalid device id" 1>&2
     exit 1
 fi
 

@@ -1,26 +1,84 @@
 #!/usr/bin/env bash
 
+# Functions
+usage() {
+    echo "usage: $(basename "${0}") [-h] {system}"
+    echo ""
+    echo "Install dotfiles on to you machine"
+    echo ""
+    echo "arguments:"
+    echo "  system          The type of system your installing dotfiles on to. (desktop|mac|server)"
+    echo ""
+    echo "options:"
+    echo "  -h              Displays this help message."
+}
+
+is_valid_system() {
+    echo "desktop mac server" | grep -w -q "$1"
+}
+
+parse_options() {
+    while :; do
+        case "${1-""}" in
+            -h | --help)
+                usage
+                exit 0
+                ;;
+            -?*)
+                echo "Unknown option: ${1}"
+                exit 1
+                ;;
+            *)
+                break
+                ;;
+        esac
+        shift
+    done
+
+    return 0
+}
+
+parse_arguments() {
+    system="$1"
+
+    if [ -z "$system" ]; then
+        echo "system is required" 1>&2
+        exit 1
+    fi
+
+    if ! is_valid_system "$system"; then
+        echo "Error: Invalid system" 1>&2
+        exit 1
+    fi
+
+    shift
+}
+
 # Variables
-script_dir="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
-bin_dir="${script_dir}/bin"
-repos_dir="${HOME}/repos"
-system="$1"
+DOTFILES_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
+REPOS_DIR="$(dirname "$DOTFILES_DIR")"
+BIN_DIR="${DOTFILES_DIR}/bin"
+
+# Start Script
+
+parse_options "$@"
+parse_arguments "$@"
+
+# Check
+echo "DOTFILES_DIR: ${DOTFILES_DIR}"
+echo "REPOS_DIR: ${REPOS_DIR}"
+echo "BIN_DIR: ${BIN_DIR}"
+echo "system: ${system}"
+exit 1
 
 # Add the bin dir to path if it's not there
-if [[ ! "$PATH" =~ (^|:)"$bin_dir"(:|$) ]]; then
-    export PATH="${PATH}:${bin_dir}"
-fi
-
-# Check if the system argument was given
-if [ -z "$system" ] || { [ "$system" != "desktop" ] && [ "$system" != "mac" ] && [ "$system" != "server" ]; }; then
-    cmsg -an "Must specify a type of system. "
-    cmsg -a  "Valid types: {desktop|mac|server}"
-    exit 1
+if [[ ! "$PATH" =~ (^|:)"$BIN_DIR"(:|$) ]]; then
+    export PATH="${PATH}:${BIN_DIR}"
 fi
 
 # Create the repos directory if it doesn't exist
-if [ ! -d "$repos_dir" ]; then
-    mkdir -p "$repos_dir"
+if [ ! -d "$REPOS_DIR" ]; then
+    mkdir -p "$REPOS_DIR"
 fi
 
 # Set the rcfile variable (because mac is different from linux)
@@ -30,39 +88,53 @@ else
     rcfile=".bashrc"
 fi
 
-# Symlink the bashrc files
+# Keep the old bashrc file
 if [ -f "${HOME}/${rcfile}" ] && [ ! -L "${HOME}/${rcfile}" ]; then
-    cd "$HOME" && mv "$rcfile" "${rcfile}.old"
+    if [ ! -f "${HOME}/${rcfile}.old" ]; then
+        echo "Found existing ${rcfile}.old file" 1>&2
+        exit 1
+    else
+        cd "$HOME" && mv "$rcfile" "${rcfile}.old"
+    fi
 fi
 
+# Symlink the bashrc files
 if [ -L "${HOME}/${rcfile}" ]; then
-    cmsg -y "The dotfiles .bashrc symlink already exists"
-else
-    cd "$HOME" && ln -s "${repos_dir}/dotfiles/bashrc/${system}/${rcfile}" .
+    cmsg -y "The .bashrc symlink already exists"
+elif [ ! -f "${HOME}/${rcfile}" ]; then
+    cd "$HOME" && ln -s "${DOTFILES_DIR}/bashrc/${system}/${rcfile}" .
 fi
 
 # Symlink the vimrc files
-if [ -L "${HOME}/.vimrc" ] && { [ -L "${HOME}/.vim" ] && [ -d "${HOME}/.vim" ]; }; then
-    cmsg -y "The dotfiles .vimrc symlinks already exist"
-else
-    cd "$HOME" && ln -s "${repos_dir}/dotfiles/vimrc/.vim" .
-    cd "$HOME" && ln -s "${repos_dir}/dotfiles/vimrc/.vimrc" .
+if [ -L "${HOME}/.vim" ]; then
+    cmsg -y "The .vim symlink already exists"
+elif [ ! -d "${HOME}/.vim" ]; then
+    cd "$HOME" && ln -s "${DOTFILES_DIR}/vimrc/.vim" .
 fi
 
-# TODO: intall the rest of the dotfiles
+if [ -L "${HOME}/.vimrc" ]; then
+    cmsg -y "The .vimrc symlink already exists"
+elif [ ! -f "${HOME}/.vimrc" ]; then
+    cd "$HOME" && ln -s "${DOTFILES_DIR}/vimrc/.vimrc" .
+fi
 
-# Add Tmux config
+# Symlink the tmux config
 if [ -L "${HOME}/.tmux.conf" ]; then
     cmsg -y "The dotfiles .tmux.conf symlink already exists"
-else
-    cd "$HOME" && ln -s "${repos_dir}/dotfiles/tmux/.tmux.conf" ".tmux.conf"
+elif [ ! -f "${HOME}/.tmux.conf" ]; then
+    cd "$HOME" && ln -s "${DOTFILES_DIR}/tmux/.tmux.conf" ".tmux.conf"
 fi
 
-# Add git config 
-if [ "$system" == "desktop" ] && [ "$system" == "mac" ]; then
-    if [ -L "${HOME}/.tmux.conf" ]; then
-        cmsg -y "The dotfiles .gitconfigsymlink already exists"
-    else
-        cd "$HOME" && ln -s "${repos_dir}/dotfiles/git/.gitconfig" .
-    fi
+# if server we're done!
+if [ "$system" == "server" ]; then
+    exit 0
+fi
+
+# desktop and mac dotfiles only
+
+# Symlink the git config
+if [ -L "${HOME}/.gitconfig" ]; then
+    cmsg -y "The .gitconfig symlink already exists"
+elif [ ! -f "${DOTFILES_DIR}/git/.gitconfig" ]; then
+    cd "$HOME" && ln -s "${DOTFILES_DIR}/git/.gitconfig" .
 fi

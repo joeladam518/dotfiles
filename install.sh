@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -Eeo pipefail
+
 # Functions
 usage() {
     echo "usage: $(basename "${0}") [-h] {system}"
@@ -69,7 +71,9 @@ parse_arguments "$@"
 #echo "REPOS_DIR: ${REPOS_DIR}"
 #echo "BIN_DIR: ${BIN_DIR}"
 #echo "system: ${system}"
-#exit 1
+#exit 0
+
+cd "$HOME" || exit 1
 
 # Add the bin dir to path if it's not there
 if [[ ! "$PATH" =~ (^|:)"$BIN_DIR"(:|$) ]]; then
@@ -137,8 +141,6 @@ fi
 if [ "$system" == "server" ]; then
     exit 0
 fi
-
-# desktop and mac dotfiles only
 
 # Symlink the git config
 if [ -L "${HOME}/.gitconfig" ]; then

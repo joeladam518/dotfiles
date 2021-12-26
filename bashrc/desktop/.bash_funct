@@ -15,7 +15,6 @@ if [ -f "${BASHRC_DIR}/shared/.bash_dev_funct" ]; then
     . "${BASHRC_DIR}/shared/.bash_dev_funct"
 fi
 
-# Show an alert notification :-)
 alert() {
     local O OPTIND body icon title
     OPTIND=1

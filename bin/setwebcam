@@ -17,14 +17,14 @@ check_os() {
     local UNAME MACHINE
 
     UNAME="$(uname -s)"
-    
+
     case "$UNAME" in
         Linux*)  MACHINE="linux";;
         *)       MACHINE="UNKNOWN";;
     esac
 
     if [ "$MACHINE" != "linux" ]; then
-        echo "Unsupported operating system [${UNAME}]."
+        echo "Unsupported operating system [${UNAME}]." 1>&2
         echo "Currently this script only supports Linux distributions." 1>&2
         exit 1
     fi
@@ -87,7 +87,7 @@ check_v4l_utils_is_installed
 # Default device number
 device="${1:-0}"
 if ! is_int "${device}"; then
-    echo "Invalid device id" 1>&2
+    echo "Error: Invalid device id" 1>&2
     exit 1
 fi
 

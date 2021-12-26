@@ -93,6 +93,7 @@ fi
 # restore the old .bashrc file if it exists
 if [ -f "${HOME}/${rcfile}.old" ]; then
     mv "${HOME}/${rcfile}.old" "${HOME}/${rcfile}"
+    echo "restored '${HOME}/${rcfile}.old'"
 fi
 
 if [ -L "${HOME}/.vim" ]; then

@@ -14,9 +14,11 @@ check_v4l_utils_is_installed() {
 }
 
 check_os() {
-    local MACHINE
+    local UNAME MACHINE
 
-    case "$(uname -s)" in
+    UNAME="$(uname -s)"
+    
+    case "$UNAME" in
         Linux*)  MACHINE="linux";;
         *)       MACHINE="UNKNOWN";;
     esac

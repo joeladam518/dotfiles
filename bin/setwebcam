@@ -33,6 +33,17 @@ usage() {
     echo "  -l              List all webcam devices"
 }
 
+case "$(uname -s)" in
+    Linux*)  MACHINE="linux";;
+    *)       MACHINE="UNKNOWN";;
+esac
+
+if [ "$MACHINE" != "linux" ]; then
+    echo "Unsupported operating system [${UNAME}]."
+    echo "Currently this script only supports Linux distributions." 1>&2
+    exit 1
+fi
+
 # Script options
 while getopts ":hl" o; do
     case "${o}" in

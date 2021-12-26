@@ -64,12 +64,12 @@ BIN_DIR="${DOTFILES_DIR}/bin"
 parse_options "$@"
 parse_arguments "$@"
 
-# Check
-echo "DOTFILES_DIR: ${DOTFILES_DIR}"
-echo "REPOS_DIR: ${REPOS_DIR}"
-echo "BIN_DIR: ${BIN_DIR}"
-echo "system: ${system}"
-exit 1
+## Check
+#echo "DOTFILES_DIR: ${DOTFILES_DIR}"
+#echo "REPOS_DIR: ${REPOS_DIR}"
+#echo "BIN_DIR: ${BIN_DIR}"
+#echo "system: ${system}"
+#exit 1
 
 # Add the bin dir to path if it's not there
 if [[ ! "$PATH" =~ (^|:)"$BIN_DIR"(:|$) ]]; then

@@ -6,10 +6,10 @@ set -Eeo pipefail
 usage() {
     echo "usage: $(basename "${0}") [-h] {system}"
     echo ""
-    echo "Install dotfiles on to you machine"
+    echo "Install dotfiles on to your machine"
     echo ""
     echo "arguments:"
-    echo "  system          The type of system your installing dotfiles on to. (desktop|mac|server)"
+    echo "  system          The type of system you're installing dotfiles on to. (desktop|mac|server)"
     echo ""
     echo "options:"
     echo "  -h              Displays this help message."

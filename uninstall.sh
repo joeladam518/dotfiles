@@ -6,10 +6,10 @@ set -Eeo pipefail
 usage() {
     echo "usage: $(basename "${0}") [-h] {system}"
     echo ""
-    echo "Uninstall dotfiles on to you machine"
+    echo "Uninstall dotfiles from your machine"
     echo ""
     echo "arguments:"
-    echo "  system          The type of system your installing dotfiles on to. (desktop|mac|server)"
+    echo "  system          The type of system you're uninstalling dotfiles from. (desktop|mac|server)"
     echo ""
     echo "options:"
     echo "  -h              Displays this help message."

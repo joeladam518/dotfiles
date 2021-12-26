@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+VERSION="${1:-16}"
+UNAME="$(uname -s)"
+
+install_on_debian() {
+    local sources_file_path="/etc/apt/sources.list.d/nodesource.list"
+
+    if [ -f "$sources_file_path" ]; then
+        sudo rm "$sources_file_path"
+        if [ -f "${sources_file_path}.save" ]; then
+            sudo rm "${sources_file_path}.save"
+        fi
+        sudo apt update
+    fi
+
+    # https://github.com/nodesource/distributions#debinstall
+    curl -sL "https://deb.nodesource.com/setup_${VERSION}.x" | sudo -E bash -
+    sudo apt install -y nodejs
+}
+
+is_installed() {
+    if command -v "$1" > /dev/null 2>&1; then
+        return "0"
+    else
+        return "1"
+    fi
+}
+
+unsupported_distro() {
+    echo "Your distro is not supported..." 1>&2
+    exit 1
+}
+
+case "${UNAME}" in
+    Linux*)  MACHINE="linux";;
+    *)       MACHINE="UNKNOWN";;
+esac
+
+if [ "$MACHINE" != "linux" ]; then
+    echo "Unsupported operating system [${UNAME}]."
+    echo "Currently this script only supports Linux distributions." 1>&2
+    exit 1
+fi
+
+if ! is_installed "lsb_release"; then
+    sudo apt update
+    sudo apt install -y lsb-release
+fi
+
+DISTRO="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
+
+case "$DISTRO" in
+    debian|ubuntu|raspbian)
+        install_on_debian
+        ;;
+    *)
+        unsupported_distro
+        ;;
+esac

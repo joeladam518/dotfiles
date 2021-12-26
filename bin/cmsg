@@ -30,9 +30,11 @@ fi
 
 ## Functions
 usage() {
-    echo "Usage: $(basename "${0}") [options] [message] -- Adds color to your output."
+    echo "usage: $(basename "${0}") [options] [message]"
     echo ""
-    echo "Options:"
+    echo "Adds color to your output."
+    echo ""
+    echo "options:"
     echo "  -n  no newline"
     echo "  -d  bold the message"
     echo "  -r  color message red"

@@ -1,78 +1,68 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail #fail fast
-
+# fail fast
+set -Eeuo pipefail
+# show the list of devices if there is an error
 trap error_cleanup ERR
 
-# functions
-cmsg() {
-    # Output messages in color! :-)
-    local CHOSEN_COLOR IS_BOLD NO_NEWLINE opt OPTIND RESET
-    CHOSEN_COLOR=""
-    IS_BOLD="0"
-    NO_NEWLINE="0"
-    OPTIND=1
-    RESET="$(tput sgr0)"
-    while getopts ":ndrgbcmyaw" opt; do
-        case "$opt" in
-            n) NO_NEWLINE="1" ;; # no new line
-            d) IS_BOLD="1" ;; # bold
-            r) CHOSEN_COLOR="$(tput setaf 1)"   ;; # color red
-            g) CHOSEN_COLOR="$(tput setaf 2)"   ;; # color green
-            b) CHOSEN_COLOR="$(tput setaf 4)"   ;; # color blue
-            c) CHOSEN_COLOR="$(tput setaf 6)"   ;; # color cyan
-            m) CHOSEN_COLOR="$(tput setaf 5)"   ;; # color magenta
-            y) CHOSEN_COLOR="$(tput setaf 3)"   ;; # color yellow
-            a) CHOSEN_COLOR="$(tput setaf 245)" ;; # color gray
-            w) CHOSEN_COLOR="$(tput setaf 7)"   ;; # color white
-            \? ) echo "cmsg() invalid option: -${OPTARG}" 1>&2; return 1; ;;
-        esac
-    done
-    shift $((OPTIND-1))
-
-    local message="$*"
-    local message_cmd="echo -e"
-
-    # add -n flag if we want no new line
-    if [ "$NO_NEWLINE" == "1" ]; then
-        message_cmd="${message_cmd}n"
-    fi
-
-    # add color and bold
-    if [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
-        message_cmd="${message_cmd} \"${BOLD}${CHOSEN_COLOR}${message}${RESET}\""
-    elif [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "0" ]; then
-        message_cmd="${message_cmd} \"${CHOSEN_COLOR}${message}${RESET}\""
-    elif [ -z "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
-        message_cmd="${message_cmd} \"${BOLD}${message}${RESET}\""
-    else
-        message_cmd="${message_cmd} \"${message}\""
-    fi
-
-    # Finally, print the message with color!
-    eval "$message_cmd"
-    return 0
-}
-
+# Functions
 error_cleanup() {
     trap - ERR
-    cmsg
-    cmsg -r "setwebcam failed..."
-    cmsg "Here's the list of webcam devices."
+    cmsg ""
+    cmsg -c "Here's the list of available devices:"
     v4l2-ctl --list-devices
 }
 
-# default device number
+is_int() {
+    case "${1}" in
+        ''|*[!0-9]*) return 1 ;;
+        *) return 0;;
+    esac
+}
 
-re='^[0-9]+$'
+usage() {
+    echo "usage: $(basename "${0}") [-h] [-l] {device_id}"
+    echo ""
+    echo "Adjusts the settings for your logitech webcam"
+    echo ""
+    echo "arguments:"
+    echo "  device_id       The the numeric id of the webcam"
+    echo ""
+    echo "options:"
+    echo "  -h              Displays this help message"
+    echo "  -l              List all webcam devices"
+}
+
+# Script options
+while getopts ":hl" o; do
+    case "${o}" in
+        h)
+            usage
+            exit 0
+            ;;
+        l)
+            echo ""
+            v4l2-ctl --list-devices
+            exit 0
+            ;;
+        \?)
+            echo "Invalid option '-${OPTARG}'";
+            usage
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+# Default device number
 device="${1:-0}"
-if [[ "${device}" =~ $re ]]; then
-   device="0"
+if ! is_int "${device}"; then
+    cmsg -r "Invalid device id" 1>&2
+    exit 1
 fi
 
-# start script
-
-cmsg -c "Setting webcam settings for device /dev/video${device}"
+cmsg -c "Setting webcam settings for device: /dev/video${device}"
+#-----------------------------------------------------------------------------------------------------------------------
 
 # settings
 v4l2-ctl -d "${device}" --set-ctrl brightness=135
@@ -97,4 +87,5 @@ v4l2-ctl -d "${device}" --set-ctrl exposure_auto_priority=0
 # zoom?
 #v4l2-ctl -d "${device}" --set-ctrl zoom_absolute=175
 
+#-----------------------------------------------------------------------------------------------------------------------
 cmsg -c "Done!"

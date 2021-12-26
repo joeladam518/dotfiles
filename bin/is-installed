@@ -6,21 +6,25 @@
 print_boolean="0"
 
 # Functions
-display_help()
-{
-    echo "Checks if a program is installed on the current machine."
-    echo "Usage: [-h] [-b] {program_name}"
-    echo "  -h  Displays this help message."
-    echo "  -b  Instead of a message indication wether the program is installed or not, just print 1 (true) or 0 (false)."
-    exit 0
+usage() {
+    echo "usage: $(basename "${0}") [-h] [-b] {program_name}"
+    echo ""
+    echo "Checks if a program is installed on the current machine"
+    echo ""
+    echo "arguments:"
+    echo "  program_name    The name of the program to check"
+    echo ""
+    echo "options:"
+    echo "  -h              Displays this help message."
+    echo "  -b              Print '1' (true) or '0' (false) instead of a message"
 }
 
 # Script options
 while getopts ":hb" o; do
     case "${o}" in
-        h) display_help ;;
+        h) usage; exit 0 ;;
         b) print_boolean="1" ;;
-        \?) echo "Invalid option '-${OPTARG}'"; display_help ;;
+        \?) echo "Invalid option '-${OPTARG}'"; usage; exit 1 ;;
     esac
 done
 shift $((OPTIND-1))

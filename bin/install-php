@@ -179,6 +179,9 @@ def php_install(version: str, env: str = 'desktop', _append: tuple = (), _exclud
 
     print("")
     if confirm('Proceed?'):
+        if not sources_are_installed():
+            install_sources()
+
         run_command("sudo apt update")
         run_command("sudo apt install -y", *packages)
     else:

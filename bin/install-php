@@ -130,7 +130,7 @@ def parse_script_args():
     parser = argparse.ArgumentParser(description='Install/Uninstall php for a given environment')
     parser.add_argument('version', type=str, action='store',
                         help='The version to install.')
-    parser.add_argument('--uninstall', action='store_true', default=False,
+    parser.add_argument('-u', '--uninstall', action='store_true', default=False,
                         help='Uninstall the php version instead of install.')
     parser.add_argument('-e', '--env', type=str, action='store', choices=['desktop', 'development', 'server'],
                         default='desktop', help="The type of environment you're installing php on")

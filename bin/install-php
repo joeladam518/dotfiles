@@ -279,6 +279,10 @@ if __name__ == '__main__':
         print('python 3.8 and above is required')
         sys.exit(FAILURE)
 
+    if get_os() not in ['debian', 'ubuntu', 'rasbian']:
+        print('your os is not supported')
+        sys.exit(FAILURE)
+
     script_args = parse_script_args()
 
     if script_args.uninstall:

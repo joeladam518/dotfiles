@@ -31,7 +31,7 @@ def get_os_distro_like() -> str:
     os_type = get_platform()
 
     if os_type == 'linux':
-        return get_distro_like()
+        return get_distro_like() or get_distro()
 
     return os_type
 

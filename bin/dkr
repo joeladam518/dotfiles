@@ -67,7 +67,7 @@ container_is_not_running() {
 }
 
 check_docker() {
-    if [ -n "$SKIP_CHECKS" ]; then
+    if [ -n "${SKIP_CHECKS:-"${1:-""}"}" ]; then
         EXEC="yes"
     else
         # Ensure that Docker is running...
@@ -133,7 +133,7 @@ update_compose_alias_with_config_path() {
 }
 
 # Fix for newer docker compose command
-if ! [ -x "$(command -v docker-compose)" ]; then
+if [ ! -x "$(command -v docker-compose)" ]; then
     shopt -s expand_aliases
     alias docker-compose='docker compose'
 fi
@@ -172,7 +172,7 @@ fi
 # The rest of the possible arguments require docker to be running and the user has to run the dkr command from a
 # directory that includes a "docker-compose.yml" config file
 update_compose_alias_with_config_path
-check_docker
+check_docker "1" # Skip checks
 
 # Proxy PHP commands to the "php" binary on the application container...
 if [ "$1" == "php" ]; then

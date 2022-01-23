@@ -79,9 +79,9 @@ def parse_script_args():
     parser = argparse.ArgumentParser(description='Determine the operating system.')
 
     parser.add_argument('-s', '--simplified', action='store_true', default=False,
-                        help='get the simplified os type. windows|mac|linux')
+                        help='get the simplified os type (windows|mac|linux)')
     parser.add_argument('-l', '--like', action='store_true', default=False,
-                        help='get the distro that the current distro is like. (for Linux)')
+                        help='get the distro that the current distro is like (for Linux)')
 
     return parser.parse_args()
 

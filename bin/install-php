@@ -9,7 +9,7 @@ from collections import OrderedDict
 from typing import Optional, Union
 
 # Types
-Luple = Union[tuple, list]
+Luple = Union[list, tuple]
 
 # Constants
 SUCCESS = 0
@@ -127,18 +127,20 @@ def install_sources() -> None:
 
 
 def parse_script_args():
-    parser = argparse.ArgumentParser(description='Install/Uninstall php for a given environment')
+    parser = argparse.ArgumentParser(description='Install/Uninstall php')
+
     parser.add_argument('version', type=str, action='store',
-                        help='The version to install.')
+                        help='the version to install')
     parser.add_argument('-u', '--uninstall', action='store_true', default=False,
-                        help='Uninstall the php version instead of install.')
+                        help='uninstall the php version instead of install')
     parser.add_argument('-e', '--env', type=str, action='store', choices=['desktop', 'development', 'server'],
-                        default='desktop', help="The type of environment you're installing php on")
+                        default='desktop', help="the type of environment you're installing php on")
     parser.add_argument('-a', '--add', type=str, action='extend', nargs="+", default=[],
-                        help='Additional extensions to install')
+                        help='additional extensions you want to install')
     parser.add_argument('-r', '--remove', type=str, action='extend', nargs="+", default=[],
-                        help='Extensions you want to exclude')
-    parser.add_argument('-v', '--verbose', action='count', default=0, help='Output verbosity')
+                        help='extensions you want to exclude')
+    parser.add_argument('-v', '--verbose', action='count', default=0,
+                        help='verbosity')
 
     return parser.parse_args()
 

@@ -157,6 +157,7 @@ if [ $# -gt 0 ]; then
 
     # These are commands are special in that they do not touch docker-compose and they do no use the config file
     if [ "$1" == "connect" ]; then
+        shift 1
         stdtk_up "$@"
         exit
     fi

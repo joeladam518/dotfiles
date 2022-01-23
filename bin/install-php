@@ -132,11 +132,11 @@ def parse_script_args():
                         help='The version to install.')
     parser.add_argument('--uninstall', action='store_true', default=False,
                         help='Uninstall the php version instead of install.')
-    parser.add_argument('--env', type=str, action='store', choices=['desktop', 'development', 'server'],
+    parser.add_argument('-e', '--env', type=str, action='store', choices=['desktop', 'development', 'server'],
                         default='desktop', help="The type of environment you're installing php on")
-    parser.add_argument('--append', type=str, action='extend', nargs="+", default=[],
+    parser.add_argument('-a', '--add', type=str, action='extend', nargs="+", default=[],
                         help='Additional extensions to install')
-    parser.add_argument('--exclude', type=str, action='extend', nargs="+", default=[],
+    parser.add_argument('-r', '--remove', type=str, action='extend', nargs="+", default=[],
                         help='Extensions you want to exclude')
     parser.add_argument('-v', '--verbose', action='count', default=0, help='Output verbosity')
 

@@ -132,7 +132,7 @@ def parse_script_args():
     parser.add_argument('version', type=str, action='store',
                         help='the version to install')
     parser.add_argument('-u', '--uninstall', action='store_true', default=False,
-                        help='uninstall the php version instead of install')
+                        help='uninstall php instead of install')
     parser.add_argument('-e', '--env', type=str, action='store', choices=['desktop', 'development', 'server'],
                         default='desktop', help="the type of environment you're installing php on")
     parser.add_argument('-a', '--add', type=str, action='extend', nargs="+", default=[],

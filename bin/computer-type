@@ -5,9 +5,12 @@ import platform
 import sys
 from os import path
 
-
+# Constants
 SUCCESS = 0
 FAILURE = 1
+
+# variables
+_release_data = {}
 
 
 def get_distro() -> str:
@@ -37,14 +40,17 @@ def get_os_distro_like() -> str:
 
 
 def get_os_release() -> dict:
-    if not path.exists('/etc/os-release'):
-        return {}
+    global _release_data
 
-    with open('/etc/os-release') as f:
-        reader = csv.reader(f, delimiter="=")
-        data = {key: value for key, value in reader}
+    if not _release_data:
+        if not path.exists('/etc/os-release'):
+            return {}
 
-    return data
+        with open('/etc/os-release') as f:
+            reader = csv.reader(f, delimiter="=")
+            _release_data = {key: value for key, value in reader}
+
+    return _release_data
 
 
 def get_os_release_value(key: str) -> str:

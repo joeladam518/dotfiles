@@ -143,7 +143,7 @@ def parse_script_args():
     return parser.parse_args()
 
 
-def php_install(version: str, env: str = 'desktop', _append: tuple = (), _exclude: tuple = (), verbose: int = 0) -> int:
+def php_install(version: str, env: str = 'desktop', add: tuple = (), remove: tuple = (), verbose: int = 0) -> int:
     global php_extensions, php_versions
 
     if version not in php_versions['install']:
@@ -155,14 +155,14 @@ def php_install(version: str, env: str = 'desktop', _append: tuple = (), _exclud
         return FAILURE
 
     # combine the packages to be installed
-    extensions = [*php_extensions["common"], *php_extensions[env], *_append]
+    extensions = [*php_extensions["common"], *php_extensions[env], *add]
 
     if to_tuple_version(version) < (8, 0):
         extensions.append('json')
 
     # filter out any extensions
     extensions = unique(extensions)
-    extensions = exclude(extensions, _exclude)
+    extensions = exclude(extensions, remove)
 
     # build the extension strings and add them to the packages list
     packages = [f"php{version}", *list(map(lambda ext: extensionize(ext, version), extensions))]
@@ -170,8 +170,8 @@ def php_install(version: str, env: str = 'desktop', _append: tuple = (), _exclud
     if verbose > 0:
         print(f"php version: {version}")
         print(f"environment: {env}")
-        print(f"additional extensions: {', '.join(_append)}")
-        print(f"excluded extensions: {', '.join(_exclude)}")
+        print(f"additional extensions: {', '.join(add)}")
+        print(f"excluded extensions: {', '.join(remove)}")
 
     print("")
     print("Packages to be installed:")
@@ -287,8 +287,8 @@ if __name__ == '__main__':
         exit_status = php_install(
             version=script_args.version,
             env=script_args.env,
-            _append=tuple(script_args.append),
-            _exclude=tuple(script_args.exclude),
+            add=tuple(script_args.add),
+            remove=tuple(script_args.remove),
             verbose=script_args.verbose
         )
 

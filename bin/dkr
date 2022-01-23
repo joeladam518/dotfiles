@@ -6,6 +6,10 @@
 
 set -Eeo pipefail
 
+# Variables
+CWD="$(pwd -P)"
+# BIN_DIR="$(cd "$(dirname "$0")" > /dev/null 2>&1 && pwd -P)"
+
 # Functions
 cmsg() {
     # Output messages in color! :-)
@@ -62,6 +66,35 @@ container_is_not_running() {
     cmsg -an " or "
     cmsg -w "'dkr up -d'"
     exit 1
+}
+
+stdtk_up() {
+    # Bring up STDTK -> https://github.com/sourcetoad/DevopsToolKit
+    local ST_DSS_DIR ST_DST_DIR BUILD
+    ST_DSS_DIR="${HOME}/devop-tools/docker/data-source-services"
+    ST_DST_DIR="${HOME}/devop-tools/docker/data-source-tools"
+    BUILD="0"
+
+    if [ ! -d "$ST_DSS_DIR" ]; then
+        echo "data source services not found... What are you trying to connect to?"
+        return 1
+    fi
+
+    if [ ! -d "$ST_DST_DIR" ]; then
+        echo "data source tools not found... "
+        return 1
+    fi
+
+    if [ "$1" == "-b" ] || [ "$1" == "--build" ]; then
+        shift 1
+        BUILD="1"
+    fi
+
+    if [ "$BUILD" == "1" ]; then
+        cd "$ST_DSS_DIR" && docker-compose up --build -d && cd "$ST_DST_DIR" && docker-compose up --build -d && cd "$CWD"
+    else
+        cd "$ST_DSS_DIR" && docker-compose up -d && cd "$ST_DST_DIR" && docker-compose up -d && cd "$CWD"
+    fi
 }
 
 # Fix for newer docker compose command

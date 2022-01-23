@@ -68,7 +68,7 @@ container_is_not_running() {
     exit 1
 }
 
-do_checks() {
+check_docker() {
     if [ -n "$SKIP_CHECKS" ]; then
         EXEC="yes"
     else
@@ -153,194 +153,201 @@ export DB_PORT="${DB_PORT:-3306}"
 export WWWUSER="${WWWUSER:-"$UID"}"
 export WWWGROUP="${WWWGROUP:-"$(id -g)"}"
 
-if [ $# -gt 0 ]; then
-
-    # These are commands are special in that they do not touch docker-compose and they do no use the config file
-    if [ "$1" == "connect" ]; then
-        shift 1
-        stdtk_up "$@"
-        exit
-    fi
-
-    # The rest of these commands need to be in the project folder and have a config file
-    update_compose_alias_with_config_path
-    do_checks
-
-    # Proxy PHP commands to the "php" binary on the application container...
-    if [ "$1" == "php" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" php "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Proxy Artisan commands to the "artisan" binary on the application container...
-    elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            # With xdebug enabled...
-            if [ -n "$1" ] && [ "$1" == "--debug" ]; then
-                shift 1
-                docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" php artisan "$@"
-            else
-                docker-compose exec -u "$APP_USER" "$APP_SERVICE" php artisan "$@"
-            fi
-        else
-            container_is_not_running
-        fi
-
-    # Proxy the "test" command to the "php artisan test" Artisan command...
-    elif [ "$1" == "test" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            # With xdebug enabled...
-            if [ -n "$1" ] && [ "$1" == "--debug" ]; then
-                shift 1
-                docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" ./vendor/bin/phpunit "$@"
-            else
-                docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/phpunit "$@"
-            fi
-        else
-            container_is_not_running
-        fi
-
-    # Proxy vendor binary commands on the application container...
-    elif [ "$1" == "bin" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/"$*"
-        else
-            container_is_not_running
-        fi
-
-    # Proxy Composer commands to the "composer" binary on the application container...
-    elif [ "$1" == "composer" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" composer "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Proxy Node commands to the "node" binary on the application container...
-    elif [ "$1" == "node" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" node "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Proxy NPM commands to the "npm" binary on the application container...
-    elif [ "$1" == "npm" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" npm "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Proxy NPX commands to the "npx" binary on the application container...
-    elif [ "$1" == "npx" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" npx "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Proxy YARN commands to the "yarn" binary on the application container...
-    elif [ "$1" == "yarn" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" yarn "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Initiate a MySQL CLI terminal session within the "mysql" container...
-    elif [[ "$1" == mysql* ]]; then
-        SERVICE="$1"
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
-        else
-            container_is_not_running
-        fi
-
-        unset SERVICE
-
-    # Initiate a MySQL CLI terminal session within the "mariadb" container...
-    elif [[ "$1" == mariadb* ]]; then
-        SERVICE="$1"
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
-        else
-            container_is_not_running
-        fi
-
-        unset SERVICE
-
-    # Initiate a PostgreSQL CLI terminal session within the "pgsql" container...
-    elif [[ "$1" == psql* ]]; then
-        SERVICE="$1"
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec "$SERVICE" bash -c 'PGPASSWORD=${PGPASSWORD} psql -U ${POSTGRES_USER} ${POSTGRES_DB}'
-        else
-            container_is_not_running
-        fi
-
-        unset SERVICE
-
-    # Initiate a Bash shell within the application container...
-    elif [ "$1" == "shell" ] || [ "$1" == "bash" ]; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" bash "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Initiate a root user Bash shell within the application container...
-    elif [ "$1" == "root-shell" ] ; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec "$APP_SERVICE" bash "$@"
-        else
-            container_is_not_running
-        fi
-
-    # Initiate a Redis CLI terminal session within the "redis" container...
-    elif [ "$1" == "redis" ] ; then
-        shift 1
-
-        if [ "$EXEC" == "yes" ]; then
-            docker-compose exec redis redis-cli
-        else
-            container_is_not_running
-        fi
-
-    # Pass unknown commands to the "docker-compose" binary...
-    else
-        docker-compose "$@"
-    fi
-else
+# If no arguments were provided
+if [ $# -eq 0 ]; then
     docker-compose ps
+    exit
+fi
+
+# These arguments can be run from any where and do not require a "docker-compose.yml" config file.
+if [ "$1" == "connect" ]; then
+    shift 1
+    stdtk_up "$@"
+    exit
+elif [ "$1" == "stpall" ]; then
+    shift 1
+    # shellcheck disable=SC2046
+    docker stop $(docker ps -aq)
+    exit
+fi
+
+# The rest of the possible arguments require docker to be running and the user has to run the dkr command from a
+# directory that includes a "docker-compose.yml" config file.
+update_compose_alias_with_config_path
+check_docker
+
+# Proxy PHP commands to the "php" binary on the application container...
+if [ "$1" == "php" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" php "$@"
+    else
+        container_is_not_running
+    fi
+
+# Proxy Artisan commands to the "artisan" binary on the application container...
+elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        # With xdebug enabled...
+        if [ -n "$1" ] && [ "$1" == "--debug" ]; then
+            shift 1
+            docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" php artisan "$@"
+        else
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" php artisan "$@"
+        fi
+    else
+        container_is_not_running
+    fi
+
+# Proxy the "test" command to the "php artisan test" Artisan command...
+elif [ "$1" == "test" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        # With xdebug enabled...
+        if [ -n "$1" ] && [ "$1" == "--debug" ]; then
+            shift 1
+            docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" ./vendor/bin/phpunit "$@"
+        else
+            docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/phpunit "$@"
+        fi
+    else
+        container_is_not_running
+    fi
+
+# Proxy vendor binary commands on the application container...
+elif [ "$1" == "bin" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/"$*"
+    else
+        container_is_not_running
+    fi
+
+# Proxy Composer commands to the "composer" binary on the application container...
+elif [ "$1" == "composer" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" composer "$@"
+    else
+        container_is_not_running
+    fi
+
+# Proxy Node commands to the "node" binary on the application container...
+elif [ "$1" == "node" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" node "$@"
+    else
+        container_is_not_running
+    fi
+
+# Proxy NPM commands to the "npm" binary on the application container...
+elif [ "$1" == "npm" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" npm "$@"
+    else
+        container_is_not_running
+    fi
+
+# Proxy NPX commands to the "npx" binary on the application container...
+elif [ "$1" == "npx" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" npx "$@"
+    else
+        container_is_not_running
+    fi
+
+# Proxy YARN commands to the "yarn" binary on the application container...
+elif [ "$1" == "yarn" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" yarn "$@"
+    else
+        container_is_not_running
+    fi
+
+# Initiate a MySQL CLI terminal session within the "mysql" container...
+elif [[ "$1" == mysql* ]]; then
+    SERVICE="$1"
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+    else
+        container_is_not_running
+    fi
+
+    unset SERVICE
+
+# Initiate a MySQL CLI terminal session within the "mariadb" container...
+elif [[ "$1" == mariadb* ]]; then
+    SERVICE="$1"
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+    else
+        container_is_not_running
+    fi
+
+    unset SERVICE
+
+# Initiate a PostgreSQL CLI terminal session within the "pgsql" container...
+elif [[ "$1" == psql* ]]; then
+    SERVICE="$1"
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec "$SERVICE" bash -c 'PGPASSWORD=${PGPASSWORD} psql -U ${POSTGRES_USER} ${POSTGRES_DB}'
+    else
+        container_is_not_running
+    fi
+
+    unset SERVICE
+
+# Initiate a Bash shell within the application container...
+elif [ "$1" == "shell" ] || [ "$1" == "bash" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec -u "$APP_USER" "$APP_SERVICE" bash "$@"
+    else
+        container_is_not_running
+    fi
+
+# Initiate a root user Bash shell within the application container...
+elif [ "$1" == "root-shell" ] ; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec "$APP_SERVICE" bash "$@"
+    else
+        container_is_not_running
+    fi
+
+# Initiate a Redis CLI terminal session within the "redis" container...
+elif [ "$1" == "redis" ] ; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        docker-compose exec redis redis-cli
+    else
+        container_is_not_running
+    fi
+
+# Pass unknown commands to the "docker-compose" binary...
+else
+    docker-compose "$@"
 fi

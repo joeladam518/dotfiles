@@ -17,8 +17,3 @@ alias vst='vagrant status'
 
 # sail aliases
 alias sail='./vendor/bin/sail'
-
-# Docker aliases
-alias dkrstpall='docker stop $(docker ps -aq)'
-alias dkrrmall='docker rm $(docker ps -aq)'
-alias dkrrmallimages='docker rmi $(docker images -q)'

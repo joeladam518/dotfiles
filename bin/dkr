@@ -68,6 +68,30 @@ container_is_not_running() {
     exit 1
 }
 
+do_checks() {
+    if [ -n "$SKIP_CHECKS" ]; then
+        EXEC="yes"
+    else
+        # Ensure that Docker is running...
+        if ! docker info > /dev/null 2>&1; then
+            cmsg -y "Docker is not running." >&2
+            exit 1
+        fi
+
+        # Determine if the container is currently up...
+        PSRESULT="$(docker-compose ps -q)"
+        if docker-compose ps | grep "$APP_SERVICE" | grep 'Exit'; then
+            cmsg -d "Shutting down old container processes..." >&2
+            docker-compose down > /dev/null 2>&1
+            EXEC="no"
+        elif [ -n "$PSRESULT" ]; then
+            EXEC="yes"
+        else
+            EXEC="no"
+        fi
+    fi
+}
+
 stdtk_up() {
     # Bring up STDTK -> https://github.com/sourcetoad/DevopsToolKit
     local ST_DSS_DIR ST_DST_DIR BUILD
@@ -97,21 +121,23 @@ stdtk_up() {
     fi
 }
 
+update_compose_alias_with_config_path() {
+    # Figure out the docker-compose.yml path
+    if [ -f "./docker-compose.yml" ] || [ -f "./docker/docker-compose.yml" ]; then
+        if [ -f "./docker/docker-compose.yml" ]; then
+            shopt -s expand_aliases
+            alias docker-compose='docker-compose --file="./docker/docker-compose.yml"'
+        fi
+    else
+        cmsg -y "Couldn't find your docker-compose.yml file. Are you sure your in the correct folder?" >&2
+        exit 1
+    fi
+}
+
 # Fix for newer docker compose command
 if ! [ -x "$(command -v docker-compose)" ]; then
     shopt -s expand_aliases
     alias docker-compose='docker compose'
-fi
-
-# Figure out the docker-compose.yml path
-if [ -f "./docker-compose.yml" ] || [ -f "./docker/docker-compose.yml" ]; then
-    if [ -f "./docker/docker-compose.yml" ]; then
-        shopt -s expand_aliases
-        alias docker-compose='docker-compose --file="./docker/docker-compose.yml"'
-    fi
-else
-    cmsg -y "Couldn't find your docker-compose.yml file. Are you sure your in the correct folder?" >&2
-    exit 1
 fi
 
 # Source the ".env" file so the environment variables are available...
@@ -127,29 +153,18 @@ export DB_PORT="${DB_PORT:-3306}"
 export WWWUSER="${WWWUSER:-"$UID"}"
 export WWWGROUP="${WWWGROUP:-"$(id -g)"}"
 
-if [ -n "$SKIP_CHECKS" ]; then
-    EXEC="yes"
-else
-    # Ensure that Docker is running...
-    if ! docker info > /dev/null 2>&1; then
-        cmsg -y "Docker is not running." >&2
-        exit 1
-    fi
-
-    # Determine if the container is currently up...
-    PSRESULT="$(docker-compose ps -q)"
-    if docker-compose ps | grep "$APP_SERVICE" | grep 'Exit'; then
-        cmsg -d "Shutting down old container processes..." >&2
-        docker-compose down > /dev/null 2>&1
-        EXEC="no"
-    elif [ -n "$PSRESULT" ]; then
-        EXEC="yes"
-    else
-        EXEC="no"
-    fi
-fi
-
 if [ $# -gt 0 ]; then
+
+    # These are commands are special in that they do not touch docker-compose and they do no use the config file
+    if [ "$1" == "connect" ]; then
+        stdtk_up "$@"
+        exit
+    fi
+
+    # The rest of these commands need to be in the project folder and have a config file
+    update_compose_alias_with_config_path
+    do_checks
+
     # Proxy PHP commands to the "php" binary on the application container...
     if [ "$1" == "php" ]; then
         shift 1

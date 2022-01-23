@@ -13,6 +13,7 @@ alias gunstg='git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o g
 alias vu='vagrant up'
 alias vh='vagrant halt'
 alias vm='vagrant ssh'
+alias vst='vagrant status'
 
 # sail aliases
 alias sail='./vendor/bin/sail'

@@ -32,7 +32,7 @@ export HISTCONTROL=ignoreboth
 # For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTSIZE=100000
 export HISTFILESIZE=200000
-export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit:* --help"
+export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit"
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 

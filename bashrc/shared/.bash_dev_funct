@@ -8,17 +8,14 @@ composer_link()
 
 # Change to a repo directory based on a alias file you define in your home directory
 repo() {
-    local repos lines line key aliased
-    declare -A repos
+    local repos line key aliased aliases_path
+    aliases_path="${HOME}/.repo-aliases"
 
-    if [ -f "${HOME}/.repo-aliases" ] && [ -r "${HOME}/.repo-aliases" ]; then
-        # convert our .repo-aliases file into an associative array
-        readarray -t lines < "${HOME}/.repo-aliases"
-        for line in "${lines[@]}"; do
-            if [ -n "$line" ]; then
-                repos["${line%%=*}"]="$(eval "echo ${line#*=}")"
-            fi
-        done
+    # convert file to bash array
+    if [ -f "$aliases_path" ] && [ -r "$aliases_path" ]; then
+        eval "$(__repo-helper --file="${aliases_path}" --name=repos)"
+    else
+        declare -A repos
     fi
 
     # add repo directories that we didn't define in out aliases file to our array
@@ -31,13 +28,13 @@ repo() {
 
     key="${1}"
     if [ -z "${key}" ]; then
-        echo "You must specify a key" >&2
+        echo "You must specify a key" 1>&2
         return 1
     fi
 
     # Check if key exists in the array
     if ! [ ${repos[$key]+bob} ]; then
-        echo "invalid option ${1}" >&2
+        echo "invalid option ${1}" 1>&2
         return 1
     fi
 

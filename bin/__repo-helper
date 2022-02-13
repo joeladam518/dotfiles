@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+# Parse your repo aliases file for a list of keys (aliases), a list of paths,
+# or a bash multidimensional array
+import argparse
+import os
+import sys
+from configparser import ConfigParser
+
+
+# Constants
+SUCCESS = 0
+FAILURE = 1
+
+
+# Functions
+def print_bash_array(parser: ConfigParser) -> None:
+    for section in parser.sections():
+        print(f'declare -A {section}')
+        for key, val in parser.items(section):
+            print(f'{section}[{key}]="{os.path.expanduser(val)}"')
+
+
+def print_keys(parser: ConfigParser, sep: str = ' ') -> None:
+    keys = []
+    for section in parser.sections():
+        keys = [*keys, *dict(parser.items(section)).keys()]
+    print(*keys, sep=sep)
+
+
+def print_paths(parser: ConfigParser, sep: str = ' ') -> None:
+    values = []
+    for section in parser.sections():
+        values = [*values, *dict(parser.items(section)).values()]
+    print(*map(lambda x: os.path.expanduser(x), values), sep=sep)
+
+
+def parse_separator(seperator: str) -> str:
+    if seperator == r'\n':
+        return '\n'
+
+    if seperator == r'\r':
+        return '\r'
+
+    if seperator == r'\t':
+        return '\t'
+
+    return seperator
+
+
+def parse_script_args():
+    parser = argparse.ArgumentParser(description='Parse your repo aliases into keys, values, or a bash array.')
+
+    parser.add_argument('-f', '--file', type=str, action='store', default='', help="your repo aliases file path")
+    parser.add_argument('-n', '--name', type=str, action='store', default='repos', help="set the variable name for your bash array")
+    parser.add_argument('-s', '--separator', type=str, action='store', default=' ', help="the seperator for when you ask for keys or paths")
+    parser.add_argument('-k', '--keys', action='store_true', default=False, help="get your repo aliases's keys")
+    parser.add_argument('-p', '--paths', action='store_true', default=False, help="get your repo aliases's paths")
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = parse_script_args()
+
+    if args.file:
+        with open(args.file, 'r') as file:
+            config = file.read()
+    else:
+        config = sys.stdin.read()
+
+    parser = ConfigParser()
+    parser.read_string(f'[{args.name}]\n' + config)
+
+    if args.keys:
+        print_keys(parser, parse_separator(args.separator))
+    elif args.paths:
+        print_paths(parser, parse_separator(args.separator))
+    else:
+        print_bash_array(parser)
+
+    sys.exit(SUCCESS)

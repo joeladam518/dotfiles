@@ -81,6 +81,10 @@ if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
+if [ -d "/usr/local/go/bin" ] && [[ ! "$PATH" =~ (^|:)"/usr/local/go/bin"(:|$) ]]; then
+    PATH="${PATH}:/usr/local/go/bin"
+fi
+
 # .fzf command line fuzzy finder
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 

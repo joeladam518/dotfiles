@@ -56,7 +56,7 @@ next_release() {
 git_removeAllUnmergedLocalBranchesNotOnRemoteFunction()
 {
     echo "Didn't do anything. TODO: finish this function :-)"
-    exit 0
+    return 0
 
     # This seemed to work on 2019-02-28 and again on 2020-09-15
     # notes: https://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore

@@ -1,3 +1,4 @@
+# -*- shell-script -*-
 # Global aliases
 
 # Reload shell

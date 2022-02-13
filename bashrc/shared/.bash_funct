@@ -1,3 +1,4 @@
+# -*- shell-script -*-
 # Global Bash Functions
 
 # Creates an archive (*.tar.gz) from given directory.

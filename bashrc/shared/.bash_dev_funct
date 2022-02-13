@@ -14,7 +14,7 @@ repo() {
 
     # convert file to bash array
     if [ -f "$aliases_path" ] && [ -r "$aliases_path" ]; then
-        eval "$(__repo-helper --file="${aliases_path}" --name=repos)"
+        eval "$(__repo-helper "${aliases_path}" --name=repos)"
     else
         declare -A repos
     fi

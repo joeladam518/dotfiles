@@ -9,8 +9,8 @@ if command -v "repo" >/dev/null 2>&1; then
         CURRENT="${COMP_WORDS[COMP_CWORD]}"
 
         if [ -f "$ALIASES_PATH" ] && [ -r "$ALIASES_PATH" ]; then
-            OPTS="$(__repo-helper --file="${ALIASES_PATH}" --keys)"
-            ALIASED="$(__repo-helper --file="${ALIASES_PATH}" --separator="\n" --paths)"
+            OPTS="$(__repo-helper "${ALIASES_PATH}" --keys)"
+            ALIASED="$(__repo-helper "${ALIASES_PATH}" --sep="\n" --paths)"
         else
             OPTS=""
             ALIASED=""

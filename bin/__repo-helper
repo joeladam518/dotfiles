@@ -3,13 +3,7 @@
 # or a bash multidimensional array
 import argparse
 import os
-import sys
 from configparser import ConfigParser
-
-
-# Constants
-SUCCESS = 0
-FAILURE = 1
 
 
 # Functions
@@ -20,26 +14,22 @@ def print_bash_array(parser: ConfigParser) -> None:
             print(f'{section}[{key}]="{os.path.expanduser(val)}"')
 
 
-def print_keys(parser: ConfigParser, sep: str = ' ') -> None:
-    keys = []
-    for section in parser.sections():
-        keys = [*keys, *dict(parser.items(section)).keys()]
+def print_keys(parser: ConfigParser, section: str, sep: str = ' ') -> None:
+    keys = dict(parser.items(section)).keys()
     print(*keys, sep=sep)
 
 
-def print_paths(parser: ConfigParser, sep: str = ' ') -> None:
-    values = []
-    for section in parser.sections():
-        values = [*values, *dict(parser.items(section)).values()]
-    print(*map(lambda x: os.path.expanduser(x), values), sep=sep)
+def print_paths(parser: ConfigParser, section: str, sep: str = ' ') -> None:
+    paths = map(lambda x: os.path.expanduser(x), dict(parser.items(section)).values())
+    print(*paths, sep=sep)
 
 
 def parse_separator(seperator: str) -> str:
-    if seperator == r'\n':
-        return '\n'
+    if seperator == ' ':
+        return ' '
 
-    if seperator == r'\r':
-        return '\r'
+    if seperator == r'\n':
+        return os.linesep
 
     if seperator == r'\t':
         return '\t'
@@ -50,31 +40,24 @@ def parse_separator(seperator: str) -> str:
 def parse_script_args():
     parser = argparse.ArgumentParser(description='Parse your repo aliases into keys, values, or a bash array.')
 
-    parser.add_argument('-f', '--file', type=str, action='store', default='', help="your repo aliases file path")
+    parser.add_argument('file', type=str, action='store', help="repo aliases file path")
     parser.add_argument('-n', '--name', type=str, action='store', default='repos', help="set the variable name for your bash array")
-    parser.add_argument('-s', '--separator', type=str, action='store', default=' ', help="the seperator for when you ask for keys or paths")
-    parser.add_argument('-k', '--keys', action='store_true', default=False, help="get your repo aliases's keys")
-    parser.add_argument('-p', '--paths', action='store_true', default=False, help="get your repo aliases's paths")
+    parser.add_argument('-s', '--sep', type=str, action='store', default=' ', help="set the seperator for keys and paths")
+    parser.add_argument('-k', '--keys', action='store_true', default=False, help="get repo aliases's keys")
+    parser.add_argument('-p', '--paths', action='store_true', default=False, help="get repo aliases's paths")
 
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_script_args()
+    config_parser = ConfigParser()
 
-    if args.file:
-        with open(args.file, 'r') as file:
-            config = file.read()
-    else:
-        config = sys.stdin.read()
-
-    parser = ConfigParser()
-    parser.read_string(f'[{args.name}]\n' + config)
+    with open(args.file, 'r') as file:
+        config_parser.read_string(f'[{args.name}]\n' + file.read())
 
     if args.keys:
-        print_keys(parser, parse_separator(args.separator))
+        print_keys(config_parser, section=args.name, sep=parse_separator(args.sep))
     elif args.paths:
-        print_paths(parser, parse_separator(args.separator))
+        print_paths(config_parser, section=args.name, sep=parse_separator(args.sep))
     else:
-        print_bash_array(parser)
-
-    sys.exit(SUCCESS)
+        print_bash_array(config_parser)

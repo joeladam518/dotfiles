@@ -174,7 +174,7 @@ def os_id_like() -> tuple:
     return system_type,
 
 
-def os_type():
+def os_type() -> str:
     """Get the type of operating system"""
     if sys.platform in ['win32', 'win64', 'cygwin']:
         return 'windows'
@@ -207,6 +207,7 @@ def parse_script_args():
 
 
 def php_sources_are_installed() -> bool:
+    """Check see if the php apt repository is installed"""
     cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep '%s' | grep 'php'"
     if os_id() in ['debian', 'raspbian']:
         if os.path.exists('/etc/apt/sources.list.d/sury-php.list'):
@@ -223,6 +224,7 @@ def php_sources_are_installed() -> bool:
 
 
 def release_info(key: Optional[str] = None) -> Union[dict, str]:
+    """Get a value form the /etc/os-release file"""
     global __os_release_data
 
     if not __os_release_data:
@@ -235,6 +237,7 @@ def release_info(key: Optional[str] = None) -> Union[dict, str]:
 
 
 def run(cmd: str, *args, **kwargs):
+    """Run a shell command with or without sudo privileges"""
     cmd_arguments = [cmd, *args]
     supress_output = kwargs.get('supress_output', False)
     capture_output = False if supress_output else kwargs.get('capture_output', False)

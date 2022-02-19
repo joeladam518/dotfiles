@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+if [ "$(osinfo -s)" != "linux" ]; then
+    echo "Unsupported operating system '$(osinfo)'." 1>&2
+    exit 1
+fi
+
+if command -v "php" > /dev/null 2>&1; then
+    echo "PHP is not installed." 1>&2
+    exit 1
+fi
+
 expected_signature="$(wget -q -O - https://composer.github.io/installer.sig)"
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 actual_signature="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"

@@ -14,38 +14,3 @@ fi
 if [ -f "${BASHRC_DIR}/shared/.bash_dev_funct" ]; then
     . "${BASHRC_DIR}/shared/.bash_dev_funct"
 fi
-
-alert() {
-    local O OPTIND body icon title
-    OPTIND=1
-    title="Alert!"
-
-    while getopts ":fi:t:T" O; do
-        case "$O" in
-            f)  icon="$([ "$?" == "0" ] && echo terminal || echo error)"
-                title="$([ -n "$title" ] && echo "Command Finished" || echo " ")"
-                body="$(history | tail -n1 | sed -e 's/^\s*[0-9]\+\s*//' | sed -E 's/[;&|]+\s*alert.*$//')"
-                ;; # Alert you to the finished command. usage example: sleep 10; alert -f
-            i)  icon="$([ -z "$icon" ] && echo "$OPTARG" || echo " ")"     ;; # change icon
-            t)  title="$([ -n "$title" ] && echo "$OPTARG" || echo " ")"   ;; # change title
-            T)  title=""                                                   ;; # Force empty title
-            \?) echo "alert() invalid option: -${OPTARG}" 1>&2; return 1 ;;
-        esac
-    done
-
-    shift $((OPTIND-1))
-
-    if [ -z "$icon" ]; then
-        icon="terminal"
-    fi
-
-    if [ -z "$title" ]; then
-        title=" "
-    fi
-
-    if [ -z "$body" ]; then
-        body="$*"
-    fi
-
-    notify-send --urgency=low -i "$icon" "$title" "$body"
-}

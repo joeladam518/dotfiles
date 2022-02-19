@@ -3,38 +3,35 @@
 # fail fast
 set -Eeuo pipefail
 # show the list of devices if there is an error
-trap error_cleanup ERR
+trap cleanup ERR
 
 # Functions
-check_v4l_utils_is_installed() {
-    if ! command -v "v4l2-ctl" >/dev/null 2>&1; then
-        echo "v4l-utils is not installed." 1>&2
-        exit 1
-    fi
+usage() {
+    cat << EOF
+Usage: $(basename "${0}") [-h] [-l] {device_id}
+
+Adjusts the settings for your logitech webcam
+
+Arguments:
+device_id       the the numeric id of the webcam
+
+Options:
+-h, --help      show this help message
+-l, --list      list all webcam devices
+EOF
+    exit 0
 }
 
-check_os() {
-    local UNAME MACHINE
-
-    UNAME="$(uname -s)"
-
-    case "$UNAME" in
-        Linux*)  MACHINE="linux";;
-        *)       MACHINE="UNKNOWN";;
-    esac
-
-    if [ "$MACHINE" != "linux" ]; then
-        echo "Unsupported operating system [${UNAME}]." 1>&2
-        echo "Currently this script only supports Linux distributions." 1>&2
-        exit 1
-    fi
+invalid_option() {
+    echo "Invalid Option: ${1}" 1>&2
+    exit 1
 }
 
-error_cleanup() {
+cleanup() {
     trap - ERR
     cmsg ""
     cmsg -c "Here's the list of available devices:"
-    v4l2-ctl --list-devices
+    list_devices
 }
 
 is_int() {
@@ -44,56 +41,66 @@ is_int() {
     esac
 }
 
-usage() {
-    echo "usage: $(basename "${0}") [-h] [-l] {device_id}"
-    echo ""
-    echo "Adjusts the settings for your logitech webcam"
-    echo ""
-    echo "arguments:"
-    echo "  device_id       The the numeric id of the webcam"
-    echo ""
-    echo "options:"
-    echo "  -h              Displays this help message"
-    echo "  -l              List all webcam devices"
+check_os() {
+    if [ "$(osinfo -s)" != "linux" ]; then
+        echo "Unsupported operating system [${UNAME}]." 1>&2
+        echo "Currently this script only supports Linux distributions." 1>&2
+        exit 1
+    fi
 }
 
-# Script options
-while getopts ":hl" o; do
-    case "${o}" in
-        h)
-            usage
-            exit 0
-            ;;
-        l)
-            echo ""
-            check_os
-            check_v4l_utils_is_installed
-            v4l2-ctl --list-devices
-            exit 0
-            ;;
-        \?)
-            echo "Invalid option '-${OPTARG}'";
-            usage
-            exit 1
-            ;;
-    esac
-done
-shift $((OPTIND-1))
+check_v4l_utils_is_installed() {
+    if ! command -v "v4l2-ctl" >/dev/null 2>&1; then
+        echo "v4l-utils is not installed." 1>&2
+        exit 1
+    fi
+}
 
-# check to make sure we can run this script
+check_device_number() {
+    if ! is_int "${device:- ""}"; then
+        echo "Error: Invalid device id" 1>&2
+        exit 1
+    fi
+}
+
+list_devices() {
+    check_os
+    check_v4l_utils_is_installed
+    echo ""
+    v4l2-ctl --list-devices
+    exit 0
+}
+
+parse_arguments() {
+    device="${1:-0}"
+
+    return 0
+}
+
+parse_params() {
+    while :; do
+        case "${1:-""}" in
+            -h | --help) usage ;;
+            -l | --list) list_devices ;;
+            -?*) invalid_option "$1" ;;
+            *) break ;;
+        esac
+        shift
+    done
+
+    return 0
+}
+
+# Script Logic
+parse_params "$@"
+parse_arguments "$@"
+
 check_os
 check_v4l_utils_is_installed
-
-# Default device number
-device="${1:-0}"
-if ! is_int "${device}"; then
-    echo "Error: Invalid device id" 1>&2
-    exit 1
-fi
+check_device_number
 
 cmsg -c "Setting webcam settings for device: /dev/video${device}"
-#-----------------------------------------------------------------------------------------------------------------------
-
+#-------------------------------------------------------------------------------------------------------------------
 # settings
 v4l2-ctl -d "${device}" --set-ctrl brightness=135
 v4l2-ctl -d "${device}" --set-ctrl contrast=128
@@ -116,6 +123,5 @@ v4l2-ctl -d "${device}" --set-ctrl exposure_auto_priority=0
 
 # zoom?
 #v4l2-ctl -d "${device}" --set-ctrl zoom_absolute=175
-
-#-----------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------------------------
 cmsg -c "Done!"

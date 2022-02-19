@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 if [ "$(osinfo -s)" != "linux" ]; then
-    echo "Unsupported operating system '$(osinfo)'." 1>&2
+    echo "Unsupported operating system '$(osinfo)'" 1>&2
     exit 1
 fi
 
 if ! command -v "php" > /dev/null 2>&1; then
-    echo "PHP is not installed." 1>&2
+    echo "PHP is not installed" 1>&2
     exit 1
 fi
 

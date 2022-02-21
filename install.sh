@@ -137,16 +137,15 @@ else
     cd "$HOME" && ln -s "${DOTFILES_DIR}/tmux/.tmux.conf" ".tmux.conf"
 fi
 
-# if server we're done!
-if [ "$system" == "server" ]; then
-    exit 0
+if [ "$system" != "server" ]; then
+    # Symlink the git config
+    if [ -L "${HOME}/.gitconfig" ]; then
+        cmsg -y "The .gitconfig symlink already exists"
+    elif [ -f "${HOME}.gitconfig" ]; then
+        cmsg -y "Found an existing .gitconfig file"
+    else
+        cd "$HOME" && cp "${DOTFILES_DIR}/git/.gitconfig" ".gitconfig"
+    fi
 fi
 
-# Symlink the git config
-if [ -L "${HOME}/.gitconfig" ]; then
-    cmsg -y "The .gitconfig symlink already exists"
-elif [ -f "${HOME}.gitconfig" ]; then
-    cmsg -y "Found an existing .gitconfig file"
-else
-    cd "$HOME" && ln -s "${DOTFILES_DIR}/git/.gitconfig" .
-fi
+

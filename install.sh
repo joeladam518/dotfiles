@@ -104,7 +104,7 @@ fi
 
 # Symlink the bashrc files
 if [ -L "${HOME}/${rcfile}" ]; then
-    cmsg -y "The .bashrc symlink already exists"
+    cmsg -y "Found an existing .bashrc symlink"
 elif [ -f "${HOME}/${rcfile}" ]; then
     cmsg -y "Found an existing .bashrc file"
 else
@@ -113,7 +113,7 @@ fi
 
 # Symlink the vimrc files
 if [ -L "${HOME}/.vim" ]; then
-    cmsg -y "The .vim symlink already exists"
+    cmsg -y "Found an existing .vim directory symlink"
 elif [ -d "${HOME}/.vim" ]; then
     cmsg -y "Found an existing .vim directory"
 else
@@ -121,7 +121,7 @@ else
 fi
 
 if [ -L "${HOME}/.vimrc" ]; then
-    cmsg -y "The .vimrc symlink already exists"
+    cmsg -y "Found an existing .vimrc symlink"
 elif [ -f "${HOME}/.vimrc" ]; then
     cmsg -y "Found an existing .vimrc file"
 else
@@ -130,7 +130,7 @@ fi
 
 # Symlink the tmux config
 if [ -L "${HOME}/.tmux.conf" ]; then
-    cmsg -y "The .tmux.conf symlink already exists"
+    cmsg -y "Found an existing .tmux.conf symlink"
 elif [ -f "${HOME}/.tmux.conf" ]; then
     cmsg -y "Found an existing .tmux.conf file"
 else
@@ -138,10 +138,10 @@ else
 fi
 
 if [ "$system" != "server" ]; then
-    # Symlink the git config
+    # Copy the git config
     if [ -L "${HOME}/.gitconfig" ]; then
-        cmsg -y "The .gitconfig symlink already exists"
-    elif [ -f "${HOME}.gitconfig" ]; then
+        cmsg -y "Found an existing .gitconfig symlink"
+    elif [ -f "${HOME}/.gitconfig" ]; then
         cmsg -y "Found an existing .gitconfig file"
     else
         cd "$HOME" && cp "${DOTFILES_DIR}/git/.gitconfig" ".gitconfig"

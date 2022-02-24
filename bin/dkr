@@ -155,7 +155,7 @@ fi
 # Determine if Sail is currently up...
 PSRESULT="$(docker-compose ps -q)"
 if docker-compose ps "$APP_SERVICE" | grep 'Exit\|exited'; then
-    cmsg -w "Shutting down old Sail processes..." 1>&2
+    cmsg -w "Shutting down old docker processes..." 1>&2
     docker-compose down > /dev/null 2>&1
     EXEC="no"
 elif [ -n "$PSRESULT" ]; then

@@ -355,6 +355,14 @@ endif
 "-------------------------------------------------------------------------------
 " => Syntax highlighting
 "-------------------------------------------------------------------------------
-" For any .bash* files
-autocmd BufRead .bash* set syntax=sh
+" For any bash config files
+autocmd BufRead .bashrc set syntax=bash
+autocmd BufRead .bash_profile set syntax=bash
+autocmd BufRead .bash_aliases set syntax=bash
+autocmd BufRead .bash_funct set syntax=bash
+autocmd BufRead .bash_*_aliases set syntax=bash
+autocmd BufRead .bash_*_funct set syntax=bash
+
+
+
 

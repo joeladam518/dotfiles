@@ -105,6 +105,9 @@ fi
 # .fzf command line fuzzy finder
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
+# chenge the default find command
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+
 # Unset any variables that were used in this script
 unset DOTFILES_DIR BASHRC_DIR MAC_BASHRC_DIR HOMEBREW_DIR
 

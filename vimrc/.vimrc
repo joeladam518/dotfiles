@@ -80,17 +80,9 @@ command Q q!
 " which is the default
 nmap Y y$
 
-" Move up/down editor lines
-"nnoremap j gj
-"nnoremap gj j
-"nnoremap k gk
-"nnoremap gk k
-
 " Toggle highlight line on cursorline 
 map <silent> <leader>- :call ToggleCursorline()<CR>
 
-" Toggle Hidden Chars
-map <silent> <leader>- :call ToggleCursorline()<CR>
 " Disable highlight when <leader><cr> is pressed
 nmap <silent> <leader><CR> :noh<CR><C-L>
 
@@ -118,22 +110,22 @@ noremap <leader><S-h> :tabp<CR>
 nmap <silent> <leader>E :Explore<CR>
 nmap <silent> <leader>R :Rex<CR>
 
-" Proper clipboard copy / paste
+" clipboard copy / paste
+" copy
 vmap <silent> <leader>rc "+y
 vmap <silent> <leader>rx "+c
-nmap <silent> <leader>rv k"+p
-vmap <silent> <leader>rv c<ESC>k"+p
-imap <silent> <C-v> <ESC>k"+p
+vmap <silent> <leader>rv c<ESC>"+gP
+nmap <silent> <leader>rv "+gP
 
 " Fast saving and quiting
 nmap <silent> <leader>w :w!<cr>
 nmap <silent> <leader>Q :q!<cr>
 
 " Open Files!
-map <leader>e :e 
-map <leader>t :tabe  
-map <leader>sh :split 
-map <leader>sv :vsplit 
+"map <leader>e :e 
+"map <leader>t :tabe  
+map <leader>ss :split<CR> 
+map <leader>sv :vsplit<CR> 
 
 "-------------------------------------------------------------------------------
 " => Vim FZF mappings
@@ -331,7 +323,7 @@ set cursorline
 set notimeout ttimeout ttimeoutlen=200
 
 " Viewing hidden characters
-set listchars=eol:¬,tab:▸\ ,space:\.
+set listchars=eol:¬,tab:▸\ ,space:\. 
 
 "-------------------------------------------------------------------------------
 " => Gui Settings
@@ -362,7 +354,4 @@ autocmd BufRead .bash_aliases set syntax=bash
 autocmd BufRead .bash_funct set syntax=bash
 autocmd BufRead .bash_*_aliases set syntax=bash
 autocmd BufRead .bash_*_funct set syntax=bash
-
-
-
 

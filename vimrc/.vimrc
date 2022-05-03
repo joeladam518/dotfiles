@@ -26,7 +26,8 @@ Plug 'phanviet/vim-monokai-pro'
 
 " -> Plugins
 " https://github.com/junegunn/fzf.vim -> Fzf for vim
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } 
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 " https://github.com/sheerun/vim-polygloti -> Comprehensive language pack 
 Plug 'sheerun/vim-polyglot' 
 " https://github.com/tpope/vim-commentary -> Commenting plugin 
@@ -127,29 +128,20 @@ nmap <silent> <leader>Q :q!<cr>
 map <leader>ss :split<CR> 
 map <leader>sv :vsplit<CR> 
 
+" Change vim's curent working dir to the current buffer's dir
+noremap <silent> <leader>cd :cd %:p:h<CR>
+
 "-------------------------------------------------------------------------------
 " => Vim FZF mappings
 "-------------------------------------------------------------------------------
-" Open a file in new buffer
-nnoremap <silent> <leader>f<leader> :call fzf#run({
-\   'sink': 'e',
-\   'options': '--multi'
-\ })<CR>
-" Open a file in a new tab
-nnoremap <silent> <leader>ft :call fzf#run({
-\   'sink': 'tabedit', 
-\   'options': '--multi'
-\ })<CR>
-" Open a file in a new vertical split
-nnoremap <silent> <leader>fv :call fzf#run({
-\   'right': winwidth('.') / 2,
-\   'sink': 'vertical split'
-\ })<CR>
-" Open a file in a new horizontial split
-nnoremap <silent> <leader>fh :call fzf#run({
-\   'down': winwidth('.') / 2,
-\   'sink': 'split'
-\ })<CR>
+" Open in vim's curent working dir
+nnoremap <silent> <leader>f<leader> :call fzf#vim#files(getcwd())<CR>
+" Open in buffer's working dir
+nnoremap <silent> <leader>ff<leader> :Files %:p:h<CR>
+" Open in home
+nnoremap <silent> <leader>fh<leader> :Files ~<CR>
+" Open in ~/repos
+nnoremap <silent> <leader>fr<leader> :Files ~/repos<CR>
 
 "-------------------------------------------------------------------------------
 " => Settings
@@ -191,13 +183,13 @@ set hidden
 " set confirm
 " set autowriteall
 
-if IsOS("mac")
-    " set auto change dir
-    set autochdir
-else
+if GetOS() == "win" || GetOS() == "linux"
     " Disable Alt key mnemonics
     set winaltkeys=no
 endif
+
+" set auto change dir
+"set autochdir
 
 " Sets how many lines of history VIM has to remember
 set history=1000

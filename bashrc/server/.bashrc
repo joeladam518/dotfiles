@@ -91,6 +91,7 @@ if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
 fi
 
 # .fzf command line fuzzy finder
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Load functions

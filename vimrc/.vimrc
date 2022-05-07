@@ -1,7 +1,7 @@
 " My Vimrc :-)
 
 " Set the leader
-" With a map leader it's possible to do extra key combinations
+" With a leader it's possible to do extra key combinations
 let mapleader=" "
 let g:mapleader=" "
 
@@ -107,29 +107,18 @@ noremap <leader>h :bprevious<CR>
 noremap <leader><S-l> :tabn<CR>
 noremap <leader><S-h> :tabp<CR>
 
-" Netrw Open and return from explorer
-nmap <silent> <leader>E :Explore<CR>
-nmap <silent> <leader>R :Rex<CR>
-
-" clipboard copy / paste
-" copy
-vmap <silent> <leader>rc "+y
-vmap <silent> <leader>rx "+c
-vmap <silent> <leader>rv c<ESC>"+gP
-nmap <silent> <leader>rv "+gP
-
-" Fast saving and quiting
-nmap <silent> <leader>w :w!<cr>
-nmap <silent> <leader>Q :q!<cr>
-
 " Open Files!
-"map <leader>e :e 
-"map <leader>t :tabe  
 map <leader>ss :split<CR> 
 map <leader>sv :vsplit<CR> 
 
 " Change vim's curent working dir to the current buffer's dir
 noremap <silent> <leader>cd :cd %:p:h<CR>
+
+" Clipboard copy & paste
+vmap <silent> <leader>rc "+y
+vmap <silent> <leader>rx "+c
+vmap <silent> <leader>rv c<ESC>"+gP
+nmap <silent> <leader>rv "+gP
 
 "-------------------------------------------------------------------------------
 " => Vim FZF mappings

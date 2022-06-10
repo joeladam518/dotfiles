@@ -39,6 +39,11 @@ export LC_ALL="en_US.UTF-8"
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
 
+# ruby
+if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+    export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
+fi
+
 # yarn
 if [ -d "${HOME}/.yarn/bin" ]; then
     export PATH="${PATH}:${HOME}/.yarn/bin"

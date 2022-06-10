@@ -97,9 +97,9 @@ stdtk_up() {
     fi
 
     if [ "$BUILD" == "1" ]; then
-        cd "$ST_DSS_DIR" && docker-compose up --build -d && cd "$ST_DST_DIR" && docker-compose up --build -d && cd "$CWD"
+        ( cd "$ST_DSS_DIR" && docker-compose up --build -d ) && ( cd "$ST_DST_DIR" && docker-compose up --build -d )
     else
-        cd "$ST_DSS_DIR" && docker-compose up -d && cd "$ST_DST_DIR" && docker-compose up -d && cd "$CWD"
+        ( cd "$ST_DSS_DIR" && docker-compose up -d ) && ( cd "$ST_DST_DIR" && docker-compose up -d )
     fi
 }
 
@@ -115,16 +115,13 @@ if [ -f "./.env" ]; then
     source "./.env"
 fi
 
-# Fix for newer docker compose command
-if [ ! -x "$(command -v docker-compose)" ]; then
+# For projects that like to put the yml in a docker directory (sourcetoad)
+if [ ! -f "./docker-compose.yml" ] && [ -f "./docker/docker-compose.yml" ]; then
+    shopt -s expand_aliases
+    alias docker-compose='docker compose --file="./docker/docker-compose.yml"'
+else
     shopt -s expand_aliases
     alias docker-compose='docker compose'
-fi
-
-# For projects that like to put the yml in a docker directory (sourcetoad)
-if [ -f "./docker/docker-compose.yml" ]; then
-    shopt -s expand_aliases
-    alias docker-compose='docker-compose --file="./docker/docker-compose.yml"'
 fi
 
 # If no arguments were provided

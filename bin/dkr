@@ -25,7 +25,6 @@ list_commands() {
     commands+=('npx           Run a npx command')
     commands+=('yarn          Run a yarn command')
     commands+=('mysql         Run a mysql command')
-    commands+=('mysql         Run a mysql command')
     commands+=('mariadb       Run a mariadb command')
     commands+=('psql          Run a psql command')
     commands+=('redis         Run a redis command')

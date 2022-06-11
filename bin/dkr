@@ -6,18 +6,58 @@
 
 set -Eeo pipefail
 
-# Variables
-CWD="$(pwd -P)"
-
-# Define environment variables...
-export APP_SERVICE="${APP_SERVICE:-""}"
-export APP_USER="${APP_USER:-root}"
-export APP_PORT="${APP_PORT:-80}"
-export DB_PORT="${DB_PORT:-3306}"
-export WWWUSER="${WWWUSER:-"$UID"}"
-export WWWGROUP="${WWWGROUP:-"$(id -g)"}"
-
 # Functions
+list_commands() {
+    commands=()
+    # docker compose command examples
+    commands+=('up            Bring the container up')
+    commands+=('down          Bring the container down')
+    commands+=('stop          Stop the container')
+    commands+=('restart       Restart the container up')
+    commands+=('ps            Display the status of all containers')
+    # proxy commands
+    commands+=('php           Run a php command')
+    commands+=('bin           Run a bin command')
+    commands+=('artisan       Run a artisan command')
+    commands+=('composer      Run a composer command')
+    commands+=('node          Run a node command')
+    commands+=('npm           Run a npm command')
+    commands+=('npx           Run a npx command')
+    commands+=('yarn          Run a yarn command')
+    commands+=('mysql         Run a mysql command')
+    commands+=('mysql         Run a mysql command')
+    commands+=('mariadb       Run a mariadb command')
+    commands+=('psql          Run a psql command')
+    commands+=('redis         Run a redis command')
+    # Shells
+    commands+=('bash          Enter the conatiner as the non-root user')
+    commands+=('root          Enter the conatiner as the root user')
+
+    if [ "${1:-""}" == "--long" ]; then
+        printf "  %s\n" "${commands[@]}"
+    else
+        printf "%s\n" "${commands[@]}" | awk '{print $1}'
+    fi
+
+    return 0;
+}
+
+usage() {
+    echo ""
+    echo "Usage: $(basename "${0}") [-h] COMMAND [options] [arguments]"
+    echo ""
+    echo "Helper script for docker-compose. Unknown commands are passed to the docker-compose binary."
+    echo ""
+    echo "Options:"
+    echo "  -h, --help    Print this help and exit"
+    echo "  -l, --list    List the available commands"
+    echo ""
+    echo "Comands:"
+    list_commands --long
+    echo ""
+    return 0
+}
+
 cmsg() {
     # Output messages in color! :-)
     local CHOSEN_COLOR IS_BOLD NO_NEWLINE opt OPTIND RESET
@@ -97,9 +137,9 @@ stdtk_up() {
     fi
 
     if [ "$BUILD" == "1" ]; then
-        ( cd "$ST_DSS_DIR" && docker-compose up --build -d ) && ( cd "$ST_DST_DIR" && docker-compose up --build -d )
+        ( cd "$ST_DSS_DIR" && "${DOCKER_COMPOSE[@]}" up --build -d ) && ( cd "$ST_DST_DIR" && "${DOCKER_COMPOSE[@]}" up --build -d )
     else
-        ( cd "$ST_DSS_DIR" && docker-compose up -d ) && ( cd "$ST_DST_DIR" && docker-compose up -d )
+        ( cd "$ST_DSS_DIR" && "${DOCKER_COMPOSE[@]}" up -d ) && ( cd "$ST_DST_DIR" && "${DOCKER_COMPOSE[@]}" up -d )
     fi
 }
 
@@ -115,23 +155,59 @@ if [ -f "./.env" ]; then
     source "./.env"
 fi
 
-# For projects that like to put the yml in a docker directory (sourcetoad)
-if [ ! -f "./docker-compose.yml" ] && [ -f "./docker/docker-compose.yml" ]; then
-    shopt -s expand_aliases
-    alias docker-compose='docker compose --file="./docker/docker-compose.yml"'
+# Define environment variables...
+export APP_SERVICE="${APP_SERVICE:-""}"
+export APP_USER="${APP_USER:-root}"
+export APP_PORT="${APP_PORT:-80}"
+export DB_PORT="${DB_PORT:-3306}"
+export DOCKER_COMPOSE_FILES="${DOCKER_COMPOSE_FILES:-""}"
+export WWWUSER="${WWWUSER:-"$UID"}"
+export WWWGROUP="${WWWGROUP:-"$(id -g)"}"
+
+# Define the docker compose command
+if docker compose &> /dev/null; then
+    DOCKER_COMPOSE=(docker compose)
 else
-    shopt -s expand_aliases
-    alias docker-compose='docker compose'
+    DOCKER_COMPOSE=(docker-compose)
+fi
+
+# Figure out where the yml file is
+if [ ! -f "./docker-compose.yml" ] && [ -f "./docker/docker-compose.yml" ]; then
+    # For projects that like to put the yml in a docker directory (sourcetoad)
+    DOCKER_COMPOSE+=('--file="./docker/docker-compose.yml"')
+elif [ -n "$DOCKER_COMPOSE_FILES" ]; then
+    DOCKER_COMPOSE_FILES=("${SAIL_FILES//:/ }")
+
+    for FILE in "${SAIL_FILES[@]}"; do
+        if [ -f "$FILE" ]; then
+            DOCKER_COMPOSE+=(-f "$FILE")
+        else
+            cmsg -w "Unable to find Docker Compose file: '${FILE}'" >&2
+            exit 1
+        fi
+    done
 fi
 
 # If no arguments were provided
 if [ $# -eq 0 ]; then
-    docker-compose ps
+    "${DOCKER_COMPOSE[@]}" ps
     exit
 fi
 
-# These arguments can be run from any where and do not require a "docker-compose.yml" config file
-if [ "$1" == "connect" ]; then
+# These arguments can be run from anywhere and do not require a "docker-compose.yml" config file
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "help" ]; then
+    shift 1
+    usage
+    exit
+elif [ "$1" == "-l" ] || [ "$1" == "--list" ] || [ "$1" == "list" ]; then
+    shift 1
+    list_commands
+    exit
+elif [ "$1" == "--compose-help" ] || [ "$1" == "compose-help" ]; then
+    shift 1
+    "${DOCKER_COMPOSE[@]}" --help
+    exit
+elif [ "$1" == "connect" ]; then
     shift 1
     stdtk_up "$@"
     exit
@@ -150,58 +226,28 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # Determine if Sail is currently up...
-PSRESULT="$(docker-compose ps -q)"
-if docker-compose ps "$APP_SERVICE" | grep 'Exit\|exited'; then
+EXEC="yes"
+if "${DOCKER_COMPOSE[@]}" ps "$APP_SERVICE" 2>&1 | grep 'Exit\|exited'; then
     cmsg -w "Shutting down old docker processes..." 1>&2
-    docker-compose down > /dev/null 2>&1
+    "${DOCKER_COMPOSE[@]}" down > /dev/null 2>&1
     EXEC="no"
-elif [ -n "$PSRESULT" ]; then
-    EXEC="yes"
-else
+elif [ -z "$("${DOCKER_COMPOSE[@]}" ps -q)" ]; then
     EXEC="no"
 fi
 
 # The rest of the possible arguments require docker to be running and the user has to run the dkr command from a
 # directory that includes a "docker-compose.yml" config file
 
+ARGS=()
+
 # Proxy PHP commands to the "php" binary on the application container...
 if [ "$1" == "php" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" php "$@"
-    else
-        container_is_not_running
-    fi
-
-# Proxy Artisan commands to the "artisan" binary on the application container...
-elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
-    shift 1
-
-    if [ "$EXEC" == "yes" ]; then
-        # With xdebug enabled...
-        if [ -n "$1" ] && [ "$1" == "--debug" ]; then
-            shift 1
-            docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" php artisan "$@"
-        else
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" php artisan "$@"
-        fi
-    else
-        container_is_not_running
-    fi
-
-# Proxy the "test" command to the "php artisan test" Artisan command...
-elif [ "$1" == "test" ]; then
-    shift 1
-
-    if [ "$EXEC" == "yes" ]; then
-        # With xdebug enabled...
-        if [ -n "$1" ] && [ "$1" == "--debug" ]; then
-            shift 1
-            docker-compose exec -u "$APP_USER" -e XDEBUG_SESSION=1 "$APP_SERVICE" ./vendor/bin/phpunit "$@"
-        else
-            docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/phpunit "$@"
-        fi
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" php "$@")
     else
         container_is_not_running
     fi
@@ -211,7 +257,21 @@ elif [ "$1" == "bin" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" ./vendor/bin/"$*"
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" ./vendor/bin/"$@")
+    else
+        container_is_not_running
+    fi
+
+# Proxy Artisan commands to the "artisan" binary on the application container...
+elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" php artisan "$@")
     else
         container_is_not_running
     fi
@@ -221,7 +281,9 @@ elif [ "$1" == "composer" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" composer "$@"
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" composer "$@")
     else
         container_is_not_running
     fi
@@ -231,7 +293,9 @@ elif [ "$1" == "node" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" node "$@"
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" node "$@")
     else
         container_is_not_running
     fi
@@ -241,7 +305,9 @@ elif [ "$1" == "npm" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" npm "$@"
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" npm "$@")
     else
         container_is_not_running
     fi
@@ -251,7 +317,9 @@ elif [ "$1" == "npx" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" npx "$@"
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" npx "$@")
     else
         container_is_not_running
     fi
@@ -261,7 +329,9 @@ elif [ "$1" == "yarn" ]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" yarn "$@"
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" yarn "$@")
     else
         container_is_not_running
     fi
@@ -272,7 +342,10 @@ elif [[ "$1" == mysql* ]]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+        ARGS+=(exec)
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$SERVICE" bash -c)
+        ARGS+=("MYSQL_PWD=\${MYSQL_PASSWORD} mysql -u \${MYSQL_USER} \${MYSQL_DATABASE}")
     else
         container_is_not_running
     fi
@@ -285,7 +358,10 @@ elif [[ "$1" == mariadb* ]]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec "$SERVICE" bash -c 'MYSQL_PWD=${MYSQL_PASSWORD} mysql -u ${MYSQL_USER} ${MYSQL_DATABASE}'
+        ARGS+=(exec)
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$SERVICE" bash -c)
+        ARGS+=("MYSQL_PWD=\${MYSQL_PASSWORD} mysql -u \${MYSQL_USER} \${MYSQL_DATABASE}")
     else
         container_is_not_running
     fi
@@ -298,44 +374,56 @@ elif [[ "$1" == psql* ]]; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec "$SERVICE" bash -c 'PGPASSWORD=${PGPASSWORD} psql -U ${POSTGRES_USER} ${POSTGRES_DB}'
+        ARGS+=(exec)
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$SERVICE" bash -c)
+        ARGS+=("PGPASSWORD=\${PGPASSWORD} psql -U \${POSTGRES_USER} \${POSTGRES_DB}")
     else
         container_is_not_running
     fi
 
     unset SERVICE
 
-# Initiate a Bash shell within the application container...
-elif [ "$1" == "shell" ] || [ "$1" == "bash" ]; then
-    shift 1
-
-    if [ "$EXEC" == "yes" ]; then
-        docker-compose exec -u "$APP_USER" "$APP_SERVICE" bash "$@"
-    else
-        container_is_not_running
-    fi
-
-# Initiate a root user Bash shell within the application container...
-elif [ "$1" == "root-shell" ] ; then
-    shift 1
-
-    if [ "$EXEC" == "yes" ]; then
-        docker-compose exec "$APP_SERVICE" bash "$@"
-    else
-        container_is_not_running
-    fi
-
 # Initiate a Redis CLI terminal session within the "redis" container...
 elif [ "$1" == "redis" ] ; then
     shift 1
 
     if [ "$EXEC" == "yes" ]; then
-        docker-compose exec redis redis-cli
+        ARGS+=(exec)
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=(redis redis-cli)
+    else
+        container_is_not_running
+    fi
+
+# Initiate a Bash shell within the application container...
+elif [ "$1" == "bash" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        ARGS+=(exec -u "$APP_USER")
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" bash "$@")
+    else
+        container_is_not_running
+    fi
+
+# Initiate a root user Bash shell within the application container...
+elif [ "$1" == "root" ]; then
+    shift 1
+
+    if [ "$EXEC" == "yes" ]; then
+        ARGS+=(exec)
+        [ ! -t 0 ] && ARGS+=(-T)
+        ARGS+=("$APP_SERVICE" bash "$@")
     else
         container_is_not_running
     fi
 
 # Pass unknown commands to the "docker-compose" binary...
 else
-    docker-compose "$@"
+    ARGS+=("$@")
 fi
+
+# Run Docker Compose with the defined arguments...
+"${DOCKER_COMPOSE[@]}" "${ARGS[@]}"

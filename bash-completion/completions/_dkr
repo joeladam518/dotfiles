@@ -7,7 +7,7 @@ if command -v "repo" >/dev/null 2>&1; then
         local CURRENT OPTS
         CURRENT="${COMP_WORDS[COMP_CWORD]}"
         # all dkr commands
-        OPTS="$(dkr -l | tr '\n' ' ')"
+        OPTS="$(dkr --help | awk 'f;/^Commands\:$/{f=1} /^$/{f=0}' | sed /^$/d | awk '{print $1}' | tr '\n' ' ')"
         # all docker-compose commands
         OPTS="${OPTS} $(docker compose --help | awk 'f;/^Commands\:$/{f=1} /^$/{f=0}' | sed /^$/d | awk '{print $1}' | tr '\n' ' ')"
         COMPREPLY=( $(compgen -W "$OPTS" -- "$CURRENT") )

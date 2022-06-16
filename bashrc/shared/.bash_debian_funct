@@ -6,7 +6,7 @@ showdns()
 {
     local nameserver
 
-    nameserver="$( ( nmcli dev list || nmcli dev show ) 2>/dev/null | grep DNS | tr -s '[:space:]' | cut -d' ' -f2 )"
+    nameserver="$( ( nmcli dev list || nmcli dev show ) 2> /dev/null | grep DNS | tr -s '[:space:]' | cut -d' ' -f2 )"
 
     if [ -z "$nameserver" ]; then
         nameserver="$(cat /etc/resolv.conf | grep 'nameserver' | head -1 |cut -d' ' -f2)"

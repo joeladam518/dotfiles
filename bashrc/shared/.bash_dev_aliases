@@ -3,12 +3,7 @@
 
 # Git Aliases
 alias st='git status'
-alias newbr='git checkout -b'
-alias gc='git commit'
 alias gp='git push'
-# "git add/unadd with fzf"
-alias gstg='git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add'
-alias gunstg='git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q'
 
 # Vagrant Aliases
 alias vu='vagrant up'

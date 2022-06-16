@@ -16,18 +16,18 @@
     renamelimit = 2415
 [alias]
     amend = commit --amend
+    br = branch
     cm = commit --verbose
     d  = diff --histogram
     dc = diff --histogram --cached
     dt = difftool
-    fa = fetch --all
     # git logging
+    wtf = log --pretty=format:'%C(auto,yellow)%H%Creset%C(auto)%d%Creset - %C(auto,blue)%cn%Creset - %C(auto,green)(%ar)%Creset%n %-s%n' --stat
     la = log --pretty=format:'%C(auto,yellow)%h%Creset - %C(auto,blue)%an%Creset -%C(auto)%d%Creset %s %C(auto,green)(%cr)%Creset' --abbrev-commit --date=relative
-    lg = "! git la -10"
-    lgr = log --graph --pretty=format:'%C(auto,yellow)%h%Creset - %C(auto,blue)%an%Creset -%C(auto)%d%Creset %s %C(auto,green)(%cr)%Creset' --abbrev-commit --date=relative
-    wtf = "! git log --pretty=format:'%C(auto,yellow)%H%Creset%C(auto)%d%Creset - %C(auto,blue)%cn%Creset - %C(auto,green)(%ar)%Creset%n %-s%n' --stat"
+    lg = la -10
+    lgr = la --graph
     # This will show you all not pushed commits from all branches
-    brcheck = "! git lg --branches --not --remotes"
+    brcheck = lg --branches --not --remotes
     # git add/remove with fzf
-    stg = "! git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add"
-    unstg = "! git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q"
+    stg = ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add
+    unstg = diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q

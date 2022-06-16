@@ -12,10 +12,11 @@ alias updatefzf='cd ~/.fzf && git pull && ./install && cd ~'
 alias clear='clear;pwd;'
 
 ## Use htop instead of top
-alias top='htop'
+if command -v htop > /dev/null; then
+    alias top='htop'
+fi
 
 ## Alias for fuzzy finder
-alias openit='open $(fzf -m);'
 alias vimit='vim $(fzf -m);'
 
 ## Directory navigation aliases

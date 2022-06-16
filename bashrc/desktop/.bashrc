@@ -135,4 +135,9 @@ if [ -d "${HOME}/Android/Sdk" ]; then
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
 
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
+
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR
+

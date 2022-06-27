@@ -159,7 +159,7 @@ fi
 # Figure out where the yml file is
 if [ ! -f "./docker-compose.yml" ] && [ -f "./docker/docker-compose.yml" ]; then
     # For projects that like to put the yml in a docker directory (sourcetoad)
-    DOCKER_COMPOSE+=('--file="./docker/docker-compose.yml"')
+    DOCKER_COMPOSE+=('--file=./docker/docker-compose.yml')
 elif [ -n "$DOCKER_COMPOSE_FILES" ]; then
     DOCKER_COMPOSE_FILES=("${SAIL_FILES//:/ }")
 

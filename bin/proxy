@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+set -Eeo pipefail
+
+# Variables
+local_domain=""
+local_port="80"
+proxy_subdomain=""
+proxy_port=""
+
+usage() {
+    cat <<EOD
+Usage: ${0} [-d] [-D] [-p] [-P] {project}
+
+If you encounter an issue where you need to have your locally run 
+application (simulator or device) talking to an internal running 
+program - you will need this.
+
+Example: ${0} -s iceman-pinch-a-penny -p 11015 -l pinchapenny.docker -P 80
+The previous example would proxy https://iceman-pinch-a-penny.local.sourcetoadtest.com to http://pinchapenny.docker:80
+
+Options:
+  -h  Print this help and exit
+  -d  The proxy subdomain
+  -D  The local domain
+  -p  The proxy port
+  -P  The local port. Defaults to 80 
+EOD
+    return 0
+}
+
+invalid_argument() {
+    echo "Invalid option: -${1} requires an argument" 1>&2
+    exit 1
+}
+
+invalid_option() {
+    echo "Invalid option: -${1}" 1>&2
+    exit 1
+}
+
+parse_params() {
+    while getopts ":hd:D:p:P:" arg; do
+        case "${arg}" in
+            h) usage; exit; ;;
+            d) proxy_subdomain="${OPTARG}" ;;
+            p) proxy_port="${OPTARG}" ;;
+            D) local_domain="${OPTARG}" ;;
+            P) local_port="${OPTARG}" ;;
+            :) invalid_argument "-${1}" ;;
+            \?) invalid_option "-${1}" ;;
+        esac
+    done
+
+    shift $((OPTIND-1))
+
+    if [ -z "$proxy_subdomain" ] || [ -z "$proxy_port" ] || [  -z "$local_domain" ] || [ -z "$local_port" ]; then
+        echo "Failed to parse options" 1>&2
+        echo ""
+        usage
+        exit 1
+    fi
+
+    return 0
+}
+
+parse_params "$@"
+
+echo
+cmsg -cn "proxy domain: "
+cmsg -w  "https://${proxy_subdomain}.local.sourcetoadtest.com"
+cmsg -cn "     on port: "
+cmsg -w  "${proxy_port}"
+cmsg -cn "local domain: "
+cmsg -w  "${local_domain}"
+cmsg -cn "     on port: "
+cmsg -w  "${local_port}"
+echo
+
+ssh -tR "${proxy_port}:${local_domain}:${local_port}" "proxy@local.sourcetoadtest.com" "sirtunnel.py" "${proxy_subdomain}.local.sourcetoadtest.com" "${proxy_port}"

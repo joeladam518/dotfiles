@@ -39,6 +39,18 @@ repo()
     return 0
 }
 
+st-release() {
+    if [ -z "${1}" ]; then
+        echo "You need to provide a tag" 1>&2
+        return 1
+    fi
+    
+    branches="${2:-"origin/staging..origin/master"}"
+    git log "${branches}" --oneline --no-merges | grep -Eio "${1}-([0-9]+)" | tr a-z A-Z | sort | uniq
+
+    return $?
+}
+
 #
 # Git functions
 #

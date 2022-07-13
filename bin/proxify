@@ -10,13 +10,13 @@ proxy_port=""
 
 usage() {
     cat <<EOD
-Usage: ${0} [-d] [-D] [-p] [-P] {project}
+Usage: $(basename "${0}") [-d] [-D] [-p] [-P] {project}
 
 If you encounter an issue where you need to have your locally run 
 application (simulator or device) talking to an internal running 
 program - you will need this.
 
-Example: ${0} -s iceman-pinch-a-penny -p 11015 -l pinchapenny.docker -P 80
+Example: $(basename "${0}") -d iceman-pinch-a-penny -p 11015 -P pinchapenny.docker -P 80
 The previous example would proxy https://iceman-pinch-a-penny.local.sourcetoadtest.com to http://pinchapenny.docker:80
 
 Options:
@@ -56,8 +56,6 @@ parse_params() {
 
     if [ -z "$proxy_subdomain" ] || [ -z "$proxy_port" ] || [  -z "$local_domain" ] || [ -z "$local_port" ]; then
         echo "Failed to parse options" 1>&2
-        echo ""
-        usage
         exit 1
     fi
 

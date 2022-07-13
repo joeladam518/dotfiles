@@ -174,25 +174,6 @@ else
     DOCKER_COMPOSE=(docker-compose)
 fi
 
-# Figure out where the yml file is
-if [ -n "$DOCKER_COMPOSE_FILES" ]; then
-    DOCKER_COMPOSE_FILES=(${DOCKER_COMPOSE_FILES//:/ })
-
-    for FILE in ${DOCKER_COMPOSE_FILES[@]}; do
-        if [ -f "$FILE" ]; then
-            DOCKER_COMPOSE+=(-f "$FILE")
-        else
-            cmsg -w "Unable to find Docker Compose file: '${FILE}'" >&2
-            exit 1
-        fi
-    done
-elif [ -f "./docker-compose.yml" ]; then
-    DOCKER_COMPOSE+=('--file=./docker-compose.yml')
-elif [ -f "./docker/docker-compose.yml" ]; then
-    # For projects that like to put the yml in a docker directory (sourcetoad)
-    DOCKER_COMPOSE+=('--file=./docker/docker-compose.yml')
-fi
-
 # If no arguments were provided
 if [ $# -eq 0 ]; then
     "${DOCKER_COMPOSE[@]}" ps
@@ -228,6 +209,25 @@ fi
 if ! docker info > /dev/null 2>&1; then
     cmsg -w "Docker is not running." 1>&2
     exit 1
+fi
+
+# Figure out where the yml file is
+if [ -n "$DOCKER_COMPOSE_FILES" ]; then
+    DOCKER_COMPOSE_FILES=(${DOCKER_COMPOSE_FILES//:/ })
+
+    for FILE in ${DOCKER_COMPOSE_FILES[@]}; do
+        if [ -f "$FILE" ]; then
+            DOCKER_COMPOSE+=(-f "$FILE")
+        else
+            cmsg -w "Unable to find Docker Compose file: '${FILE}'" >&2
+            exit 1
+        fi
+    done
+elif [ -f "./docker-compose.yml" ]; then
+    DOCKER_COMPOSE+=('--file=./docker-compose.yml')
+elif [ -f "./docker/docker-compose.yml" ]; then
+    # For projects that like to put the yml in a docker directory (sourcetoad)
+    DOCKER_COMPOSE+=('--file=./docker/docker-compose.yml')
 fi
 
 # Determine if Sail is currently up...

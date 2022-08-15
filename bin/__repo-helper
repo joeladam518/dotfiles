@@ -15,33 +15,27 @@ def get_repo_aliases(aliases: dict, repos_directory: str) -> dict:
     if not os.path.exists(repos_directory):
         raise Exception(f"'{repos_directory}' doesn't exist.")
 
-    aliases = {key: os.path.expanduser(path) for (key, path) in aliases.items()}
-    aliases_keys = list(aliases.keys())
-    aliases_paths = list(aliases.values())
-    new_aliases = {}
+    new_aliases = {key: os.path.expanduser(path) for (key, path) in aliases.items()}
+    new_aliases_keys = list(aliases.keys())
+    new_aliases_paths = list(aliases.values())
 
     def get_aliases_key(val) -> Optional[str]:
         try:
-            pos = aliases_paths.index(val)
+            pos = new_aliases_paths.index(val)
         except ValueError:
             return None
 
-        return aliases_keys[pos]
+        return new_aliases_keys[pos]
 
-    # add all folders in the repos directory making sure to swap the aliases key if found
     for f in os.scandir(repos_directory):
         if not f.is_dir():
             continue
+        
         path = os.path.abspath(f.path)
         key = get_aliases_key(path)
-        new_aliases[key if key else f.name] = path
 
-    # see if there are any aliases that didn't get added and add them
-    paths_to_add = [path for path in aliases.values() if path not in new_aliases.values()]
-    for path in paths_to_add:
-        key = get_aliases_key(path)
-        if key:
-            new_aliases[key] = path
+        if key is None:
+            new_aliases[f.name] = path
 
     return new_aliases
 
@@ -56,7 +50,7 @@ def parse_script_args():
     parser.add_argument('-n', '--name', action='store', default='repos',
                         help="set the variable name of your bash array")
     parser.add_argument('-s', '--sep', type=str, action='store', default="\n",
-                        help="set the seperator for keys and paths")
+                        help="set the separator for keys and paths")
     parser.add_argument('-k', '--keys', action='store_true', default=False,
                         help="get repo aliases's keys")
     parser.add_argument('-p', '--paths', action='store_true', default=False,

@@ -71,19 +71,6 @@ def print_bash_array(aliases: dict, name: str) -> None:
         print(f'{name}[{key}]="{path}"')
 
 
-def separator(seperator: str) -> str:
-    if seperator == ' ':
-        return ' '
-
-    if seperator == r'\n':
-        return os.linesep
-
-    if seperator == r'\t':
-        return '\t'
-
-    return seperator
-
-
 if __name__ == '__main__':
     args = parse_script_args()
     config_parser = ConfigParser()
@@ -94,9 +81,9 @@ if __name__ == '__main__':
     repo_aliases = get_repo_aliases(dict(config_parser.items(args.name)), args.dir)
 
     if args.keys:
-        print(*repo_aliases.keys(), sep=separator(args.sep))
+        print(*repo_aliases.keys(), sep=args.sep.encode().decode('unicode-escape'))
     elif args.paths:
-        print(*repo_aliases.values(), sep=separator(args.sep))
+        print(*repo_aliases.values(), sep=args.sep.encode().decode('unicode-escape'))
     else:
         print_bash_array(repo_aliases, name=args.name)
 

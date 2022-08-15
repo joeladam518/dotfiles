@@ -1,150 +1,31 @@
 #!/usr/bin/env python3
-import argparse
-import csv
 import os
-import platform
 import sys
-from typing import Optional
+from argparse import ArgumentParser, Namespace
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bin-helpers')))
+from osinfo import *
 
 # Constants
 SUCCESS = 0
 FAILURE = 1
 
+def more_than_one_option_chosen(script_args: Namespace) -> None:
+    count = 0
+    for value in script_args.__dict__.values():
+        if value:
+            count = count + 1
+        if count > 1:
+            return True
 
-def get_os_release() -> dict:
-    """
-    Get the freedesktop release info. Mainly for linux operating systems.
-    https://www.freedesktop.org/software/systemd/man/os-release.html
-    In python 3.10 they introduced the 'freedesktop_os_release' function so if
-    we have it we use it. But for older versions I've included a polyfill.
-    :return: A dict of release information
-    :rtype: dict
-    """
-    if os_type() not in ['linux', 'freebsd']:
-        return {}
-
-    if hasattr(platform, 'freedesktop_os_release'):
-        try:
-            return platform.freedesktop_os_release()
-        except OSError:
-            return {}
-
-    path = get_os_release_path()
-
-    if not path:
-        return {}
-
-    with open(path) as f:
-        reader = csv.reader(f, delimiter="=")
-        return {key: value for key, value in reader}
-
-
-def get_os_release_path() -> Optional[str]:
-    root = os.path.abspath(os.sep)
-    path = os.path.join(root, 'etc', 'os-release')
-    if os.path.exists(path):
-        return path
-
-    path = os.path.join(root, 'usr', 'lib', 'os-release')
-    if os.path.exists(path):
-        return path
-
-    return None
-
-
-def get_os_release_value(key) -> str:
-    return get_os_release().get(key, '')
-
-
-def os_codename() -> str:
-    return get_os_release_value('VERSION_CODENAME')
-
-
-def os_id() -> str:
-    """
-    Get the operating system's identifier. If not a freedesktop
-    system, this will just return the type of system.
-    """
-    system_type = os_type()
-
-    if system_type in ['linux', 'freebsd']:
-        # Returns the lowercase operating system name for linux/freebsd based systems
-        # https://www.freedesktop.org/software/systemd/man/os-release.html#ID=
-        return get_os_release_value('ID')
-
-    return system_type
-
-
-def os_id_like() -> tuple:
-    """
-    The operating systems that the the local operating system is based on. If not a
-    freedesktop system, this will just return the type of system.
-    """
-    system_type = os_type()
-
-    if system_type in ['linux', 'freebsd']:
-        id_like = get_os_release_value('ID_LIKE')
-
-        if not id_like:
-            id_ = get_os_release_value('ID')
-            return (id_,) if id_ else ()
-
-        return tuple(id_like.split(' '))
-
-    return system_type,
-
-
-def os_name() -> str:
-    system_type = os_type()
-
-    if system_type == 'mac':
-        return 'macOS'
-
-    if system_type in ['linux', 'freebsd']:
-        return get_os_release_value('NAME')
-
-    return platform.system()
-
-
-def os_pretty_name() -> str:
-    system_type = os_type()
-
-    if system_type in ['linux', 'freebsd']:
-        return get_os_release_value('PRETTY_NAME')
-
-    return f"{os_name()} {os_version()}"
-
-
-def os_type() -> str:
-    """Get the type of operating system"""
-    if sys.platform in ['win32', 'win64', 'cygwin']:
-        return 'windows'
-
-    system_type = platform.system().lower()
-
-    if system_type == 'darwin':
-        return 'mac'
-
-    return system_type
-
-
-def os_version() -> str:
-    """Get the operating system version"""
-    system_type = os_type()
-
-    if system_type == 'windows':
-        return platform.release()
-
-    if system_type == 'mac':
-        mac_ver = platform.mac_ver()
-        return mac_ver[0]
-
-    return get_os_release_value('VERSION_ID')
+    return False
 
 
 def parse_script_args():
-    parser = argparse.ArgumentParser(description='Determine the operating system.')
+    parser = ArgumentParser(description='Determine the operating system.')
 
+    parser.add_argument('-c', '--codename', action='store_true', default=False,
+                        help='get the codename')
     parser.add_argument('-i', '--id', action='store_true', default=False,
                         help='get the distro')
     parser.add_argument('-l', '--like', action='store_true', default=False,
@@ -161,21 +42,27 @@ def parse_script_args():
 
 if __name__ == '__main__':
     if sys.version_info < (3, 8):
-        print('python 3.8 and above is required')
+        print('python 3.8 and above is required', file=sys.stderr)
         sys.exit(FAILURE)
 
     args = parse_script_args()
 
-    if args.id:
+    if more_than_one_option_chosen(args):
+        print('You\'re only allowed to choose one of the options.', file=sys.stderr)
+        sys.exit(FAILURE)
+
+    if args.version:
+        print(os_version())
+    elif args.id:
         print(os_id())
     elif args.like:
         print(' '.join(os_id_like()))
-    elif args.pretty:
-        print(os_pretty_name())
     elif args.simplified:
         print(os_type())
-    elif args.version:
-        print(os_version())
+    elif args.codename:
+        print(os_codename())
+    elif args.pretty:
+        print(os_pretty_name())
     else:
         print(os_name())
 

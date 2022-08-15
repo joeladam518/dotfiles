@@ -1,30 +1,70 @@
 #!/usr/bin/env python3
-# Parse your repo aliases file for a list of keys (aliases), a list of paths,
-# or a bash multidimensional array
-import argparse
+# Parse your repo aliases file for a list of keys (aliases),
+# a list of paths, or a bash multidimensional array
 import os
+from argparse import ArgumentParser
 from configparser import ConfigParser
+from getpass import getuser
+from typing import Optional
 
 
 # Functions
-def print_bash_array(parser: ConfigParser) -> None:
-    for section in parser.sections():
-        print(f'declare -A {section}')
-        for key, val in parser.items(section):
-            print(f'{section}[{key}]="{os.path.expanduser(val)}"')
+def get_repo_aliases(aliases: dict, repos_directory: str) -> dict:
+    repos_directory = os.path.expanduser(repos_directory)
+
+    if not os.path.exists(repos_directory):
+        raise Exception(f"'{repos_directory}' doesn't exist.")
+
+    aliases = {key: os.path.expanduser(path) for (key, path) in aliases.items()}
+    aliases_key_list = list(aliases.keys())
+    aliases_val_list = list(aliases.values())
+
+    def get_aliases_key(val) -> Optional[str]:
+        try:
+            pos = aliases_val_list.index(val)
+        except ValueError:
+            return None
+
+        return aliases_key_list[pos]
+
+    newAliases = {}
+    for f in os.scandir(repos_directory):
+        if not f.is_dir():
+            continue
+
+        path = os.path.abspath(f.path)
+        key = get_aliases_key(path)
+        newAliases[key if key else f.name] = path
+
+    return newAliases
 
 
-def print_keys(parser: ConfigParser, section: str, sep: str = ' ') -> None:
-    keys = dict(parser.items(section)).keys()
-    print(*keys, sep=sep)
+def parse_script_args():
+    parser = ArgumentParser(description='Parse your repo aliases into keys, values, or a bash array.')
+
+    parser.add_argument('file', type=str, action='store',
+                        help="repo aliases file path")
+    parser.add_argument('-d', '--dir', action='store', default=os.path.expanduser(f"~{getuser()}/repos"),
+                        help="set the directory where your repos are located")
+    parser.add_argument('-n', '--name', action='store', default='repos',
+                        help="set the variable name of your bash array")
+    parser.add_argument('-s', '--sep', type=str, action='store', default="\n",
+                        help="set the seperator for keys and paths")
+    parser.add_argument('-k', '--keys', action='store_true', default=False,
+                        help="get repo aliases's keys")
+    parser.add_argument('-p', '--paths', action='store_true', default=False,
+                        help="get repo aliases's paths")
+
+    return parser.parse_args()
 
 
-def print_paths(parser: ConfigParser, section: str, sep: str = ' ') -> None:
-    paths = map(lambda x: os.path.expanduser(x), dict(parser.items(section)).values())
-    print(*paths, sep=sep)
+def print_bash_array(aliases: dict, name: str) -> None:
+    print(f'declare -A {name}')
+    for key, path in aliases.items():
+        print(f'{name}[{key}]="{path}"')
 
 
-def parse_separator(seperator: str) -> str:
+def separator(seperator: str) -> str:
     if seperator == ' ':
         return ' '
 
@@ -37,27 +77,19 @@ def parse_separator(seperator: str) -> str:
     return seperator
 
 
-def parse_script_args():
-    parser = argparse.ArgumentParser(description='Parse your repo aliases into keys, values, or a bash array.')
-
-    parser.add_argument('file', type=str, action='store', help="repo aliases file path")
-    parser.add_argument('-n', '--name', type=str, action='store', default='repos', help="set the variable name for your bash array")
-    parser.add_argument('-s', '--sep', type=str, action='store', default=' ', help="set the seperator for keys and paths")
-    parser.add_argument('-k', '--keys', action='store_true', default=False, help="get repo aliases's keys")
-    parser.add_argument('-p', '--paths', action='store_true', default=False, help="get repo aliases's paths")
-
-    return parser.parse_args()
-
 if __name__ == '__main__':
     args = parse_script_args()
-    config_parser = ConfigParser()
+    parser = ConfigParser()
 
     with open(args.file, 'r') as file:
-        config_parser.read_string(f'[{args.name}]\n' + file.read())
+        parser.read_string(f'[{args.name}]\n' + file.read())
+
+    repo_aliases = get_repo_aliases(dict(parser.items(args.name)), args.dir)
 
     if args.keys:
-        print_keys(config_parser, section=args.name, sep=parse_separator(args.sep))
+        print(*repo_aliases.keys(), sep=separator(args.sep))
     elif args.paths:
-        print_paths(config_parser, section=args.name, sep=parse_separator(args.sep))
+        print(*repo_aliases.values(), sep=separator(args.sep))
     else:
-        print_bash_array(config_parser)
+        print_bash_array(repo_aliases, name=args.name)
+

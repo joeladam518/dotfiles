@@ -4,7 +4,7 @@
 # cd into a repo based on a ".repo-aliases" file you define in your home directory
 repo()
 {
-    local repos line key aliased aliases_path
+    local repos key aliases_path
     aliases_path="${HOME}/.repo-aliases"
 
     # convert file to bash array
@@ -14,23 +14,15 @@ repo()
         declare -A repos
     fi
 
-    # add repo directories that we didn't define in out aliases file to our array
-    aliased="$(printf '%s\n' "${repos[@]}")"
-    for line in "${HOME}/repos/"*; do
-        if ! (echo "$aliased" | grep -xq "$line"); then
-            repos["$(basename "$line")"]="$line"
-        fi
-    done
-
     key="${1}"
     if [ -z "${key}" ]; then
-        echo "You must specify a key" 1>&2
+        cmsg -y "You must specify a key" 1>&2
         return 1
     fi
 
     # Check if key exists in the array
     if ! [ ${repos[$key]+bob} ]; then
-        echo "invalid option ${1}" 1>&2
+        cmsg -r "invalid option ${1}" 1>&2
         return 1
     fi
 
@@ -39,14 +31,15 @@ repo()
     return 0
 }
 
-st-release() {
+st-release()
+{
     if [ -z "${1}" ]; then
         echo "You need to provide a tag" 1>&2
         return 1
     fi
 
     branches="${2:-"origin/staging..origin/master"}"
-    git log "${branches}" --oneline --no-merges | grep -Eio "${1}-([0-9]+)" | tr a-z A-Z | sort | uniq
+    git log "${branches}" --oneline --no-merges | grep -Eio "${1}-([0-9]+)" | tr "[:lower:]" "[:upper:]" | sort | uniq
 
     return $?
 }

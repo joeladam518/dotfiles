@@ -1,27 +1,28 @@
 #!/usr/bin/env python3
-import argparse
-import csv
 import os
-import platform
-import subprocess
 import sys
+import subprocess
+from argparse import ArgumentParser
 from collections import OrderedDict
-from typing import Optional, Union
+from typing import Union
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bin-helpers')))
+from osinfo import *
 
 # Constants
 SUCCESS = 0
 FAILURE = 1
 
 # Globals
-__os_release_data = {}
 php_extensions = {
+    "default": ('bcmath', 'cli', 'common', 'curl', 'mbstring', 'opcache', 'readline', 'xml', 'zip'),
     "desktop": (),
-    "dev": ('dev', 'igbinary', 'intl', 'memcached', 'redis', 'xdebug'),
-    "server": ('fpm', 'gd', 'igbinary', 'intl', 'memcached', 'redis'),
+    "dev": ('dev', 'igbinary', 'intl', 'memcached', 'mysql', 'pgsql', 'redis', 'sqlite3', 'xdebug'),
+    "server": ('fpm', 'gd', 'igbinary', 'intl', 'memcached', 'mysql', 'pgsql', 'redis', 'sqlite3'),
 }
 php_versions = {
-    "install": ('7.4', '8.0', '8.1'),
-    "uninstall": ('5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1'),
+    "install": ('8.0', '8.1', '8.2'),
+    "uninstall": ('5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2'),
 }
 
 
@@ -48,40 +49,11 @@ def exclude(items: Union[list, tuple], exclude_: Union[list, tuple] = ()) -> Uni
 
 
 def get_installed_packages(version: str) -> list:
+    """Get the currently installed php packages"""
     cmd = "dpkg -l | grep php%s | sed 's/^ii\s*//' | sed 's/\s\{3,\}.*$//' | tr '\n' ' '"
     packages = run(cmd % version, capture_output=True)
     packages = packages.strip().split(' ')
     return list(filter(lambda package: bool(package), packages))
-
-
-def get_os_release() -> dict:
-    if hasattr(platform, 'freedesktop_os_release'):
-        try:
-            return platform.freedesktop_os_release()
-        except OSError:
-            pass
-
-    path = get_os_release_path()
-
-    if not path:
-        return {}
-
-    with open(path) as f:
-        reader = csv.reader(f, delimiter="=")
-        return {key: value for key, value in reader}
-
-
-def get_os_release_path() -> Optional[str]:
-    root = os.path.abspath(os.sep)
-    path = os.path.join(root, 'etc', 'os-release')
-    if os.path.exists(path):
-        return path
-
-    path = os.path.join(root, 'usr', 'lib', 'os-release')
-    if os.path.exists(path):
-        return path
-
-    return None
 
 
 def install_php(version: str, env: str, add: Union[list, tuple], remove: Union[list, tuple]) -> int:
@@ -96,10 +68,9 @@ def install_php(version: str, env: str, add: Union[list, tuple], remove: Union[l
         return FAILURE
 
     # combine the packages to be installed
-    extensions = ['bcmath', 'cli', 'common', 'curl', 'mbstring', 'mysql', 'opcache', 'pgsql',
-                  'readline', 'sqlite3', 'xml', 'zip', *php_extensions[env], *add]
+    extensions = [*php_extensions['default'], *php_extensions.get(env, ()), *add]
 
-    if to_tuple_version(version) < (8, 0):
+    if to_version_tuple(version) < (8, 0):
         extensions.append('json')
 
     # filter out any extensions we don't want
@@ -114,7 +85,7 @@ def install_php(version: str, env: str, add: Union[list, tuple], remove: Union[l
 
     print("")
     if confirm('Proceed?'):
-        if not php_sources_are_installed():
+        if not php_sources_installed():
             install_php_sources()
 
         run('apt update', root=True)
@@ -139,64 +110,17 @@ def install_php_sources() -> None:
         run('apt install -y', *packages, root=True)
         run('add-apt-repository ppa:ondrej/php -y', root=True)
     else:
-        raise Exception('Unsupported os')
-
-
-def os_id() -> str:
-    """
-    Get the operating system's identifier. If not a freedesktop
-    system, this will just return the type of system.
-    """
-    system_type = os_type()
-
-    if system_type in ['linux', 'freebsd']:
-        return release_info('ID')
-
-    return system_type
-
-
-def os_id_like() -> tuple:
-    """
-    The operating systems that the the local operating system is based on. If
-    not a freedesktop system, this will just return the type of system.
-    """
-    system_type = os_type()
-
-    if system_type in ['linux', 'freebsd']:
-        id_like = release_info('ID_LIKE')
-
-        if not id_like:
-            id_ = release_info('ID')
-            return (id_,) if id_ else ()
-
-        return tuple(id_like.split(' '))
-
-    return system_type,
-
-
-def os_type() -> str:
-    """Get the type of operating system"""
-    if sys.platform in ['win32', 'win64', 'cygwin']:
-        return 'windows'
-
-    system_type = platform.system().lower()
-
-    if system_type == 'darwin':
-        return 'mac'
-
-    return system_type
+        raise Exception('Unsupported OS')
 
 
 def parse_script_args():
-    global php_extensions
-
-    parser = argparse.ArgumentParser(description='Install/Uninstall php')
+    parser = ArgumentParser(description='Install/Uninstall php')
 
     parser.add_argument('version', type=str, action='store',
                         help='the version to install')
     parser.add_argument('-u', '--uninstall', action='store_true', default=False,
                         help='uninstall the php version instead of install')
-    parser.add_argument('-e', '--env', type=str, action='store', choices=php_extensions.keys(),
+    parser.add_argument('-e', '--env', type=str, action='store', choices=('desktop', 'dev', 'server'),
                         default='desktop', help="the type of environment you're installing php on")
     parser.add_argument('-a', '--add', type=str, action='extend', nargs="+", default=[],
                         help='additional extensions you want to install')
@@ -206,7 +130,7 @@ def parse_script_args():
     return parser.parse_args()
 
 
-def php_sources_are_installed() -> bool:
+def php_sources_installed() -> bool:
     """Check see if the php apt repository is installed"""
     cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep '%s' | grep 'php'"
     if os_id() in ['debian', 'raspbian']:
@@ -215,25 +139,12 @@ def php_sources_are_installed() -> bool:
         proc = run(cmd % 'sury', check=False, supress_output=True)
         return proc.returncode == 0
     elif os_id() == 'ubuntu':
-        if os.path.exists(f"/etc/apt/sources.list.d/ondrej-ubuntu-php-{release_info('VERSION_CODENAME')}.list"):
+        if os.path.exists(f"/etc/apt/sources.list.d/ondrej-ubuntu-php-{os_codename()}.list"):
             return True
         proc = run(cmd % 'ondrej', check=False, supress_output=True)
         return proc.returncode == 0
     else:
         return False
-
-
-def release_info(key: Optional[str] = None) -> Union[dict, str]:
-    """Get a value form the /etc/os-release file"""
-    global __os_release_data
-
-    if not __os_release_data:
-        __os_release_data = get_os_release()
-
-    if key:
-        return __os_release_data.get(key, '')
-
-    return __os_release_data
 
 
 def run(cmd: str, *args, **kwargs):
@@ -263,9 +174,9 @@ def run(cmd: str, *args, **kwargs):
     return process
 
 
-def to_tuple_version(version: str) -> tuple:
-    version_parts = version.split('.')
-    return tuple(map(lambda part: int(part), version_parts))
+def to_version_tuple(version: str) -> tuple:
+    """Convert a version strig to a int tuple so its easy to comapre"""
+    return tuple(map(lambda part: int(part), version.split('.')))
 
 
 def uninstall_php(version: str) -> int:

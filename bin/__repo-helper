@@ -83,6 +83,7 @@ if __name__ == '__main__':
     elif args.list_paths:
         print(*repo_aliases.values(), sep=args.sep.encode().decode('unicode-escape'))
     else:
+        # print the list of aliases for viewing (debug)
         length = max(len(x) for x in repo_aliases.values())
         for key in sorted(repo_aliases):
             print(f'{repo_aliases[key]:{length}} = {key}')

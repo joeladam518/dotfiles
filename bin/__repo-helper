@@ -2,10 +2,16 @@
 # Parse your repo aliases file for a list of keys (aliases),
 # a list of paths, or a bash multidimensional array
 import os
+import sys
 from argparse import ArgumentParser, Namespace
 from configparser import ConfigParser
 from getpass import getuser
 from typing import Optional
+
+# Constants
+FAILURE=1
+SUCCESS=0
+SECTION_NAME='repos'
 
 
 # Functions
@@ -15,7 +21,7 @@ def get_repo_aliases(script_args: Namespace, parser: ConfigParser) -> dict:
     if not os.path.exists(repos_directory):
         raise Exception(f"'{repos_directory}' doesn't exist.")
 
-    new_aliases = {key: os.path.expanduser(path) for (key, path) in parser.items(script_args.name)}
+    new_aliases = {key: os.path.expanduser(path) for (key, path) in parser.items(SECTION_NAME)}
     new_aliases_keys = list(new_aliases.keys())
     new_aliases_paths = list(new_aliases.values())
 
@@ -30,7 +36,7 @@ def get_repo_aliases(script_args: Namespace, parser: ConfigParser) -> dict:
     for f in os.scandir(repos_directory):
         if not f.is_dir():
             continue
-        
+
         path = os.path.abspath(f.path)
         key = get_aliases_key(path)
 
@@ -41,28 +47,22 @@ def get_repo_aliases(script_args: Namespace, parser: ConfigParser) -> dict:
 
 
 def parse_script_args():
-    arg_parser = ArgumentParser(description='Parse your repo aliases into keys, values, or a bash array.')
+    arg_parser = ArgumentParser(description='Parse your repo aliases')
 
     arg_parser.add_argument('file', type=str, action='store',
                             help="repo aliases file path")
-    arg_parser.add_argument('-d', '--dir', action='store', default=os.path.expanduser(f"~{getuser()}/repos"),
+    arg_parser.add_argument('--dir', type=str, action='store', default=os.path.expanduser(f"~{getuser()}/repos"),
                             help="set the directory where your repos are located")
-    arg_parser.add_argument('-n', '--name', action='store', default='repos',
-                            help="set the variable name of your bash array")
-    arg_parser.add_argument('-s', '--sep', type=str, action='store', default="\n",
-                            help="set the separator for keys and paths")
-    arg_parser.add_argument('-k', '--keys', action='store_true', default=False,
-                            help="get repo aliases's keys")
-    arg_parser.add_argument('-p', '--paths', action='store_true', default=False,
-                            help="get repo aliases's paths")
+    arg_parser.add_argument('--key', type=str, action='store', default=None,
+                            help="get path by key")
+    arg_parser.add_argument('--list-keys', action='store_true', default=False,
+                            help="list keys")
+    arg_parser.add_argument('--list-paths', action='store_true', default=False,
+                            help="list paths")
+    arg_parser.add_argument('--sep', type=str, action='store', default="\n",
+                            help="set the separator for listing keys and paths")
 
     return arg_parser.parse_args()
-
-
-def print_bash_array(aliases: dict, name: str) -> None:
-    print(f'declare -A {name}')
-    for key, path in aliases.items():
-        print(f'{name}[{key}]="{path}"')
 
 
 if __name__ == '__main__':
@@ -70,14 +70,23 @@ if __name__ == '__main__':
     parser = ConfigParser()
 
     with open(args.file, 'r') as file:
-        parser.read_string(f'[{args.name}]\n' + file.read())
+        parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
 
     repo_aliases = get_repo_aliases(args, parser)
 
-    if args.keys:
+    if args.key:
+        path = repo_aliases.get(args.key)
+        if path:
+            print(path)
+        else:
+            sys.exit(FAILURE)
+    elif args.list_keys:
         print(*repo_aliases.keys(), sep=args.sep.encode().decode('unicode-escape'))
-    elif args.paths:
+    elif args.list_paths:
         print(*repo_aliases.values(), sep=args.sep.encode().decode('unicode-escape'))
     else:
-        print_bash_array(repo_aliases, name=args.name)
+        length = max(len(x) for x in repo_aliases.values())
+        for key in sorted(repo_aliases):
+            print(f'{repo_aliases[key]:{length}} = {key}')
 
+    sys.exit(SUCCESS)

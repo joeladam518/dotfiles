@@ -65,12 +65,12 @@ def parse_script_args():
 
 if __name__ == '__main__':
     args = parse_script_args()
-    parser = ConfigParser()
+    config_parser = ConfigParser()
 
     with open(args.file, 'r') as file:
-        parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
+        config_parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
 
-    repo_aliases = get_repo_aliases(args, parser)
+    repo_aliases = get_repo_aliases(args, config_parser)
 
     if args.key:
         path = repo_aliases.get(args.key)

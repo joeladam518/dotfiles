@@ -11,7 +11,7 @@ if command -v "repo" >/dev/null 2>&1; then
         OPTS=""
 
         if [ -f "$ALIASES_PATH" ] && [ -r "$ALIASES_PATH" ]; then
-            OPTS="$(__repo-helper "${ALIASES_PATH}" --keys --sep=" ")"
+            OPTS="$(__repo-helper "${ALIASES_PATH}" --list-keys --sep=" ")"
         fi
 
         COMPREPLY=( $(compgen -W "$OPTS" -- "$CURRENT") )

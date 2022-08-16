@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# Parse your repo aliases file for a list of keys (aliases),
-# a list of paths, or a bash multidimensional array
 import os
 import sys
 from argparse import ArgumentParser, Namespace

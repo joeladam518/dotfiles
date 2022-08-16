@@ -19,17 +19,17 @@ def get_repo_aliases(script_args: Namespace, parser: ConfigParser) -> dict:
     if not os.path.exists(repos_directory):
         raise Exception(f"'{repos_directory}' doesn't exist.")
 
-    new_aliases = {key: os.path.expanduser(path) for (key, path) in parser.items(SECTION_NAME)}
-    new_aliases_keys = list(new_aliases.keys())
-    new_aliases_paths = list(new_aliases.values())
+    aliases = {key: os.path.expanduser(path) for (key, path) in parser.items(SECTION_NAME)}
+    aliases_keys = list(aliases.keys())
+    aliases_paths = list(aliases.values())
 
     def get_aliases_key(val) -> Optional[str]:
         try:
-            pos = new_aliases_paths.index(val)
+            pos = aliases_paths.index(val)
         except ValueError:
             return None
 
-        return new_aliases_keys[pos]
+        return aliases_keys[pos]
 
     for f in os.scandir(repos_directory):
         if not f.is_dir():
@@ -39,9 +39,9 @@ def get_repo_aliases(script_args: Namespace, parser: ConfigParser) -> dict:
         key = get_aliases_key(path)
 
         if key is None:
-            new_aliases[f.name] = path
+            aliases[f.name] = path
 
-    return new_aliases
+    return aliases
 
 
 def parse_script_args():

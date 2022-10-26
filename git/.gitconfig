@@ -27,3 +27,6 @@
     # git add/remove with fzf
     stg = "! git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add"
     unstg = "! git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q"
+#[commit]
+#    gpgSign = true
+

@@ -1,6 +1,28 @@
 # -*- shell-script -*-
 # Global Bash Functions
 
+# Ask a yes or no question
+confirm() {
+    local prompt answer response
+    prompt="$(cmsg -g "$* ")"
+    read -er -t 10 -p "$prompt" answer
+    for response in y Y yes Yes YES sure Sure SURE ok Ok OK
+    do
+        if [ "_$answer" == "_$response" ]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+is_int() {
+    case "${1}" in
+        ''|*[!0-9]*) return 1 ;;
+        *) return 0;;
+    esac
+}
+
 # Creates an archive (*.tar.gz) from given directory.
 tarthis()
 {

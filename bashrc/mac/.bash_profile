@@ -48,7 +48,6 @@ fi
 if [ -d "${HOME}/.yarn/bin" ]; then
     export PATH="${PATH}:${HOME}/.yarn/bin"
 fi
-
 if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
     export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
 fi
@@ -65,11 +64,6 @@ fi
 # include dotfiles' bin dir in the PATH
 if [ -d "${DOTFILES_DIR}/bin" ]; then
     export PATH="${DOTFILES_DIR}/bin:${PATH}"
-fi
-
-# include the user's bin dir in the PATH
-if [ -d "${HOME}/bin" ]; then
-    export PATH="${HOME}/bin:${PATH}"
 fi
 
 # include brew's bin dir in the PATH
@@ -108,11 +102,14 @@ fi
 [[ -r "${HOME}/.git-completion.bash" ]] && . "${HOME}/.git-completion.bash"
 
 # .fzf command line fuzzy finder
+# change the default find command
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-# chenge the default find command
-export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+# include the user's bin dir in the PATH
+if [ -d "${HOME}/bin" ]; then
+    export PATH="${HOME}/bin:${PATH}"
+fi
 
 # Unset any variables that were used in this script
 unset DOTFILES_DIR BASHRC_DIR MAC_BASHRC_DIR HOMEBREW_DIR
-

@@ -87,7 +87,6 @@ if __name__ == '__main__':
     if Version(args.version).lt('8.0'):
         extensions.append('json')
 
-    # filter out any extensions we don't want
     extensions = arr.unique(extensions)
 
     # build the extension strings and add them to the packages list

@@ -76,13 +76,16 @@ unset color_prompt force_color_prompt
 # Colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# Add the python directory to $PYTHONPATH so scripts can find the custom modules
+# if [ -z "$PYTHONPATH" ]; then
+#     export PYTHONPATH="${DOTFILES_DIR}/python"
+# elif [[ ! "$PYTHONPATH" =~ (^|:)"${DOTFILES_DIR}/python"(:|$) ]]; then
+#     export PYTHONPATH="${PYTHONPATH}:${DOTFILES_DIR}/python"
+# fi
+
 # if the dotfiles bin folder exists, add it to PATH
 if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     PATH="${PATH}:${DOTFILES_DIR}/bin"
-fi
-
-if [ -d "/usr/local/go/bin" ] && [[ ! "$PATH" =~ (^|:)"/usr/local/go/bin"(:|$) ]]; then
-    PATH="${PATH}:/usr/local/go/bin"
 fi
 
 # .fzf command line fuzzy finder
@@ -122,6 +125,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# enable Git bash compleation
 if [ -r "/usr/share/bash-completion/completions/git" ]; then
     . "/usr/share/bash-completion/completions/git"
 fi
@@ -135,9 +139,14 @@ if [ -d "${HOME}/Android/Sdk" ]; then
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
 
+# incluse the GO executables
+if [ -d "/usr/local/go/bin" ] && [[ ! "$PATH" =~ (^|:)"/usr/local/go/bin"(:|$) ]]; then
+    PATH="${PATH}:/usr/local/go/bin"
+fi
+
+# Rust
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
 
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR
-

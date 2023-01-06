@@ -1,131 +1,37 @@
 #!/usr/bin/env python3
 import os
 import sys
-import subprocess
 from argparse import ArgumentParser
-from collections import OrderedDict
-from typing import Union
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bin-helpers')))
-from osinfo import *
-
-# Constants
-SUCCESS = 0
-FAILURE = 1
-
-# Globals
-php_extensions = {
-    "default": ('bcmath', 'cli', 'common', 'curl', 'mbstring', 'opcache', 'readline', 'xml', 'zip'),
-    "desktop": (),
-    "dev": ('dev', 'igbinary', 'intl', 'memcached', 'mysql', 'pgsql', 'redis', 'sqlite3', 'xdebug'),
-    "server": ('fpm', 'gd', 'igbinary', 'intl', 'memcached', 'mysql', 'pgsql', 'redis', 'sqlite3'),
-}
-php_versions = {
-    "install": ('8.0', '8.1', '8.2'),
-    "uninstall": ('5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2'),
-}
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'python')))
+from dotfiles import arr, console, osinfo, php, run, Version
 
 
 # Functions
-def confirm(question: str, tries: int = 2) -> bool:
-    question = f"{question} [y/N] "
-    valid = {"yes": True, "ye": True, "y": True, "no": False, "n": False}
-
-    while tries > 0:
-        choice = input(question).lower()
-        if choice in valid:
-            return valid[choice]
-        tries = tries - 1
-        if tries > 0:
-            print('Error: invalid input')
-            print("options: yes | y | no | n")
-
-    return False
-
-
-def exclude(items: Union[list, tuple], exclude_: Union[list, tuple] = ()) -> Union[list, tuple]:
-    original_type = type(items)
-    return original_type([item for item in items if item not in exclude_])
-
-
-def get_installed_packages(version: str) -> list:
-    """Get the currently installed php packages"""
-    cmd = "dpkg -l | grep php%s | sed 's/^ii\s*//' | sed 's/\s\{3,\}.*$//' | tr '\n' ' '"
-    packages = run(cmd % version, capture_output=True)
-    packages = packages.strip().split(' ')
-    return list(filter(lambda package: bool(package), packages))
-
-
-def install_php(version: str, env: str, add: Union[list, tuple], remove: Union[list, tuple]) -> int:
-    global php_extensions, php_versions
-
-    if version not in php_versions['install']:
-        print('Invalid php version')
-        return FAILURE
-
-    if env not in php_extensions:
-        print('Environment not supported')
-        return FAILURE
-
-    # combine the packages to be installed
-    extensions = [*php_extensions['default'], *php_extensions.get(env, ()), *add]
-
-    if to_version_tuple(version) < (8, 0):
-        extensions.append('json')
-
-    # filter out any extensions we don't want
-    extensions = exclude(unique(extensions), remove)
-
-    # build the extension strings and add them to the packages list
-    packages = [f"php{version}", *list(map(lambda ext: f"php{version}-{ext}", extensions))]
-
-    print("")
-    print("Packages to be installed:")
-    print(*packages, sep='\n')
-
-    print("")
-    if confirm('Proceed?'):
-        if not php_sources_installed():
-            install_php_sources()
-
-        run('apt update', root=True)
-        run('apt install -y', *packages, root=True)
-    else:
-        print("Exiting...")
-
-    print("")
-    return SUCCESS
-
-
 def install_php_sources() -> None:
-    if os_id() in ['debian', 'raspbian']:
+    if osinfo.id() in ['debian', 'raspbian']:
         packages = ['apt-transport-https', 'ca-certificates', 'software-properties-common', 'lsb-release', 'gnupg2']
-        run('apt install -y', *packages, root=True)
-        run('wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg', root=True)
+        run.command('apt install -y', *packages, root=True)
+        run.command('wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg', root=True)
         source = 'deb https://packages.sury.org/php/ $(lsb_release -sc) main'
         source_file_path = '/etc/apt/sources.list.d/sury-php.list'
-        run(f'echo "{source}" | sudo tee "{source_file_path}"')
-    elif os_id() == 'ubuntu':
+        run.command(f'echo "{source}" | sudo tee "{source_file_path}"')
+    elif osinfo.id() == 'ubuntu':
         packages = ['software-properties-common', 'lsb-release']
-        run('apt install -y', *packages, root=True)
-        run('add-apt-repository ppa:ondrej/php -y', root=True)
+        run.command('apt install -y', *packages, root=True)
+        run.command('add-apt-repository ppa:ondrej/php -y', root=True)
     else:
         raise Exception('Unsupported OS')
 
 
 def parse_script_args():
-    parser = ArgumentParser(description='Install/Uninstall php')
+    """Parse script args"""
+    parser = ArgumentParser(description='Install PHP')
 
-    parser.add_argument('version', type=str, action='store',
-                        help='the version to install')
-    parser.add_argument('-u', '--uninstall', action='store_true', default=False,
-                        help='uninstall the php version instead of install')
-    parser.add_argument('-e', '--env', type=str, action='store', choices=('desktop', 'dev', 'server'),
-                        default='desktop', help="the type of environment you're installing php on")
-    parser.add_argument('-a', '--add', type=str, action='extend', nargs="+", default=[],
-                        help='additional extensions you want to install')
-    parser.add_argument('-r', '--remove', type=str, action='extend', nargs="+", default=[],
-                        help='extensions you want to exclude')
+    parser.add_argument('-e', '--env', type=str, action='store', choices=('desktop', 'server'), default='desktop',
+                        help='type of environment php will be installed on')
+    parser.add_argument('-v', '--version', type=str, action='store', default=None,
+                        help='php version to install')
 
     return parser.parse_args()
 
@@ -133,108 +39,73 @@ def parse_script_args():
 def php_sources_installed() -> bool:
     """Check see if the php apt repository is installed"""
     cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep '%s' | grep 'php'"
-    if os_id() in ['debian', 'raspbian']:
+    if osinfo.id() in ['debian', 'raspbian']:
         if os.path.exists('/etc/apt/sources.list.d/sury-php.list'):
             return True
-        proc = run(cmd % 'sury', check=False, supress_output=True)
+        proc = run.command(cmd % 'sury', check=False, supress_output=True)
         return proc.returncode == 0
-    elif os_id() == 'ubuntu':
-        if os.path.exists(f"/etc/apt/sources.list.d/ondrej-ubuntu-php-{os_codename()}.list"):
+    elif osinfo.id() == 'ubuntu':
+        if os.path.exists(f"/etc/apt/sources.list.d/ondrej-ubuntu-php-{osinfo.codename()}.list"):
             return True
-        proc = run(cmd % 'ondrej', check=False, supress_output=True)
+        proc = run.command(cmd % 'ondrej', check=False, supress_output=True)
         return proc.returncode == 0
     else:
         return False
 
 
-def run(cmd: str, *args, **kwargs):
-    """Run a shell command with or without sudo privileges"""
-    cmd_arguments = [cmd, *args]
-    supress_output = kwargs.get('supress_output', False)
-    capture_output = False if supress_output else kwargs.get('capture_output', False)
-    stdout = subprocess.DEVNULL if supress_output else None
+if __name__ == '__main__':
+    if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
+        print('Your operating system is not supported', file=sys.stderr)
+        sys.exit(console.FAILURE)
 
-    if kwargs.get('root', False):
-        cmd_arguments.insert(0, 'sudo')
+    args = parse_script_args()
 
-    process = subprocess.run(
-        ' '.join(cmd_arguments),
-        check=kwargs.get('check', True),
-        shell=True,
-        executable=os.environ['SHELL'],
-        stdout=stdout,
-        capture_output=capture_output,
-        env=kwargs.get('env', None)
-    )
+    installable_versions = [v for v in php.versions if Version(v).gt('8.0')]
+    if not args.version or args.version not in installable_versions:
+        args.version = console.choice(
+            "Which version would you like to install?",
+            installable_versions,
+            default=php.current_version
+        )
+        if not args.version:
+            print('Invalid php version', file=sys.stderr)
+            sys.exit(console.FAILURE)
 
-    if capture_output:
-        output = process.stderr if process.returncode > 0 else process.stdout
-        return output.decode(sys.getdefaultencoding())
+    if not args.env or args.env not in php.extensions:
+        args.env = console.choice(
+            "What kind of environment is this for?",
+            ('desktop', 'server'),
+            default='desktop'
+        )
+        if not args.env:
+            print('Environment not supported', file=sys.stderr)
+            sys.exit(console.FAILURE)
 
-    return process
+    # combine the packages to be installed
+    extensions = [*php.extensions['default'], *php.extensions.get(args.env, ())]
 
+    if Version(args.version).lt('8.0'):
+        extensions.append('json')
 
-def to_version_tuple(version: str) -> tuple:
-    """Convert a version strig to a int tuple so its easy to comapre"""
-    return tuple(map(lambda part: int(part), version.split('.')))
+    # filter out any extensions we don't want
+    extensions = arr.unique(extensions)
 
-
-def uninstall_php(version: str) -> int:
-    global php_versions
-
-    if version not in php_versions['uninstall']:
-        print("Invalid php version")
-        return FAILURE
-
-    packages = get_installed_packages(version)
-
-    if len(packages) == 0:
-        print("")
-        print(f"No packages found for php{version}")
-        print("")
-        return SUCCESS
+    # build the extension strings and add them to the packages list
+    packages = [f"php{args.version}", *list(map(lambda ext: f"php{args.version}-{ext}", extensions))]
 
     print("")
-    print('Packages to be uninstalled:')
+    print("Packages to be installed:")
     print(*packages, sep='\n')
 
     print("")
-    if confirm('Proceed?'):
-        run('apt purge -y', *packages, root=True)
-        run('apt autoremove -y', root=True)
+    if console.confirm('Proceed?'):
+        if not php_sources_installed():
+            install_php_sources()
+
+        run.command('apt update', root=True)
+        run.command('apt install -y', *packages, root=True)
     else:
         print("Exiting...")
 
     print("")
-    return SUCCESS
-
-
-def unique(items: Union[list, tuple]) -> Union[list, tuple]:
-    original_type = type(items)
-    return original_type(OrderedDict.fromkeys(items))
-
-
-if __name__ == '__main__':
-    if sys.version_info < (3, 8):
-        print('python 3.8 and above is required')
-        sys.exit(FAILURE)
-
-    if os_id() not in ['debian', 'raspbian', 'ubuntu']:
-        print('your os is not supported')
-        sys.exit(FAILURE)
-
-    script_args = parse_script_args()
-
-    if script_args.uninstall:
-        exit_status = uninstall_php(
-            script_args.version
-        )
-    else:
-        exit_status = install_php(
-            script_args.version,
-            script_args.env,
-            tuple(script_args.add),
-            tuple(script_args.remove)
-        )
-
-    sys.exit(exit_status)
+    sys.exit(console.SUCCESS)

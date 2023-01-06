@@ -3,13 +3,11 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bin-helpers')))
-from osinfo import *
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'python')))
+from dotfiles import console, osinfo
 
-# Constants
-SUCCESS = 0
-FAILURE = 1
 
+# Functions
 def more_than_one_option_chosen(script_args: Namespace) -> None:
     count = 0
     for value in script_args.__dict__.values():
@@ -22,7 +20,7 @@ def more_than_one_option_chosen(script_args: Namespace) -> None:
 
 
 def parse_script_args():
-    parser = ArgumentParser(description='Determine the operating system.')
+    parser = ArgumentParser(description='Display basic info about your os')
 
     parser.add_argument('-c', '--codename', action='store_true', default=False,
                         help='get the codename')
@@ -41,29 +39,25 @@ def parse_script_args():
 
 
 if __name__ == '__main__':
-    if sys.version_info < (3, 8):
-        print('python 3.8 and above is required', file=sys.stderr)
-        sys.exit(FAILURE)
-
     args = parse_script_args()
 
     if more_than_one_option_chosen(args):
         print('You\'re only allowed to choose one of the options.', file=sys.stderr)
-        sys.exit(FAILURE)
+        sys.exit(console.FAILURE)
 
     if args.version:
-        print(os_version())
+        print(osinfo.version())
     elif args.id:
-        print(os_id())
+        print(osinfo.id())
     elif args.like:
-        print(' '.join(os_id_like()))
+        print(' '.join(osinfo.id_like()))
     elif args.simplified:
-        print(os_type())
+        print(osinfo.ostype())
     elif args.codename:
-        print(os_codename())
+        print(osinfo.codename())
     elif args.pretty:
-        print(os_pretty_name())
+        print(osinfo.pretty_name())
     else:
-        print(os_name())
+        print(osinfo.name())
 
-    sys.exit(SUCCESS)
+    sys.exit(console.SUCCESS)

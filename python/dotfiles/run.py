@@ -10,17 +10,26 @@ RunOutput = Union[CompletedProcess, str]
 
 
 def command(cmd: str, *args, **kwargs) -> RunOutput:
-    """
-    Run a command
-    :param str cmd: The command
-    :param args: The command's arguments
-    :param check: Raise CalledProcessError on failure
-    :param supress_output: Don't print/return any output
-    :param capture_output: Return output instead or printing it out
-    :param env: dictionary of env vars to run with the script
-    :param timeout: timeout after n number of seconds
-    :return: The command's output
-    :rtype: RunOutput
+    """Run a command
+
+    Args:
+        cmd (str): The command to run
+        *args: The command's arguments.
+        **kwargs: Keyword arguments.
+
+    Keyword Arguments:
+        root (bool): Run command as root
+        check (bool): Raise CalledProcessError on failure
+        supress_output (bool): Don't print/return any output
+        capture_output (bool): Return output instead or printing it out
+        env (dict): dictionary of env vars to run with the script
+        timeout (int): timeout after n number of seconds
+
+    Returns:
+        RunOutput: The script's output
+
+    Raises:
+        CalledProcessError: Command failure
     """
     arguments = [cmd, *args]
     executable = None if osinfo.ostype() == 'windows' else os.environ.get('SHELL', '/bin/sh')
@@ -50,17 +59,27 @@ def command(cmd: str, *args, **kwargs) -> RunOutput:
 
 
 def script(path: str, *args, **kwargs) -> RunOutput:
-    """
-    Run a script
-    :param str path: The path to the script to run
-    :param args: The command's arguments
-    :param check: Raise CalledProcessError on failure
-    :param supress_output: Don't print/return any output
-    :param capture_output: Return output instead or printing it out
-    :param env: dictionary of env vars to run with the script
-    :param timeout: timeout after n number of seconds
-    :return: The script's output
-    :rtype: RunOutput
+    """Run a script
+
+    Args:
+        path (str): The path to the script to run.
+        *args: The script's arguments.
+        **kwargs: Keyword arguments.
+
+    Keyword Arguments:
+        root (bool): Run command as root.
+        check (bool): Raise CalledProcessError on failure.
+        supress_output (bool): Don't print/return any output.
+        capture_output (bool): Return output instead or printing it out.
+        env (dict): dictionary of env vars to run with the script.
+        timeout (int): timeout after n number of seconds.
+
+
+    Returns:
+        RunOutput: The script's output
+
+    Raises:
+        CalledProcessError: Command failure
     """
     if not os.path.exists(path):
         raise FileNotFoundError(f"'{path}' was not found.")

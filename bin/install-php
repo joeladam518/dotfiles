@@ -9,6 +9,7 @@ from dotfiles import arr, console, osinfo, php, run, Version
 
 # Functions
 def install_php_sources() -> None:
+    """Install the php apt repository"""
     if osinfo.id() in ['debian', 'raspbian']:
         packages = ['apt-transport-https', 'ca-certificates', 'software-properties-common', 'lsb-release', 'gnupg2']
         run.command('apt install -y', *packages, root=True)

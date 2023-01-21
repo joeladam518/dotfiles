@@ -23,17 +23,19 @@ def _get_release_path() -> Optional[str]:
 
 
 def codename() -> str:
+    """Get the distrubution's version codename."""
     return get_release_value('VERSION_CODENAME')
 
 
 def get_release() -> dict:
-    """
-    Get the freedesktop release info. Mainly for linux operating systems.
+    """Get the freedesktop release info. Mainly for linux operating systems.
+
     https://www.freedesktop.org/software/systemd/man/os-release.html
     In python 3.10 they introduced the 'freedesktop_os_release' function so if
     we have it we use it. But for older versions I've included a polyfill.
-    :return: A dict of release information
-    :rtype: dict
+
+    Returns:
+        dict: The OS release details
     """
     if ostype() not in ['linux', 'freebsd']:
         return {}
@@ -55,13 +57,18 @@ def get_release() -> dict:
 
 
 def get_release_value(key) -> str:
+    """Get a value from what's returned from get_release().
+
+    Returns:
+        str: The release value
+    """
     return get_release().get(key, '')
 
 
 def id() -> str:
-    """
-    Get the operating system's identifier. If not a freedesktop
-    system, this will just return the type of system.
+    """Get the operating system's identifier.
+
+    If not a freedesktop system, this will just return the type of system.
     """
     system_type = ostype()
 
@@ -74,9 +81,9 @@ def id() -> str:
 
 
 def id_like() -> tuple:
-    """
-    The operating systems that the the local operating system is based on. If not a
-    freedesktop system, this will just return the type of system.
+    """The operating systems that the the local operating system is based on.
+
+    If not a freedesktop system, this will just return the type of system.
     """
     system_type = ostype()
 
@@ -93,6 +100,7 @@ def id_like() -> tuple:
 
 
 def name() -> str:
+    """Get the name of the operating system."""
     system_type = ostype()
 
     if system_type == 'mac':
@@ -105,7 +113,7 @@ def name() -> str:
 
 
 def ostype() -> str:
-    """Get the type of operating system"""
+    """Get the type of operating system."""
     if sys.platform in ['win32', 'win64', 'cygwin']:
         return 'windows'
 
@@ -118,6 +126,7 @@ def ostype() -> str:
 
 
 def pretty_name() -> str:
+    """Get the pretty name of the operating system."""
     system_type = ostype()
 
     if system_type in ['linux', 'freebsd']:
@@ -127,7 +136,7 @@ def pretty_name() -> str:
 
 
 def version() -> str:
-    """Get the operating system version"""
+    """Get the operating system version."""
     system_type = ostype()
 
     if system_type == 'windows':

@@ -13,13 +13,22 @@ SECTION_NAME='repos'
 
 
 # Functions
-def get_repo_aliases(script_args: Namespace, parser: ConfigParser) -> dict:
+def get_repo_aliases(script_args: Namespace) -> dict:
     repos_directory = os.path.expanduser(script_args.dir)
 
     if not os.path.exists(repos_directory):
         raise Exception(f"'{repos_directory}' doesn't exist.")
-
-    aliases = {key: os.path.expanduser(path) for (key, path) in parser.items(SECTION_NAME)}
+    
+    aliases_config = {}
+    try:
+        with open(script_args.file, 'r') as file:
+            config_parser = ConfigParser()
+            config_parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
+            aliases_config = config_parser.items(SECTION_NAME)
+    except FileNotFoundError:
+        pass
+    
+    aliases = {key: os.path.expanduser(path) for (key, path) in aliases_config}
     aliases_keys = list(aliases.keys())
     aliases_paths = list(aliases.values())
 
@@ -65,12 +74,7 @@ def parse_script_args():
 
 if __name__ == '__main__':
     args = parse_script_args()
-    config_parser = ConfigParser()
-
-    with open(args.file, 'r') as file:
-        config_parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
-
-    repo_aliases = get_repo_aliases(args, config_parser)
+    repo_aliases = get_repo_aliases(args)
 
     if args.key:
         path = repo_aliases.get(args.key)

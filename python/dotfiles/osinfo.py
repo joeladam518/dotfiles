@@ -2,14 +2,14 @@ import csv
 import os
 import platform
 import sys
+from argparse import ArgumentParser, Namespace
 from typing import Optional
 
-# Constants
 SUCCESS = 0
 FAILURE = 1
 
-
-def _get_release_path() -> Optional[str]:
+# Functions
+def __get_release_path() -> Optional[str]:
     root = os.path.abspath(os.sep)
     path = os.path.join(root, 'etc', 'os-release')
     if os.path.exists(path):
@@ -20,6 +20,36 @@ def _get_release_path() -> Optional[str]:
         return path
 
     return None
+
+
+def __more_than_one_option_chosen(script_args: Namespace) -> None:
+    count = 0
+    for value in script_args.__dict__.values():
+        if value:
+            count = count + 1
+        if count > 1:
+            return True
+
+    return False
+
+
+def __parse_script_args():
+    parser = ArgumentParser(description='Display basic info about your os')
+
+    parser.add_argument('-c', '--codename', action='store_true', default=False,
+                        help='get the codename')
+    parser.add_argument('-i', '--id', action='store_true', default=False,
+                        help='get the distro')
+    parser.add_argument('-l', '--like', action='store_true', default=False,
+                        help='get the distro that the current distro is like (for Linux)')
+    parser.add_argument('-p', '--pretty', action='store_true', default=False,
+                        help='get the pretty name')
+    parser.add_argument('-s', '--simplified', action='store_true', default=False,
+                        help='get the simplified os type (windows|mac|linux)')
+    parser.add_argument('-v', '--version', action='store_true', default=False,
+                        help='get the os version')
+
+    return parser.parse_args()
 
 
 def codename() -> str:
@@ -46,14 +76,17 @@ def get_release() -> dict:
         except OSError:
             pass
 
-    path = _get_release_path()
+    path = __get_release_path()
 
     if not path:
         return {}
 
-    with open(path) as f:
-        reader = csv.reader(f, delimiter="=")
-        return {key: value for key, value in reader}
+    try:
+        with open(path) as f:
+            reader = csv.reader(f, delimiter="=")
+            return {key: value for key, value in reader}
+    except FileNotFoundError:
+        return {}
 
 
 def get_release_value(key) -> str:
@@ -147,3 +180,28 @@ def version() -> str:
         return mac_ver[0]
 
     return get_release_value('VERSION_ID')
+
+
+if __name__ == '__main__':
+    args = __parse_script_args()
+
+    if __more_than_one_option_chosen(args):
+        print('You\'re only allowed to choose one of the options.', file=sys.stderr)
+        sys.exit(FAILURE)
+
+    if args.version:
+        print(version())
+    elif args.id:
+        print(id())
+    elif args.like:
+        print(' '.join(id_like()))
+    elif args.simplified:
+        print(ostype())
+    elif args.codename:
+        print(codename())
+    elif args.pretty:
+        print(pretty_name())
+    else:
+        print(name())
+
+    sys.exit(SUCCESS)

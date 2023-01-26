@@ -11,6 +11,7 @@ Convert files to .mp4
 
 Options:
 -h, --help            Print this help and exit
+-y, --dont-confirm    Convert all files without confirming first
 EOF
     return 0
 }

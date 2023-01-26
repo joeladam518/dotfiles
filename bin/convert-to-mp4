@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+set -Eeo pipefail
+
+# Functions
+usage() {
+    cat << EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-h]
+
+Convert files to .mp4
+
+Options:
+-h, --help            Print this help and exit
+EOF
+    return 0
+}
+
+confirm() {
+    local prompt answer response
+    prompt="$(echo -e "$*")"
+    read -er -t 10 -p "$prompt" answer
+    for response in y Y yes Yes YES sure Sure SURE ok Ok OK
+    do
+        if [ "_$answer" == "_$response" ]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+invalid_option() {
+    echo "Invalid Option: ${1}" 1>&2
+    exit 1
+}
+
+validate_filepaths() {
+    for filepath in "${filepaths[@]}"
+    do
+        if [ ! -f "$filepath" ]; then
+            echo "${filepath} doesn't exist." 1>&2
+            exit 1
+        fi
+    done
+
+    return 0
+}
+
+parse_long_options() {
+    case "$1" in
+        help) usage; exit ;;
+        dont-confirm) dont_confirm="0" ;;
+        *) invalid_option "-${OPTARG}" ;;
+    esac
+
+    return 0
+}
+
+parse_params() {
+    # flags
+    dont_confirm="0"
+
+    while getopts ":hy-:" opt; do
+        case "$opt" in
+            h) usage; exit ;;
+            y) dont_confirm="1"; ;;
+            :) invalid_option "$OPTARG" ;;
+            -) parse_long_options "$OPTARG" ;;
+            \?) invalid_option "$OPTARG" ;;
+        esac
+    done
+
+    shift $((OPTIND-1))
+
+    # arguments
+    filepaths=( "$@" )
+
+    return 0
+}
+
+# Start script logic
+
+# This script doesn't work without ffmpeg
+if ! command -v ffmpeg > /dev/null; then
+    echo "ffmpeg isn't installed" 1>&2
+    exit 1
+fi
+
+parse_params "$@"
+
+# make sure all paths are files
+validate_filepaths
+
+for filepath in "${filepaths[@]}"
+do
+    directory="$(cd "$(dirname "$filepath")" > /dev/null 2>&1 && pwd -P)"
+    filename="$(basename -- "$filepath")"
+    filename_without_extension="${filename%.*}"
+    converted_filename="${filename_without_extension}.mp4"
+
+    if [ "$dont_confirm" == "1" ] || confirm "Convert ${directory}/${filename} to ${directory}/${converted_filename}? (yes/No):\n> "; then
+        ffmpeg -i "${directory}/${filename}" -an "${directory}/${converted_filename}"
+    fi
+done

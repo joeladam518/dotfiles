@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 SUCCESS = 0
 FAILURE = 1
+CTRL_C = 130
 
 
 class EmptyAnswerError(ValueError):

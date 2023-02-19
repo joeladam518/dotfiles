@@ -1,4 +1,6 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
+# -*- shell-script -*-
+# shellcheck shell=bash
+# ~/.bashrc: executed by bash(1) for non-login shells
 
 # If not running interactively, don't do anything
 case $- in
@@ -83,6 +85,16 @@ if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
+# Load functions
+if [ -f "${SERVER_BASHRC_DIR}/.bash_functions" ]; then
+    . "${SERVER_BASHRC_DIR}/.bash_functions"
+fi
+
+# Load aliases
+if [ -f "${SERVER_BASHRC_DIR}/.bash_aliases" ]; then
+    . "${SERVER_BASHRC_DIR}/.bash_aliases"
+fi
+
 # Bash-Git-Prompt
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
@@ -92,17 +104,7 @@ fi
 
 # .fzf command line fuzzy finder
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-# Load functions
-if [ -f "${SERVER_BASHRC_DIR}/.bash_funct" ]; then
-    . "${SERVER_BASHRC_DIR}/.bash_funct"
-fi
-
-# Load aliases
-if [ -f "${SERVER_BASHRC_DIR}/.bash_aliases" ]; then
-    . "${SERVER_BASHRC_DIR}/.bash_aliases"
-fi
+[ -f "${HOME}/.fzf.bash" ] && . "${HOME}/.fzf.bash"
 
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

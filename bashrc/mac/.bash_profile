@@ -1,12 +1,14 @@
-# .bash_profile for Joel's Mac Book Pro
+# -*- shell-script -*-
+# shellcheck shell=bash
+# ~/.bash_profile: executed by bash(1) for non-login shells on mac
 
-# bashrc directory
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 MAC_BASHRC_DIR="${BASHRC_DIR}/mac"
 HOMEBREW_DIR="/opt/homebrew"
 
-# Shell options!
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 # Check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -21,9 +23,6 @@ shopt -s histappend
 # double ** search !
 shopt -s globstar
 
-# gpg signing
-export GPG_TTY="$(tty)"
-
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth
@@ -32,9 +31,9 @@ export HISTCONTROL=ignoreboth
 export HISTSIZE=1000000
 export HISTFILESIZE=2000000
 export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit"
-# export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S : "
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
+
+# gpg signing
+export GPG_TTY="$(tty)"
 
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
@@ -61,8 +60,8 @@ if [ -d "${HOME}/Library/Android/sdk" ]; then
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
 
-# include dotfiles' bin dir in the PATH
-if [ -d "${DOTFILES_DIR}/bin" ]; then
+# if the dotfiles bin folder exists, add it to PATH
+if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     export PATH="${DOTFILES_DIR}/bin:${PATH}"
 fi
 
@@ -71,9 +70,16 @@ if [ -d "${HOMEBREW_DIR}/bin" ]; then
     export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 fi
 
+# Add the python directory to $PYTHONPATH so scripts can find the custom modules
+# if [ -z "$PYTHONPATH" ]; then
+#     export PYTHONPATH="${DOTFILES_DIR}/python"
+# elif [[ ! "$PYTHONPATH" =~ (^|:)"${DOTFILES_DIR}/python"(:|$) ]]; then
+#     export PYTHONPATH="${PYTHONPATH}:${DOTFILES_DIR}/python"
+# fi
+
 # Load functions file
-if [ -f "${MAC_BASHRC_DIR}/.bash_funct" ]; then
-    . "${MAC_BASHRC_DIR}/.bash_funct"
+if [ -f "${MAC_BASHRC_DIR}/.bash_functions" ]; then
+    . "${MAC_BASHRC_DIR}/.bash_functions"
 fi
 
 # Load alias definitions

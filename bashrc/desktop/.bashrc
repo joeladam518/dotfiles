@@ -8,10 +8,12 @@ case $- in
       *) return;;
 esac
 
-# bashrc directory
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 DESKTOP_BASHRC_DIR="${BASHRC_DIR}/desktop"
+
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 # Cmdhist
 shopt -s cmdhist
@@ -35,8 +37,6 @@ export HISTCONTROL=ignoreboth
 export HISTSIZE=100000
 export HISTFILESIZE=200000
 export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit"
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
 
 # Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -78,6 +78,11 @@ unset color_prompt force_color_prompt
 # Colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# if the dotfiles bin folder exists, add it to PATH
+if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
+    PATH="${PATH}:${DOTFILES_DIR}/bin"
+fi
+
 # Add the python directory to $PYTHONPATH so scripts can find the custom modules
 # if [ -z "$PYTHONPATH" ]; then
 #     export PYTHONPATH="${DOTFILES_DIR}/python"
@@ -85,35 +90,14 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 #     export PYTHONPATH="${PYTHONPATH}:${DOTFILES_DIR}/python"
 # fi
 
-# if the dotfiles bin folder exists, add it to PATH
-if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
-    PATH="${PATH}:${DOTFILES_DIR}/bin"
-fi
-
-# .fzf command line fuzzy finder
-export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-# Bash-Git-Prompt
-if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
-    GIT_PROMPT_ONLY_IN_REPO=1
-    GIT_PROMPT_FETCH_REMOTE_STATUS=1
-    . "${HOME}/.bash-git-prompt/gitprompt.sh"
-fi
-
 # Load functions
-if [ -f "${DESKTOP_BASHRC_DIR}/.bash_funct" ]; then
-    . "${DESKTOP_BASHRC_DIR}/.bash_funct"
+if [ -f "${DESKTOP_BASHRC_DIR}/.bash_functions" ]; then
+    . "${DESKTOP_BASHRC_DIR}/.bash_functions"
 fi
 
 # Load aliases
 if [ -f "${DESKTOP_BASHRC_DIR}/.bash_aliases" ]; then
     . "${DESKTOP_BASHRC_DIR}/.bash_aliases"
-fi
-
-# Load custom bash completeions
-if [ -f "${HOME}/repos/dotfiles/bash-completion/bash_completion" ] && [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
-    . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
 fi
 
 # Enable programmable completion features (you don't need to enable
@@ -127,12 +111,25 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# enable Git bash compleation
+# Enable Git bash compleation
 if [ -r "/usr/share/bash-completion/completions/git" ]; then
     . "/usr/share/bash-completion/completions/git"
+elif [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
+    . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
 fi
 
-# Andriod development
+# .fzf command line fuzzy finder
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+[ -f "${HOME}/.fzf.bash" ] && . "${HOME}/.fzf.bash"
+
+# Bash-Git-Prompt
+if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
+    GIT_PROMPT_ONLY_IN_REPO=1
+    GIT_PROMPT_FETCH_REMOTE_STATUS=1
+    . "${HOME}/.bash-git-prompt/gitprompt.sh"
+fi
+
+# Andriod
 if [ -d "${HOME}/Android/Sdk" ]; then
     export ANDROID_HOME="${HOME}/Android/Sdk"
     export PATH="${PATH}:${ANDROID_HOME}/emulator"
@@ -141,14 +138,19 @@ if [ -d "${HOME}/Android/Sdk" ]; then
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
 
-# incluse the GO executables
+# GO
 if [ -d "/usr/local/go/bin" ] && [[ ! "$PATH" =~ (^|:)"/usr/local/go/bin"(:|$) ]]; then
     PATH="${PATH}:/usr/local/go/bin"
 fi
 
 # Rust
-if [ -f "$HOME/.cargo/env" ]; then
-    . "$HOME/.cargo/env"
+if [ -f "${HOME}/.cargo/env" ]; then
+    . "${HOME}/.cargo/env"
 fi
+
+# Node Version Manager
+export NVM_DIR="${HOME}/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR

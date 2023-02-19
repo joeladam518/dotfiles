@@ -18,7 +18,7 @@ def get_repo_aliases(script_args: Namespace) -> dict:
 
     if not os.path.exists(repos_directory):
         raise Exception(f"'{repos_directory}' doesn't exist.")
-    
+
     aliases_config = {}
     try:
         with open(script_args.file, 'r') as file:
@@ -27,7 +27,7 @@ def get_repo_aliases(script_args: Namespace) -> dict:
             aliases_config = config_parser.items(SECTION_NAME)
     except FileNotFoundError:
         pass
-    
+
     aliases = {key: os.path.expanduser(path) for (key, path) in aliases_config}
     aliases_keys = list(aliases.keys())
     aliases_paths = list(aliases.values())

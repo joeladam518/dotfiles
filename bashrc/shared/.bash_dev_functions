@@ -1,4 +1,5 @@
 # -*- shell-script -*-
+# shellcheck shell=bash
 # Development functions
 
 # cd into a repo based on a ".repo-aliases" file you define in your home directory
@@ -25,7 +26,11 @@ repo()
     return 0
 }
 
-st-release()
+#
+# Git functions
+#
+
+release-notes()
 {
     if [ -z "${1}" ]; then
         echo "You need to provide a tag" 1>&2
@@ -35,12 +40,8 @@ st-release()
     branches="${2:-"origin/staging..origin/master"}"
     git log "${branches}" --oneline --no-merges | grep -Eio "${1}-([0-9]+)" | tr "[:lower:]" "[:upper:]" | sort | uniq
 
-    return $?
+    return "$?"
 }
-
-#
-# Git functions
-#
 
 __git_delete_dead_local_branches_not_on_remote()
 {

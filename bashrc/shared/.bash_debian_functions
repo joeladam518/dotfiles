@@ -1,5 +1,6 @@
 # -*- shell-script -*-
-# Shared function between desktops and servers
+# shellcheck shell=bash
+# Shared desktop/server functions
 
 # Show the current and closest dns resolver on the network
 showdns()

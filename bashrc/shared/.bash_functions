@@ -1,8 +1,10 @@
 # -*- shell-script -*-
+# shellcheck shell=bash
 # Global Bash Functions
 
 # Ask a yes or no question
-confirm() {
+confirm()
+{
     local prompt answer response
     prompt="$(cmsg -g "$* ")"
     read -er -t 10 -p "$prompt" answer
@@ -14,13 +16,6 @@ confirm() {
     done
 
     return 1
-}
-
-is_int() {
-    case "${1}" in
-        ''|*[!0-9]*) return 1 ;;
-        *) return 0;;
-    esac
 }
 
 # Creates an archive (*.tar.gz) from given directory.

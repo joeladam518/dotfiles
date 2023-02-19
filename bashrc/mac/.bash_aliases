@@ -1,3 +1,5 @@
+# -*- shell-script -*-
+# shellcheck shell=bash
 # Mac Aliases
 
 # Import the global aliases

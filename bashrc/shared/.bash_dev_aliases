@@ -1,4 +1,5 @@
 # -*- shell-script -*-
+# shellcheck shell=bash
 # Development aliases
 
 # Git Aliases

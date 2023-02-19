@@ -1,3 +1,5 @@
+# -*- shell-script -*-
+# shellcheck shell=bash
 # Server Aliases
 
 # Import the global aliases

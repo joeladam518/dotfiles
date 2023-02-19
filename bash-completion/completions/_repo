@@ -1,4 +1,5 @@
 # -*- shell-script -*-
+# shellcheck shell=bash
 # bash completions for the repo function
 
 # Load if the repo command exists and we have and aliases file

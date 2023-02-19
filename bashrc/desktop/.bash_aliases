@@ -1,3 +1,5 @@
+# -*- shell-script -*-
+# shellcheck shell=bash
 # Desktop Aliases
 
 # Import the shared aliases

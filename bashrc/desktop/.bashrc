@@ -1,4 +1,6 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
+# -*- shell-script -*-
+# shellcheck shell=bash
+# ~/.bashrc: executed by bash(1) for non-login shells
 
 # If not running interactively, don't do anything
 case $- in

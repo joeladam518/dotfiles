@@ -1,5 +1,6 @@
 #  -*- shell-script -*-
-# source ompletion directory definitions
+# shellcheck shell=bash
+# source completion directory definitions
 
 completion_dir="${HOME}/repos/dotfiles/bash-completion/completions"
 

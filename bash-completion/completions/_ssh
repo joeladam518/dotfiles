@@ -1,4 +1,5 @@
 # -*- shell-script -*-
+# shellcheck shell=bash
 # bash compleation for ssh
 
 if [ -f "${HOME}/.ssh/config" ] && [ -r "${HOME}/.ssh/config" ]; then

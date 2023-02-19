@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="${1:-16}"
+VERSION="${1:-18}"
 
 install_on_debian() {
     local sources_file_path="/etc/apt/sources.list.d/nodesource.list"

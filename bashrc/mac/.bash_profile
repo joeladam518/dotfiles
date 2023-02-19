@@ -38,26 +38,9 @@ export GPG_TTY="$(tty)"
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
 
-# ruby
-if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
-    export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
-fi
-
-# yarn
-if [ -d "${HOME}/.yarn/bin" ]; then
-    export PATH="${PATH}:${HOME}/.yarn/bin"
-fi
-if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
-    export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
-fi
-
-# Andriod development
-if [ -d "${HOME}/Library/Android/sdk" ]; then
-    export ANDROID_HOME="${HOME}/Library/Android/sdk"
-    export PATH="${PATH}:${ANDROID_HOME}/emulator"
-    export PATH="${PATH}:${ANDROID_HOME}/tools"
-    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
-    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+# include brew's bin dir in the PATH
+if [ -d "${HOMEBREW_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOMEBREW_DIR}/bin"(:|$) ]]; then
+    export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 fi
 
 # if the dotfiles bin folder exists, add it to PATH
@@ -65,9 +48,9 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
     export PATH="${DOTFILES_DIR}/bin:${PATH}"
 fi
 
-# include brew's bin dir in the PATH
-if [ -d "${HOMEBREW_DIR}/bin" ]; then
-    export PATH="${HOMEBREW_DIR}/bin:${PATH}"
+# include the user's bin dir in the PATH
+if [ -d "${HOME}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOME}/bin"(:|$) ]]; then
+    export PATH="${HOME}/bin:${PATH}"
 fi
 
 # Add the python directory to $PYTHONPATH so scripts can find the custom modules
@@ -87,6 +70,23 @@ if [ -f "${MAC_BASHRC_DIR}/.bash_aliases" ]; then
     . "${MAC_BASHRC_DIR}/.bash_aliases"
 fi
 
+# Enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [[ -r "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh" ]]; then
+    . "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh"
+fi
+
+# Load custom bash completeions
+if [[ -r "${DOTFILES_DIR}/bash-completion/bash_completion" ]]; then
+    . "${DOTFILES_DIR}/bash-completion/bash_completion"
+fi
+
+# Enable Git bash compleation
+if [[ -r "${HOME}/.git-completion.bash" ]]; then
+    . "${HOME}/.git-completion.bash"
+fi
+
 # Bash-Git-Prompt
 if [ -r "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
@@ -94,28 +94,40 @@ if [ -r "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh" ]; then
     . "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh"
 fi
 
-# Load custom bash completeions
-if [ -f "${DOTFILES_DIR}/bash-completion/bash_completion" ] && [ -r "${DOTFILES_DIR}/bash-completion/bash_completion" ]; then
-    . "${DOTFILES_DIR}/bash-completion/bash_completion"
-fi
-
-# Enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-[[ -r "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh" ]] && . "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh"
-
-# Git completion
-[[ -r "${HOME}/.git-completion.bash" ]] && . "${HOME}/.git-completion.bash"
-
 # .fzf command line fuzzy finder
-# change the default find command
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-# include the user's bin dir in the PATH
-if [ -d "${HOME}/bin" ]; then
-    export PATH="${HOME}/bin:${PATH}"
+# Andriod development
+if [ -d "${HOME}/Library/Android/sdk" ]; then
+    export ANDROID_HOME="${HOME}/Library/Android/sdk"
+    export PATH="${PATH}:${ANDROID_HOME}/emulator"
+    export PATH="${PATH}:${ANDROID_HOME}/tools"
+    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
+    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
+
+# ruby
+if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+    export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
+fi
+
+# yarn
+if [ -d "${HOME}/.yarn/bin" ]; then
+    export PATH="${PATH}:${HOME}/.yarn/bin"
+fi
+if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
+    export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
+fi
+
+# Node Version Manager
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"  # This loads nvm
+    [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
+fi
+
+source "${HOME}/.docker/init-bash.sh" || true # Added by Docker Desktop
 
 # Unset any variables that were used in this script
 unset DOTFILES_DIR BASHRC_DIR MAC_BASHRC_DIR HOMEBREW_DIR

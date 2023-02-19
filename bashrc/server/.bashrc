@@ -13,7 +13,8 @@ DOTFILES_DIR="${HOME}/repos/dotfiles"
 BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 SERVER_BASHRC_DIR="${BASHRC_DIR}/server"
 
-# Shel Options!
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 # Cmdhist
 shopt -s cmdhist
@@ -36,9 +37,7 @@ export HISTCONTROL=ignoreboth
 # For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTSIZE=100000
 export HISTFILESIZE=200000
-export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit:* --help"
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
+export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit"
 
 # Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -81,7 +80,7 @@ unset color_prompt force_color_prompt
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # if the dotfiles bin folder exists, add it to PATH
-if [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
+if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
@@ -104,7 +103,7 @@ fi
 
 # .fzf command line fuzzy finder
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f "${HOME}/.fzf.bash" ] && . "${HOME}/.fzf.bash"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile

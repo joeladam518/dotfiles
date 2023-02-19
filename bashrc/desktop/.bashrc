@@ -111,16 +111,15 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Enable Git bash compleation
-if [ -r "/usr/share/bash-completion/completions/git" ]; then
-    . "/usr/share/bash-completion/completions/git"
-elif [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
+# Load custom bash completeions
+if [[ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]]; then
     . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
 fi
 
-# .fzf command line fuzzy finder
-export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f "${HOME}/.fzf.bash" ] && . "${HOME}/.fzf.bash"
+# Enable Git bash compleation
+if [[ -r "/usr/share/bash-completion/completions/git" ]]; then
+    . "/usr/share/bash-completion/completions/git"
+fi
 
 # Bash-Git-Prompt
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
@@ -128,6 +127,10 @@ if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_FETCH_REMOTE_STATUS=1
     . "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
+
+# .fzf command line fuzzy finder
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Andriod
 if [ -d "${HOME}/Android/Sdk" ]; then
@@ -149,8 +152,10 @@ if [ -f "${HOME}/.cargo/env" ]; then
 fi
 
 # Node Version Manager
-export NVM_DIR="${HOME}/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"  # This loads nvm
+    [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
+fi
 
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR

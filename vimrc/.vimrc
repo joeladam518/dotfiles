@@ -242,7 +242,7 @@ colorscheme PaperColor
 if has("gui_running")
     set mouse=a
 else
-    set mouse=
+    set mouse=a
 endif
 
 " Set the command window height to 2 lines, to avoid many cases of having to press <Enter> to continue"
@@ -332,7 +332,7 @@ endif
 autocmd BufRead .bashrc set syntax=bash
 autocmd BufRead .bash_profile set syntax=bash
 autocmd BufRead .bash_aliases set syntax=bash
-autocmd BufRead .bash_funct set syntax=bash
+autocmd BufRead .bash_functions set syntax=bash
 autocmd BufRead .bash_*_aliases set syntax=bash
-autocmd BufRead .bash_*_funct set syntax=bash
+autocmd BufRead .bash_*_functions set syntax=bash
 

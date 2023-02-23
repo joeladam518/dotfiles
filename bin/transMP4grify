@@ -12,6 +12,7 @@ Convert files to .mp4
 Options:
 -h, --help            Print this help and exit
 -y, --dont-confirm    Convert all files without confirming first
+-a, --include-audio   Don't strip audio
 EOF
     return 0
 }
@@ -51,6 +52,7 @@ parse_long_options() {
     case "$1" in
         help) usage; exit ;;
         dont-confirm) dont_confirm="0" ;;
+        include-audio) include_audio="0" ;;
         *) invalid_option "-${OPTARG}" ;;
     esac
 
@@ -60,11 +62,13 @@ parse_long_options() {
 parse_params() {
     # flags
     dont_confirm="0"
+    include_audio="0"
 
-    while getopts ":hy-:" opt; do
+    while getopts ":hay-:" opt; do
         case "$opt" in
             h) usage; exit ;;
-            y) dont_confirm="1"; ;;
+            a) include_audio="1" ;;
+            y) dont_confirm="1" ;;
             :) invalid_option "$OPTARG" ;;
             -) parse_long_options "$OPTARG" ;;
             \?) invalid_option "$OPTARG" ;;
@@ -100,6 +104,10 @@ do
     converted_filename="${filename_without_extension}.mp4"
 
     if [ "$dont_confirm" == "1" ] || confirm "Convert ${directory}/${filename} to ${directory}/${converted_filename}? (yes/No):\n> "; then
-        ffmpeg -i "${directory}/${filename}" -an "${directory}/${converted_filename}"
+        if [ "$include_audio" == "1" ]; then
+            ffmpeg -i "${directory}/${filename}" "${directory}/${converted_filename}"
+        else
+            ffmpeg -i "${directory}/${filename}" -an "${directory}/${converted_filename}"
+        fi
     fi
 done

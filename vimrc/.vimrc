@@ -20,15 +20,17 @@ let g:mapleader=" "
 " Start Vim-plug
 call plug#begin('~/.vim/plugged')
 
-" -> Colorschemes 
+" -> Colorschemes
+" https://github.com/NLKNguyen/papercolor-theme
 Plug 'NLKNguyen/papercolor-theme'
+" https://github.com/phanviet/vim-monokai-pro
 Plug 'phanviet/vim-monokai-pro'
 
 " -> Plugins
 " https://github.com/junegunn/fzf.vim -> Fzf for vim
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-" https://github.com/sheerun/vim-polygloti -> Comprehensive language pack 
+" https://github.com/sheerun/vim-polyglot -> Comprehensive language pack 
 Plug 'sheerun/vim-polyglot' 
 " https://github.com/tpope/vim-commentary -> Commenting plugin 
 Plug 'tpope/vim-commentary'
@@ -138,7 +140,7 @@ nnoremap <silent> <leader>fr<leader> :Files ~/repos<CR>
 " *** Only for Winows vim Version ***
 " Activate all the handy Windows key-bindings we're used to.
 if IsOS("win")
-	source $VIMRUNTIME/mswin.vim
+    source $VIMRUNTIME/mswin.vim
     behave mswin
 endif
 
@@ -193,7 +195,7 @@ set wildmenu
 set showcmd
 
 " highlight matching [{()}]
-set showmatch          
+set showmatch
 
 " Makes search act like search in modern browsers
 set incsearch
@@ -218,6 +220,7 @@ set nomodeline
 "-------------------------------------------------------------------------------
 " Set Term color setting to 256 colors
 set t_Co=256
+set termguicolors
 
 " Enable syntax highlighting
 syntax on
@@ -233,7 +236,7 @@ set background=dark
 " Set the colorshceme
 colorscheme pablo
 colorscheme PaperColor
-
+"colorscheme monokai_pro
 "-------------------------------------------------------------------------------
 " => Usability options
 "-------------------------------------------------------------------------------
@@ -304,7 +307,7 @@ set cursorline
 set notimeout ttimeout ttimeoutlen=200
 
 " Viewing hidden characters
-set listchars=eol:¬,tab:▸\ ,space:\. 
+set listchars=eol:¬,tab:▸\ ,space:·
 
 "-------------------------------------------------------------------------------
 " => Gui Settings

@@ -9,7 +9,7 @@ alias reload-shell='exec ${SHELL}; echo shell reloaded;'
 # Upgrade fzf
 alias updatefzf='cd ~/.fzf && git pull && ./install && cd ~'
 
-## Clear the screen of your clutter
+# Clear the screen of your clutter
 alias clear='clear;pwd;'
 
 ## Use htop instead of top

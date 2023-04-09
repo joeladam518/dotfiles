@@ -12,6 +12,7 @@ DOTFILES_DIR="${HOME}/repos/dotfiles"
 BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 DESKTOP_BASHRC_DIR="${BASHRC_DIR}/desktop"
 
+export EDITOR=vim
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 

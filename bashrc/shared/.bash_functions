@@ -57,3 +57,13 @@ extract()
 
     return "$?"
 }
+
+# start tmux
+tmux()
+{
+    if [ "$#" -eq 0 ]; then
+        command tmux new -s 'jh' -n ''
+    else
+        command tmux "$@"
+    fi
+}

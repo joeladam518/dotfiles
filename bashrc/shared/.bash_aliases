@@ -6,9 +6,6 @@
 alias reload-bashrc='source ~/.bashrc;'
 alias reload-shell='exec ${SHELL}; echo shell reloaded;'
 
-# Upgrade fzf
-alias updatefzf='cd ~/.fzf && git pull && ./install && cd ~'
-
 # Clear the screen of your clutter
 alias clear='clear;pwd;'
 

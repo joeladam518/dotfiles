@@ -9,15 +9,21 @@ repo()
 
     key="${1}"
     if [ -z "${key}" ]; then
-        cmsg -r "you must specify a key" 1>&2
+        cmsg -r "Invalid alias key ''" 1>&2
         return 1
+    fi
+
+    if [ "$key" == "-l" ] || [ "$key" == "--list" ]; then
+        cmsg -d "Available repos"
+        __repo-helper "${HOME}/.repo-aliases" --list-keys
+        return 0
     fi
 
     # Check if key exists
     path="$(__repo-helper "${HOME}/.repo-aliases" --key="${key}")"
 
     if [ -z "$path" ]; then
-        cmsg -r "invalid option '${key}'" 1>&2
+        cmsg -r "Invalid alias key '${key}'" 1>&2
         return 1
     fi
 

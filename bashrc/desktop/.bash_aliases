@@ -17,7 +17,13 @@ if [ -f "${BASHRC_DIR}/shared/.bash_debian_aliases" ]; then
     . "${BASHRC_DIR}/shared/.bash_debian_aliases"
 fi
 
-# fzf aliases
-alias codeit='code $(fzf -m);'
-alias openit='open $(fzf -m);'
-alias sublit='subl $(fzf -m);'
+# fzf aliases - checks to see if the command exists before adding the alias
+if command -v code > /dev/null; then
+    alias codeit='code $(fzf -m);'
+fi
+if command -v xdg-open > /dev/null; then
+    alias openit='xdg-open $(fzf -m);'
+fi
+if command -v subl > /dev/null; then
+    alias sublit='subl $(fzf -m);'
+fi

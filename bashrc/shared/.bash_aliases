@@ -1,6 +1,6 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Global aliases
+# Shared aliases
 
 # Reload shell
 alias reload-bashrc='source ~/.bashrc;'

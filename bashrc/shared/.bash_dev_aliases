@@ -1,6 +1,6 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Development aliases
+# Shared development aliases
 
 # Git Aliases
 alias st='git status'

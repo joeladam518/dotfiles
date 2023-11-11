@@ -1,6 +1,6 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Global Bash Functions
+# Shared functions
 
 # Ask a yes or no question
 confirm()
@@ -58,7 +58,8 @@ extract()
     return "$?"
 }
 
-# start tmux
+# Fill in the most common arguments I use when starting tmux if I don't
+# provide any specific args.
 tmux()
 {
     if [ "$#" -eq 0 ]; then

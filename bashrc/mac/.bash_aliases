@@ -21,7 +21,10 @@ alias ll='ls -aFl'
 alias lll='ls -Fl'
 alias lr='ll -R'
 
-# fzf aliases
-alias codeit='code $(fzf -m);'
-alias mvimit='mvim -p --remote-tab-silent $(fzf -m);'
-alias openit='open $(fzf -m);'
+# fzf aliases - checks to see if the command exists before adding the alias
+if command -v code > /dev/null; then
+    alias codeit='code $(fzf -m);'
+fi
+if command -v open > /dev/null; then
+    alias openit='open $(fzf -m);'
+fi

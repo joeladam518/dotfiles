@@ -34,8 +34,3 @@ alias lll='ls -lhpv'    # ll without hidden files/directories
 
 # Prints disk usage in human readable form
 alias duu='du -ach -d1 | sort -h'
-
-# apt-get aliases
-alias auu='sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y'
-# alias afu='sudo apt full-upgrade -y'
-# alias aar='sudo apt autoremove -y'

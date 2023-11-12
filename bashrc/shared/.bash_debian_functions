@@ -2,6 +2,15 @@
 # shellcheck shell=bash
 # Shared desktop/server functions
 
+# update the computer
+auu() {
+    if [ "$EUID" -eq "0" ]; then
+        apt update && apt upgrade -y && apt autoremove -y
+    else
+        sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+    fi
+}
+
 # Show the current and closest dns resolver on the network
 showdns()
 {

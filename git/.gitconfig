@@ -24,6 +24,7 @@
     lg = la -10
     lgr = la --graph
     wtf = log --pretty=format:'%C(auto,yellow)%H%Creset%C(auto)%d%Creset - %C(auto,blue)%cn%Creset - %C(auto,green)(%ar)%Creset%n %-s%n' --stat
+    st = status
     # git add/remove with fzf
     stg = "! git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add"
     unstg = "! git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q"

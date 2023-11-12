@@ -2,15 +2,18 @@
 # shellcheck shell=bash
 # Shared functions
 
-# Ask a yes or no question
 confirm()
 {
-    local prompt answer response
-    prompt="$(cmsg -g "$* ")"
-    read -er -t 10 -p "$prompt" answer
-    for response in y Y yes Yes YES sure Sure SURE ok Ok OK
+    # Ask a yes or no question
+
+    local CONFIRM_PROMPT CONFIRM_ANSWER CONFIRM_RESPONSE
+
+    CONFIRM_PROMPT="$(cmsg -g "$* ")"
+    read -er -t 10 -p "$CONFIRM_PROMPT" CONFIRM_ANSWER
+
+    for CONFIRM_RESPONSE in y Y yes Yes YES sure Sure SURE ok Ok OK
     do
-        if [ "_$answer" == "_$response" ]; then
+        if [ "_${CONFIRM_ANSWER}" == "_${CONFIRM_RESPONSE}" ]; then
             return 0
         fi
     done
@@ -18,53 +21,60 @@ confirm()
     return 1
 }
 
-# Creates an archive (*.tar.gz) from given directory.
-tarthis()
-{
-    tar -cvzf "${1%%/}.tar.gz" "${1%%/}/"
-    return "$?"
-}
-
-# Create a ZIP archive of a file or folder.
-zipthis()
-{
-    zip -r "${1%%/}.zip" "$1"
-    return "$?"
-}
-
-# Handy Extract function
 extract()
 {
-    if [ ! -f "$1" ]; then
-        echo "'${1}' is not a valid file!" 1>&2
+    # Handy Extract function
+
+    local FILE_PATH
+    FILE_PATH="${1:-""}"
+
+    if [ -z "$FILE_PATH" ] || [ ! -f "$FILE_PATH" ]; then
+        echo "'${FILE_PATH}' is not a valid file!" 1>&2
         return 1
     fi
 
-    case "$1" in
-        *.tar.bz2) tar -xvjf "$1" ;;
-        *.tar.gz) tar -xvzf "$1" ;;
-        *.bz2) bunzip2 "$1" ;;
-        *.rar) unrar -x "$1" ;;
-        *.gz) gunzip "$1" ;;
-        *.tar) tar -xvf "$1" ;;
-        *.tbz2) tar -xvjf "$1" ;;
-        *.tgz) tar -xvzf "$1" ;;
-        *.zip) unzip "$1" ;;
-        *.Z) uncompress "$1" ;;
-        *.7z) 7z -x "$1" ;;
-        *) echo "'${1}' cannot be extracted via >extract<" 1>&2; return 1 ;;
+    case "$FILE_PATH" in
+        *.tar.bz2) tar -xvjf "$FILE_PATH" ;;
+        *.tar.gz) tar -xvzf "$FILE_PATH" ;;
+        *.bz2) bunzip2 "$FILE_PATH" ;;
+        *.rar) unrar -x "$FILE_PATH" ;;
+        *.gz) gunzip "$FILE_PATH" ;;
+        *.tar) tar -xvf "$FILE_PATH" ;;
+        *.tbz2) tar -xvjf "$FILE_PATH" ;;
+        *.tgz) tar -xvzf "$FILE_PATH" ;;
+        *.zip) unzip "$FILE_PATH" ;;
+        *.Z) uncompress "$FILE_PATH" ;;
+        *.7z) 7z -x "$FILE_PATH" ;;
+        *) echo "'${FILE_PATH}' cannot be extracted via >extract<" 1>&2; return 1 ;;
     esac
 
     return "$?"
 }
 
-# Fill in the most common arguments I use when starting tmux if I don't
-# provide any specific args.
+tarthis()
+{
+    # Creates an archive (*.tar.gz) from given directory
+
+    tar -cvzf "${1%%/}.tar.gz" "${1%%/}/"
+    return "$?"
+}
+
 tmux()
 {
+    # Fill in the most common arguments I use when starting tmux if I don't
+    # provide any specific args.
+
     if [ "$#" -eq 0 ]; then
         command tmux new -s 'jh' -n ''
     else
         command tmux "$@"
     fi
+}
+
+zipthis()
+{
+    # Create a ZIP archive of a file or folder
+
+    zip -r "${1%%/}.zip" "$1"
+    return "$?"
 }

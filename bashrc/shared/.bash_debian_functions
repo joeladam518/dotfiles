@@ -2,9 +2,10 @@
 # shellcheck shell=bash
 # Shared desktop/server functions
 
-# update the computer
 auu()
 {
+    # Update your computer
+
     if [ "$EUID" -eq "0" ]; then
         apt update && apt upgrade -y && apt autoremove -y
     else
@@ -12,25 +13,26 @@ auu()
     fi
 }
 
-# Show the current and closest dns resolver on the network
 showdns()
 {
-    local nameserver
+    # Show the current and closest dns resolver on the network
 
-    nameserver="$( ( nmcli dev list || nmcli dev show ) 2> /dev/null | grep DNS | tr -s '[:space:]' | cut -d' ' -f2 )"
+    local NAMESERVER
+    NAMESERVER="$( ( nmcli dev list || nmcli dev show ) 2> /dev/null | grep DNS | tr -s '[:space:]' | cut -d' ' -f2 )"
 
-    if [ -z "$nameserver" ]; then
-        nameserver="$(cat /etc/resolv.conf | grep 'nameserver' | head -1 |cut -d' ' -f2)"
+    if [ -z "$NAMESERVER" ]; then
+        NAMESERVER="$(cat /etc/resolv.conf | grep 'nameserver' | head -1 |cut -d' ' -f2)"
     fi
 
-    if [ -z "$nameserver" ] || [ "$nameserver" == "127.0.0.53" ]; then
-        nameserver="$(ip route | grep default | cut -d' ' -f3)"
+    if [ -z "$NAMESERVER" ] || [ "$NAMESERVER" == "127.0.0.53" ]; then
+        NAMESERVER="$(ip route | grep default | cut -d' ' -f3)"
     fi
 
-    if [ -z "$nameserver" ]; then
+    if [ -z "$NAMESERVER" ]; then
         echo "Couldn't find nameserver" 1>&2
         return 1
     fi
 
-    echo "$nameserver"
+    echo "$NAMESERVER"
+    return 0
 }

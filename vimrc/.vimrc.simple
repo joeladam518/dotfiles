@@ -194,6 +194,7 @@ set background=dark
 
 " Set the colorshceme
 colorscheme pablo
+colorscheme PaperColor  
 "-------------------------------------------------------------------------------
 " => Usability options
 "-------------------------------------------------------------------------------

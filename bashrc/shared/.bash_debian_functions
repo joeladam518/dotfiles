@@ -3,7 +3,8 @@
 # Shared desktop/server functions
 
 # update the computer
-auu() {
+auu()
+{
     if [ "$EUID" -eq "0" ]; then
         apt update && apt upgrade -y && apt autoremove -y
     else

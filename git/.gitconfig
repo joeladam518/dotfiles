@@ -3,20 +3,23 @@
 [color]
     ui = true
     status = auto
+#[commit]
+#    gpgsign = true
+[core]
+    editor = vim
 [diff]
     tool = vimdiff
     algorithm = patience
-[core]
-    editor = /usr/bin/vim
 [init]
     templatedir = ./.git_template
-[pull]
-    rebase = true
 [merge]
     renamelimit = 2415
+[pull]
+    rebase = true
 [alias]
     amend = commit --amend
     br = branch
+    #commit = commit -S
     d = diff --histogram
     dt = difftool
     # git logging
@@ -28,6 +31,3 @@
     # git add/remove with fzf
     stg = "! git ls-files -m -o --exclude-standard | fzf --print0 -m | xargs -0 -t -o git add"
     unstg = "! git diff --cached --name-only | fzf --print0 -m | xargs -0 -t -o git reset -q"
-#[commit]
-#    gpgSign = true
-

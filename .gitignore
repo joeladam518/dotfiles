@@ -2,7 +2,9 @@
 .idea
 .vscode
 .phpintel
+.fleet
 *.swp
+*.orig
 .netrwhist
 
 # Packages

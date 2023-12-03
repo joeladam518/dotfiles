@@ -48,7 +48,7 @@ class PhpVars:
         return default_values
 
 
-def install_php_sources() -> None:
+def _install_php_sources() -> None:
     """Install the php apt repository"""
     if osinfo.id() in ['debian', 'raspbian']:
         packages = ['apt-transport-https', 'ca-certificates', 'software-properties-common', 'lsb-release', 'gnupg2']
@@ -65,7 +65,7 @@ def install_php_sources() -> None:
         raise Exception('Unsupported OS')
 
 
-def php_sources_are_not_installed() -> bool:
+def _php_sources_are_not_installed() -> bool:
     """Check see if the php apt repository is installed"""
     cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep '%s' | grep 'php'"
     if osinfo.id() in ['debian', 'raspbian']:
@@ -83,9 +83,9 @@ def php_sources_are_not_installed() -> bool:
     return True
 
 
-def get_available_php_versions() -> tuple:
+def _get_available_php_versions() -> tuple:
     """Find php versions by searching for packages with versions. i.e: 'php8.1-intl' """
-    if php_sources_are_not_installed():
+    if _php_sources_are_not_installed():
         return PhpVars.versions
 
     try:
@@ -97,7 +97,7 @@ def get_available_php_versions() -> tuple:
         return PhpVars.versions
 
 
-def get_installed_php_packages(version: Optional[str] = None) -> list:
+def _get_installed_php_packages(version: Optional[str] = None) -> list:
     """Get the currently installed php packages"""
     cmd = r"dpkg -l | grep -E '^[a-zA-Z]*\s*php%s' | sed 's/^[a-zA-Z]*\s*//' | sed 's/\s\{3,\}.*$//' | tr '\n' ' '"
     packages = run.command(cmd % (version or '*'), capture_output=True)
@@ -105,9 +105,9 @@ def get_installed_php_packages(version: Optional[str] = None) -> list:
     return list(filter(bool, packages))
 
 
-def get_uninstallable_versions() -> Tuple[str]:
+def _get_uninstallable_versions() -> Tuple[str]:
     """Filter the php versions to the one that can be uninstalled"""
-    versions = map(lambda package: re.search(r'php(\d\.\d)?.*', package).group(1), get_installed_php_packages())
+    versions = map(lambda package: re.search(r'php(\d\.\d)?.*', package).group(1), _get_installed_php_packages())
     return array.unique(tuple(filter(bool, list(versions))))
 
 
@@ -133,7 +133,7 @@ def install_php(subcommand: Subcommand) -> None:
 
     try:
         args: InstallPhpArguments = InstallPhpArguments.from_command(subcommand)
-        installable_versions: List[str] = [v for v in get_available_php_versions() if Version(v).gt('7.4')]
+        installable_versions: List[str] = [v for v in _get_available_php_versions() if Version(v).gt('7.4')]
 
         if args.version is None or args.version not in installable_versions:
             args.version = console.choice(
@@ -166,8 +166,8 @@ def install_php(subcommand: Subcommand) -> None:
 
         print()
         if console.confirm('Proceed?'):
-            if php_sources_are_not_installed():
-                install_php_sources()
+            if _php_sources_are_not_installed():
+                _install_php_sources()
 
             run.command('apt update', root=True)
             run.command('apt install -y', *packages, root=True)
@@ -198,7 +198,7 @@ def uninstall_php(subcommand: Subcommand) -> None:
 
     try:
         args: UninstallPhpArguments = UninstallPhpArguments.from_command(subcommand)
-        uninstallable_versions: Tuple[str] = get_uninstallable_versions()
+        uninstallable_versions: Tuple[str] = _get_uninstallable_versions()
 
         if not uninstallable_versions:
             print()
@@ -216,7 +216,7 @@ def uninstall_php(subcommand: Subcommand) -> None:
                 console.error('Invalid php version')
                 sys.exit(console.FAILURE)
 
-        packages = get_installed_php_packages(args.version)
+        packages = _get_installed_php_packages(args.version)
 
         if len(packages) == 0:
             print()

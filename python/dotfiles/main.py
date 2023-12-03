@@ -1,23 +1,13 @@
 import sys
-from argparse import ArgumentParser, RawDescriptionHelpFormatter, PARSER
+from argparse import ArgumentParser
 
 from dotfiles import console, commands
-from dotfiles.cli import Command
+from dotfiles.cli import Command, HelpFormatter
 from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
 from dotfiles.paths import home_path
 
 
-class HelpFormatter(RawDescriptionHelpFormatter):
-    """Custom help formatter that removes the default `positional arguments` and `optional arguments` headers"""
-    def _format_action(self, action):
-        # noinspection PyProtectedMember
-        parts = super(RawDescriptionHelpFormatter, self)._format_action(action)
-        if action.nargs == PARSER:
-            parts = "\n".join(parts.split("\n")[1:])
-        return parts
-
-
-def get_parser() -> ArgumentParser:
+def _get_parser() -> ArgumentParser:
     """Parse command line arguments"""
     parser = ArgumentParser(
         prog='dotfiles',
@@ -211,7 +201,7 @@ def get_parser() -> ArgumentParser:
 def cli() -> None:
     """Command line interface entry point"""
     try:
-        parser = get_parser()
+        parser = _get_parser()
         arguments, extra_arguments = parser.parse_known_args()
         command: Command = Command.from_namespace(arguments)
 

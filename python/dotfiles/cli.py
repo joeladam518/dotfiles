@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from argparse import Namespace
+from argparse import Namespace, RawDescriptionHelpFormatter, PARSER
 from collections import OrderedDict
 from typing import Union
 
@@ -20,6 +20,16 @@ def _get_arg_strings(attributes: dict) -> list:
     if star_args:
         arg_strings.append(f"**{repr(star_args)}")
     return arg_strings
+
+
+class HelpFormatter(RawDescriptionHelpFormatter):
+    """Custom help formatter that removes the default `positional arguments` and `optional arguments` headers"""
+    def _format_action(self, action):
+        # noinspection PyProtectedMember
+        parts = super(RawDescriptionHelpFormatter, self)._format_action(action)
+        if action.nargs == PARSER:
+            parts = "\n".join(parts.split("\n")[1:])
+        return parts
 
 
 class Command:

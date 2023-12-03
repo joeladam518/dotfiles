@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" > /dev/null 2>&1 && pwd -P)"
+PYTHON_DIR="$(dirname "$SCRIPT_DIR")/python"
+
+if [ -n "$PYTHONPATH" ]; then
+    export PYTHONPATH="${PYTHONPATH}:${PYTHON_DIR}"
+else
+    export PYTHONPATH="${PYTHON_DIR}"
+fi
+
+python3 "${PYTHON_DIR}/dotfiles" "$@"

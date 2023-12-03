@@ -1,10 +1,9 @@
 import os
 import subprocess
 import sys
-from . import osinfo
 from typing import Union
+from dotfiles import osinfo
 
-# Types
 CompletedProcess = subprocess.CompletedProcess
 RunOutput = Union[CompletedProcess, str]
 

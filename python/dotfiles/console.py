@@ -1,20 +1,15 @@
-from . import arr
+import sys
 from typing import Any, Dict, List, Tuple, Union
+
+from dotfiles import array
+from dotfiles.errors import EmptyAnswerError, InvalidAnswerError
 
 SUCCESS = 0
 FAILURE = 1
 CTRL_C = 130
 
-
-class EmptyAnswerError(ValueError):
-    pass
-
-
-class InvalidAnswerError(ValueError):
-    pass
-
-
 def confirm(question: str, tries: int = 2) -> bool:
+    """Ask a yes/no question via input() and return their answer."""
     valid = {"yes": True, "ye": True, "y": True, "no": False, "n": False}
 
     while tries > 0:
@@ -23,7 +18,7 @@ def confirm(question: str, tries: int = 2) -> bool:
         if answer in valid:
             return valid[answer]
         print(f'\nValue "{answer}" is invalid!')
-        print(f'Options: "' + '", "'.join(valid.keys()) + '"\n')
+        print('Options: "' + '", "'.join(valid.keys()) + '"\n')
         tries = tries - 1
 
     return False
@@ -36,6 +31,7 @@ def choice(
     attempts: int = 2,
     multiple: bool = False
 ) -> Union[Any, Tuple[Any, ...], None]:
+    """Ask a choice question via input() and return their answer."""
     choices_is_dict = isinstance(choices, dict)
     if not choices_is_dict and default is not None and not isinstance(default, int):
         try:
@@ -63,7 +59,7 @@ def choice(
             raise EmptyAnswerError()
 
         if multiple:
-            answer = arr.unique(tuple([a.strip() for a in answer.split(',') if a]))
+            answer = array.unique(tuple([a.strip() for a in answer.split(',') if a]))
 
         if not choices_is_dict:
             try:
@@ -74,7 +70,7 @@ def choice(
                 pass
 
         # validate
-        for a in arr.wrap(answer, tuple):
+        for a in array.wrap(answer, tuple):
             if not is_choice(a):
                 raise InvalidAnswerError(f'Value "{a}" is invalid!')
 
@@ -97,11 +93,11 @@ def choice(
 
         try:
             return get_answer()
-        except EmptyAnswerError:
+        except EmptyAnswerError as exc:
             if default_is_valid_choice:
                 return default
 
-            raise InvalidAnswerError(f'Value "" is invalid!')
+            raise InvalidAnswerError('Value is invalid!') from exc
 
     while attempts > 0:
         try:
@@ -113,3 +109,9 @@ def choice(
         attempts = attempts - 1
 
     return None
+
+
+def error(*args, **kwargs) -> None:
+    """doc_inherit print"""
+    print(*args, **kwargs, file=sys.stderr)
+

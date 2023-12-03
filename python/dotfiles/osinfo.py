@@ -2,14 +2,11 @@ import csv
 import os
 import platform
 import sys
-from argparse import ArgumentParser, Namespace
 from typing import Optional
 
-SUCCESS = 0
-FAILURE = 1
 
-# Functions
 def __get_release_path() -> Optional[str]:
+    """Get the path to the os-release file."""
     root = os.path.abspath(os.sep)
     path = os.path.join(root, 'etc', 'os-release')
     if os.path.exists(path):
@@ -22,38 +19,8 @@ def __get_release_path() -> Optional[str]:
     return None
 
 
-def __more_than_one_option_chosen(script_args: Namespace) -> None:
-    count = 0
-    for value in script_args.__dict__.values():
-        if value:
-            count = count + 1
-        if count > 1:
-            return True
-
-    return False
-
-
-def __parse_script_args():
-    parser = ArgumentParser(description='Display basic info about your os')
-
-    parser.add_argument('-c', '--codename', action='store_true', default=False,
-                        help='get the codename')
-    parser.add_argument('-i', '--id', action='store_true', default=False,
-                        help='get the distro')
-    parser.add_argument('-l', '--like', action='store_true', default=False,
-                        help='get the distro that the current distro is like (for Linux)')
-    parser.add_argument('-p', '--pretty', action='store_true', default=False,
-                        help='get the pretty name')
-    parser.add_argument('-s', '--simplified', action='store_true', default=False,
-                        help='get the simplified os type (windows|mac|linux)')
-    parser.add_argument('-v', '--version', action='store_true', default=False,
-                        help='get the os version')
-
-    return parser.parse_args()
-
-
 def codename() -> str:
-    """Get the distrubution's version codename."""
+    """Get the distribution's version codename."""
     return get_release_value('VERSION_CODENAME')
 
 
@@ -82,7 +49,7 @@ def get_release() -> dict:
         return {}
 
     try:
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             reader = csv.reader(f, delimiter="=")
             return {key: value for key, value in reader}
     except FileNotFoundError:
@@ -114,20 +81,20 @@ def id() -> str:
 
 
 def id_like() -> tuple:
-    """The operating systems that the the local operating system is based on.
+    """The operating systems that the local operating system is based on.
 
     If not a freedesktop system, this will just return the type of system.
     """
     system_type = ostype()
 
     if system_type in ['linux', 'freebsd']:
-        id_like = get_release_value('ID_LIKE')
+        id_like_ = get_release_value('ID_LIKE')
 
         if not id_like:
             id_ = get_release_value('ID')
             return (id_,) if id_ else ()
 
-        return tuple(id_like.split(' '))
+        return tuple(id_like_.split(' '))
 
     return system_type,
 
@@ -180,28 +147,3 @@ def version() -> str:
         return mac_ver[0]
 
     return get_release_value('VERSION_ID')
-
-
-if __name__ == '__main__':
-    args = __parse_script_args()
-
-    if __more_than_one_option_chosen(args):
-        print('You\'re only allowed to choose one of the options.', file=sys.stderr)
-        sys.exit(FAILURE)
-
-    if args.version:
-        print(version())
-    elif args.id:
-        print(id())
-    elif args.like:
-        print(' '.join(id_like()))
-    elif args.simplified:
-        print(ostype())
-    elif args.codename:
-        print(codename())
-    elif args.pretty:
-        print(pretty_name())
-    else:
-        print(name())
-
-    sys.exit(SUCCESS)

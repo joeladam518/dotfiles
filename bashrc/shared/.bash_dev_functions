@@ -41,11 +41,11 @@ repo()
 
     if [ "$REPO_ALIAS" == "-l" ] || [ "$REPO_ALIAS" == "--list" ]; then
         cmsg -d "Available repos"
-        __repo-helper "${HOME}/.repo-aliases" --list-keys
+        dotfiles repos --list-keys
         return 0
     fi
 
-    REPO_PATH="$(__repo-helper "${HOME}/.repo-aliases" --key="${REPO_ALIAS}")"
+    REPO_PATH="$(dotfiles repos "${REPO_ALIAS}")"
 
     if [ -z "$REPO_PATH" ]; then
         cmsg -r "Invalid alias '${REPO_ALIAS}'" 1>&2

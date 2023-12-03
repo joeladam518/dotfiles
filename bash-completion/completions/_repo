@@ -8,7 +8,7 @@ if command -v "repo" >/dev/null 2>&1; then
     {
         local CURRENT OPTS
         CURRENT="${COMP_WORDS[COMP_CWORD]}"
-        OPTS="$(__repo-helper "${HOME}/.repo-aliases" --list-keys --sep=" ")"
+        OPTS="$(dotfiles repos --list-keys --sep=" ")"
         COMPREPLY=( $(compgen -W "$OPTS" -- "$CURRENT") )
 
         return 0
@@ -16,4 +16,3 @@ if command -v "repo" >/dev/null 2>&1; then
 
     complete -F __repo repo
 fi
-

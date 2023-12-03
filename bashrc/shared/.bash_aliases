@@ -13,6 +13,9 @@ alias .....='cd ../../../..'
 alias reload-bashrc='source ~/.bashrc;'
 alias reload-shell='exec ${SHELL}; echo "shell reloaded";'
 
+# Osinfo
+alias osinfo='dotfiles osinfo'
+
 # Clear the screen of your clutter
 alias clear='clear;pwd;'
 

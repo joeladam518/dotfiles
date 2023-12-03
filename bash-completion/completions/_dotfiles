@@ -1,0 +1,45 @@
+# -*- shell-script -*-
+# shellcheck shell=bash
+# bash completions for the repo function
+
+# Load if the repo command exists and we have and aliases file
+if command -v "dotfiles" >/dev/null 2>&1; then
+    __dotfiles()
+    {
+        local CURRENT PREVIOUS OPTS
+        CURRENT="${COMP_WORDS[COMP_CWORD]}"
+        PREVIOUS="${COMP_WORDS[COMP_CWORD-1]}"
+
+        case ${COMP_CWORD} in
+            1)
+                OPTS="$(dotfiles --completion)"
+                ;;
+            2)
+                case ${PREVIOUS} in
+                    "install")
+                        OPTS="$(dotfiles --completion install)"
+                        ;;
+                    "repos")
+                        OPTS="$(dotfiles --completion repos)"
+                        ;;
+                    "uninstall")
+                        OPTS="$(dotfiles --completion uninstall)"
+                        ;;
+                    *)
+                        OPTS=""
+                        ;;
+                esac
+                ;;
+            *)
+                OPTS=""
+                ;;
+        esac
+
+        COMPREPLY=( $(compgen -W "$OPTS" -- "$CURRENT") )
+
+        return 0
+    }
+
+
+    complete -F __dotfiles dotfiles
+fi

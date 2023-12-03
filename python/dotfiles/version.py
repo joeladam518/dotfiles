@@ -1,22 +1,27 @@
 from typing import Union, Tuple
 
+__all__ = ['Version']
+
 
 def _versionize_float(value: float) -> tuple:
+    """Versionize a version float"""
     return _versionize_str(str(value))
 
 
 def _versionize_int(value: int) -> tuple:
+    """Versionize a version integer"""
     return _versionize_float(float(value))
 
 
 def _versionize_str(value: str) -> tuple:
+    """Versionize a version string"""
     error_message = f'Can not convert "{value}" to a version.'
 
     if '.' not in value:
         try:
             return _versionize_int(int(value))
-        except ValueError:
-            raise ValueError(error_message)
+        except ValueError as ex:
+            raise ValueError(error_message) from ex
 
     string_list = []
     for val in value.split('.'):
@@ -26,13 +31,14 @@ def _versionize_str(value: str) -> tuple:
                 string_list.append(int(val_parts[0]))
             else:
                 string_list.append(int(val))
-        except ValueError:
-            raise ValueError(error_message)
+        except ValueError as ex:
+            raise ValueError(error_message) from ex
 
     return tuple(string_list)
 
 
 def _versionize(version: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> Tuple[int, int, int]:
+    """Versionize a version"""
     if isinstance(version, int):
         version = _versionize_int(version)
     elif isinstance(version, float):
@@ -53,10 +59,12 @@ def _versionize(version: Union[str, int, float, Tuple[int, int], Tuple[int, int,
 
 
 class Version:
+    """Useful for comparing version strings"""
     def __init__(self, a: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]):
         self.a = _versionize(a)
 
     def compare(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> int:
+        """Compare two versions"""
         b = _versionize(b)
 
         if self.a == b:
@@ -65,21 +73,27 @@ class Version:
         return -1 if self.a < b else 1
 
     def eq(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> bool:
+        """Version a is equal to version b"""
         return self.a == _versionize(b)
 
     def ne(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> bool:
+        """Version a is not equal to version b"""
         return self.a != _versionize(b)
 
     def lt(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> bool:
+        """Version a is less than version b"""
         return self.a < _versionize(b)
 
     def le(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> bool:
+        """Version a is less than or equal to version b"""
         return self.a <= _versionize(b)
 
     def gt(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> bool:
+        """Version a is greater than version b"""
         return self.a > _versionize(b)
 
     def ge(self, b: Union[str, int, float, Tuple[int, int], Tuple[int, int, int]]) -> bool:
+        """Version a is greater than or equal to version b"""
         return self.a >= _versionize(b)
 
     def __eq__(self, other):

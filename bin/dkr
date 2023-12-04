@@ -148,8 +148,8 @@ stdtk_down() {
 
 # Start
 
-if [ "$(osinfo -s)" != "linux" ] && [ "$(osinfo -s)" != "mac" ]; then
-    cmsg -w "Unsupported operating system [$(osinfo)]." 1>&2
+if [ "$(dotfiles osinfo -s)" != "linux" ] && [ "$(dotfiles osinfo -s)" != "mac" ]; then
+    cmsg -w "Unsupported operating system [$(dotfiles osinfo)]." 1>&2
     exit 1
 fi
 

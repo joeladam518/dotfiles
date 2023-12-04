@@ -51,6 +51,16 @@ class RepoCommand(Command):
     def get_sell_completion_string(self) -> str:
         return ' '.join(self._get_repo_aliases().keys())
 
+    def validate(self) -> None:
+        if not self.aliases_file:
+            raise ValidationError(self.name, 'Invalid repo aliases file path')
+        if not self.repos_directory:
+            raise ValidationError(self.name, 'Invalid repos directory path')
+        if self.list_keys and self.list_paths:
+            raise ValidationError(self.name, 'You can only one of "--list-keys" or "--list-paths" options')
+        if not self.sep:
+            raise ValidationError(self.name, 'Invalid sep')
+
     def _get_repo_aliases(self) -> dict:
         """Gets the repo aliases from the repo aliases file."""
         aliases_config = {}
@@ -78,16 +88,6 @@ class RepoCommand(Command):
                     aliases[f.name] = path
 
         return OrderedDict(sorted(aliases.items()))
-
-    def validate(self) -> None:
-        if not self.aliases_file:
-            raise ValidationError(self.name, 'Invalid repo aliases file path')
-        if not self.repos_directory:
-            raise ValidationError(self.name, 'Invalid repos directory path')
-        if self.list_keys and self.list_paths:
-            raise ValidationError(self.name, 'You can only one of "--list-keys" or "--list-paths" options')
-        if not self.sep:
-            raise ValidationError(self.name, 'Invalid sep')
 
     def _execute(self) -> None:
         repo_aliases = self._get_repo_aliases()

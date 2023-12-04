@@ -3,10 +3,6 @@ from argparse import Namespace, RawDescriptionHelpFormatter, PARSER
 from collections import OrderedDict
 from typing import Union
 
-def _convert_args_to_dict(namespace: Union[Namespace, dict, None]) -> dict:
-    """Converts a Namespace object to a dict."""
-    return namespace.__dict__ if isinstance(namespace, object) else (namespace or {})
-
 
 def _get_arg_strings(attributes: dict) -> list:
     """Returns a list of strings representing the attributes of an object."""
@@ -24,6 +20,7 @@ def _get_arg_strings(attributes: dict) -> list:
 
 class HelpFormatter(RawDescriptionHelpFormatter):
     """Custom help formatter that removes the default `positional arguments` and `optional arguments` headers"""
+
     def _format_action(self, action):
         # noinspection PyProtectedMember
         parts = super(RawDescriptionHelpFormatter, self)._format_action(action)
@@ -32,91 +29,23 @@ class HelpFormatter(RawDescriptionHelpFormatter):
         return parts
 
 
-class Command:
-    """Represents a command's data."""
+class Arguments:
+    """Basic arguments object. Kinda like a namespace"""
 
-    def __init__(self, name: str, arguments: dict):
-        self.name: str = name
-        self.completion: bool = False
-        self.arguments: Union[OrderedDict, dict] = arguments
+    def __init__(self, **kwargs):
+        self.__dict__ = OrderedDict(kwargs)
 
     @classmethod
-    def from_namespace(cls, namespace: Union[Namespace, dict, None]) -> 'Command':
-        """Creates a Command object from a Namespace object."""
-        data = _convert_args_to_dict(namespace)
-        command: Union[str, None] = data.get('command')
-        args: dict = {k: data[k] for k in data.keys() - {'command'}}
-        return cls(command, OrderedDict(args.items()))
+    def from_dict(cls, dictionary: dict) -> 'Arguments':
+        """Creates a new Arguments object from a dict"""
+        return cls(**dictionary)
 
-    def __contains__(self, key):
-        return key in self.arguments
+    def get(self, key, default=None):
+        """Gets a value from the arguments object"""
+        return self.__dict__.get(key, default)
 
-    def __eq__(self, other):
-        if not isinstance(other, Command):
-            raise TypeError('Invalid type comparison.')
-
-        return self.name == other.name and self.arguments == other.arguments
-
-    def __repr__(self):
-        type_name = type(self).__name__
-        arg_strings = _get_arg_strings(self.arguments)
-        return ('%s(\n  name=%s,\n  arguments={\n%s\n  }\n)' %
-                (type_name, self.name, ',\n'.join(map(lambda s: f"    {s}", arg_strings))))
-
-    def __str__(self):
-        return self.name
-
-
-class Subcommand(Command):
-    """Represents a subcommand's data"""
-
-    def __init__(self, command_name: str, name: str, arguments: dict):
-        super().__init__(name, arguments)
-        self.command_name: str = command_name
-
-    @classmethod
-    def from_namespace(cls, namespace: Union[Namespace, dict, None]) -> 'Subcommand':
-        data = _convert_args_to_dict(namespace)
-        command: Union[str, None] = data.get('command')
-        subcommand: Union[str, None] = data.get('subcommand')
-        args: dict = {k: data[k] for k in data.keys() - {'command', 'subcommand'}}
-        return cls(command, subcommand, args)
-
-    @classmethod
-    def from_command(cls, command: Command) -> 'Subcommand':
-        """Creates a Subcommand object from a Command object"""
-        subcommand_name: Union[str, None] = command.arguments.get('subcommand')
-        args: dict = {k: command.arguments[k] for k in command.arguments.keys() - {'command', 'subcommand'}}
-        subcommand = cls(command.name, subcommand_name, args)
-        subcommand.completion = command.completion
-        return subcommand
-
-    def __eq__(self, other):
-        if not isinstance(other, Subcommand):
-            raise TypeError('Invalid type comparison.')
-        return (
-            self.name == other.name and
-            self.command_name == other.command_name and
-            self.arguments == other.arguments
-        )
-
-    def __repr__(self):
-        type_name = type(self).__name__
-        arg_strings = _get_arg_strings(self.arguments)
-        return ('%s(\n  name=%s,\n  command=%s,\n  arguments={\n%s\n  }\n)' %
-                (type_name, self.name, self.command_name, ',\n'.join(map(lambda s: f"    {s}", arg_strings))))
-
-
-class Arguments(ABC):
-    """Basic arguments obejct. Kinda like a namespace but with better typing"""
-
-    @classmethod
-    @abstractmethod
-    def from_command(cls, command: Command) -> 'Arguments':
-        """Creates an Arguments object from a Command object"""
-
-    def validate(self) -> None:
-        """Validate the arguments"""
+    def __bool__(self):
+        return bool(self.__dict__)
 
     def __contains__(self, key):
         return key in self.__dict__
@@ -129,4 +58,78 @@ class Arguments(ABC):
     def __repr__(self):
         type_name = type(self).__name__
         arg_strings = _get_arg_strings(self.__dict__)
-        return '%s(\n%s\n)' % (type_name, ',\n'.join(map(lambda s: f"  {s}", arg_strings)))
+        args_string = ', '.join(arg_strings)
+        return f"{type_name}({args_string})"
+
+    def __str__(self):
+        type_name = type(self).__name__
+        arg_strings = _get_arg_strings(self.__dict__)
+        args_string = ',\n'.join(map(lambda s: f"  {s}", arg_strings))
+        return f"{type_name}(\n{args_string}\n)"
+
+
+class Command(ABC):
+    """Represents a command."""
+
+    def __init__(self):
+        self.shell_completion: bool = False
+
+    @classmethod
+    @abstractmethod
+    def from_arguments(cls, namespace: Union[Arguments, Namespace, dict, None]) -> 'Command':
+        """Creates a new command from a Command object"""
+
+    def get_command_arguments(self) -> dict:
+        """Returns an Arguments object for the command"""
+        return {k: self.__dict__[k] for k in self.__dict__.keys() - {'shell_completion'}}
+
+    def get_sell_completion_string(self) -> str:
+        """Returns the shell completion string for the command"""
+        return ''
+
+    def validate(self) -> None:
+        """Validate the command's arguments.
+        Throws a ValidationError if the validation fails"""
+
+    @abstractmethod
+    def _execute(self) -> None:
+        """The method that every command must implement.
+        This is them main logic of the command."""
+
+    def execute(self) -> None:
+        """Executes the command."""
+        self.validate()
+
+        if self.shell_completion:
+            print(self.get_sell_completion_string())
+        else:
+            self._execute()
+
+    def __bool__(self):
+        return bool(self.get_command_arguments())
+
+    def __contains__(self, key):
+        return key in self.__dict__
+
+    def __eq__(self, other):
+        if not isinstance(other, Command):
+            return NotImplemented
+        return vars(self) == vars(other)
+
+    def __repr__(self):
+        type_name = type(self).__name__
+        arg_strings = _get_arg_strings(self.__dict__)
+        args_string = ', '.join(arg_strings)
+        return f"{type_name}({args_string})"
+
+    def __str__(self):
+        type_name = type(self).__name__
+        arg_strings = _get_arg_strings(self.__dict__)
+        args_string = ',\n'.join(map(lambda s: f"  {s}", arg_strings))
+        return f"{type_name}(\n{args_string}\n)"
+
+
+def arguments_to_dict(namespace: Union[Arguments, Namespace, dict, None]) -> dict:
+    """Converts an object to a dict."""
+    arguments = namespace.__dict__ if isinstance(namespace, object) else (namespace or {})
+    return {k: arguments[k] for k in arguments.keys() - {'command', 'subcommand', 'shell_completion'}}

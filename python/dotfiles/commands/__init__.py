@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from .install import install
-from .osinfo import osinfo
-from .repos import repos
-from .uninstall import uninstall
+from .install import InstallCommand
+from .osinfo import OsinfoCommand
+from .repos import RepoCommand
+from .uninstall import UninstallCommand
+
 
 __all__ = [
-    'install',
-    'osinfo',
-    'repos',
-    'uninstall'
+    'InstallCommand',
+    'OsinfoCommand',
+    'RepoCommand',
+    'UninstallCommand'
 ]

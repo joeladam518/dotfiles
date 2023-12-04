@@ -1,10 +1,16 @@
+from argparse import Namespace
+from typing import Union
+
 from dotfiles import osinfo as _osinfo
-from dotfiles.cli import Arguments, Command
+from dotfiles.cli import Command, Arguments
 from dotfiles.errors import ValidationError
 
 
-class OsinfoArguments(Arguments):
-    """Arguments for the `osinfo` command"""
+class OsinfoCommand(Command):
+    """`dotfiles osinfo` command"""
+    name: str = 'osinfo'
+    description: str = 'Display basic info about your os'
+    help: str = 'display basic info about your os'
 
     def __init__(
         self,
@@ -15,6 +21,7 @@ class OsinfoArguments(Arguments):
         simplified: bool = False,
         version: bool = False
     ):
+        super().__init__()
         self.codename = codename
         self.id = id
         self.like = like
@@ -23,41 +30,38 @@ class OsinfoArguments(Arguments):
         self.version = version
 
     @classmethod
-    def from_command(cls, command: Command) -> 'OsinfoArguments':
-        return cls(
-            codename=command.arguments.get('codename', False),
-            id=command.arguments.get('id', False),
-            like=command.arguments.get('like', False),
-            pretty=command.arguments.get('pretty', False),
-            simplified=command.arguments.get('simplified', False),
-            version=command.arguments.get('version', False)
+    def from_arguments(cls, namespace: Union[Arguments, Namespace]) -> 'OsinfoCommand':
+        command: 'OsinfoCommand' = cls(
+            codename=getattr(namespace, 'codename', False),
+            id=getattr(namespace, 'id', False),
+            like=getattr(namespace, 'like', False),
+            pretty=getattr(namespace, 'pretty', False),
+            simplified=getattr(namespace, 'simplified', False),
+            version=getattr(namespace, 'version', False)
         )
+        command.shell_completion = getattr(namespace, 'completion', False)
+        return command
 
     def validate(self):
         chosen_options = []
-        for key, value in self.__dict__.items():
+        for key, value in self.get_command_arguments().items():
             if value:
                 chosen_options.append(key)
         if len(chosen_options) > 1:
-            raise ValidationError("You're only allowed to choose a single option.")
+            raise ValidationError(self.name, "You're only allowed to choose a single option.")
 
-
-def osinfo(command: Command) -> None:
-    """Display basic info about your os"""
-    args = OsinfoArguments.from_command(command)
-    args.validate()
-
-    if args.version:
-        print(_osinfo.version())
-    elif args.id:
-        print(_osinfo.id())
-    elif args.like:
-        print(' '.join(_osinfo.id_like()))
-    elif args.simplified:
-        print(_osinfo.ostype())
-    elif args.codename:
-        print(_osinfo.codename())
-    elif args.pretty:
-        print(_osinfo.pretty_name())
-    else:
-        print(_osinfo.name())
+    def _execute(self) -> None:
+        if self.version:
+            print(_osinfo.version())
+        elif self.id:
+            print(_osinfo.id())
+        elif self.like:
+            print(' '.join(_osinfo.id_like()))
+        elif self.simplified:
+            print(_osinfo.ostype())
+        elif self.codename:
+            print(_osinfo.codename())
+        elif self.pretty:
+            print(_osinfo.pretty_name())
+        else:
+            print(_osinfo.name())

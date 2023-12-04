@@ -2,10 +2,10 @@ import os
 import re
 import sys
 from subprocess import CalledProcessError
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Union
 
 from dotfiles import array, console, osinfo, run, Version
-from dotfiles.cli import Arguments, Command, Subcommand
+from dotfiles.cli import Arguments
 
 
 class PhpVars:
@@ -114,25 +114,27 @@ def _get_uninstallable_versions() -> Tuple[str]:
 class InstallPhpArguments(Arguments):
     """Arguments for installing php"""
     def __init__(self, env: Optional[str], version: Optional[str]):
+        super().__init__()
         self.env: Optional[str] = env
         self.version: Optional[str] = version
 
     @classmethod
-    def from_command(cls, command: Command) -> 'InstallPhpArguments':
+    def from_arguments(cls, arguments: Arguments) -> 'InstallPhpArguments':
+        """Creates an instance of this class from a dictionary of arguments"""
         return cls(
-            env=command.arguments.get('env', None),
-            version=command.arguments.get('version', None)
+            env=arguments.get('env', None),
+            version=arguments.get('version', None)
         )
 
 
-def install_php(subcommand: Subcommand) -> None:
+def install_php(arguments: Arguments) -> None:
     """"Install php"""
     if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
         print('Your operating system is not supported', file=sys.stderr)
         sys.exit(console.FAILURE)
 
     try:
-        args: InstallPhpArguments = InstallPhpArguments.from_command(subcommand)
+        args: InstallPhpArguments = InstallPhpArguments.from_arguments(arguments)
         installable_versions: List[str] = [v for v in _get_available_php_versions() if Version(v).gt('7.4')]
 
         if args.version is None or args.version not in installable_versions:
@@ -183,21 +185,23 @@ def install_php(subcommand: Subcommand) -> None:
 class UninstallPhpArguments(Arguments):
     """Arguments for uninstalling php"""
     def __init__(self, version: Optional[str]):
+        super().__init__()
         self.version: Optional[str] = version
 
     @classmethod
-    def from_command(cls, command: Command) -> 'UninstallPhpArguments':
-        return cls(version=command.arguments.get('version', None))
+    def from_arguments(cls, arguments: Arguments) -> 'UninstallPhpArguments':
+        """Creates an instance of this class from a dictionary of arguments"""
+        return cls(version=arguments.get('version', None))
 
 
-def uninstall_php(subcommand: Subcommand) -> None:
+def uninstall_php(arguments: Arguments) -> None:
     """Uninstall php"""
     if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
         print('Your operating system is not supported', file=sys.stderr)
         sys.exit(console.FAILURE)
 
     try:
-        args: UninstallPhpArguments = UninstallPhpArguments.from_command(subcommand)
+        args: UninstallPhpArguments = UninstallPhpArguments.from_arguments(arguments)
         uninstallable_versions: Tuple[str] = _get_uninstallable_versions()
 
         if not uninstallable_versions:

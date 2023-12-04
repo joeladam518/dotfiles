@@ -8,6 +8,7 @@ SUCCESS = 0
 FAILURE = 1
 CTRL_C = 130
 
+
 def confirm(question: str, tries: int = 2) -> bool:
     """Ask a yes/no question via input() and return their answer."""
     valid = {"yes": True, "ye": True, "y": True, "no": False, "n": False}
@@ -114,4 +115,3 @@ def choice(
 def error(*args, **kwargs) -> None:
     """doc_inherit print"""
     print(*args, **kwargs, file=sys.stderr)
-

@@ -7,12 +7,22 @@ class InvalidAnswerError(ValueError):
 
 
 class InvalidCommand(ValueError):
-    pass
+    """Represents an invalid command"""
+    def __init__(self, command: str):
+        super().__init__(f'Invalid command "{command}"')
+        self.command = command
 
 
 class InvalidSubcommand(ValueError):
-    pass
+    """Represents an invalid command"""
+    def __init__(self, command: str, subcommand: str):
+        super().__init__(f'the following arguments are required: subcommand')
+        self.command = command
+        self.subcommand = subcommand
 
 
 class ValidationError(ValueError):
-    pass
+    """Represents a validation error"""
+    def __init__(self, command: str, message: str):
+        super().__init__(message)
+        self.command = command

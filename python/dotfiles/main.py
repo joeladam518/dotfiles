@@ -1,18 +1,34 @@
 import sys
 from argparse import ArgumentParser
+from collections import OrderedDict
+from typing import Dict, Tuple, Type
 
-from dotfiles import console, commands
+from dotfiles import console
+from dotfiles.commands import InstallCommand, OsinfoCommand, RepoCommand, UninstallCommand
 from dotfiles.cli import Command, HelpFormatter
 from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
 from dotfiles.paths import home_path
 
+_commands: OrderedDict[str, Type[Command]] = OrderedDict({
+    InstallCommand.name: InstallCommand,
+    OsinfoCommand.name: OsinfoCommand,
+    RepoCommand.name: RepoCommand,
+    UninstallCommand.name: UninstallCommand
+})
 
-def _get_parser() -> ArgumentParser:
+
+def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
     """Parse command line arguments"""
     parser = ArgumentParser(
         prog='dotfiles',
         description='Helper commands',
         formatter_class=HelpFormatter,
+    )
+    parser.add_argument(
+        '--completion',
+        action='store_true',
+        default=False,
+        help='shell completion'
     )
     subparsers = parser.add_subparsers(
         title='commands',
@@ -22,9 +38,9 @@ def _get_parser() -> ArgumentParser:
 
     # Command: `osinfo`
     info_parser = subparsers.add_parser(
-        'osinfo',
-        description='Display basic info about your os',
-        help='display basic info about your os',
+        OsinfoCommand.name,
+        description=OsinfoCommand.description,
+        help=OsinfoCommand.help,
     )
     info_parser.add_argument(
         '-c',
@@ -71,9 +87,9 @@ def _get_parser() -> ArgumentParser:
 
     # Command: `repos`
     repo_parser = subparsers.add_parser(
-        'repos',
-        description='Repo aliases',
-        help='repo aliases',
+        RepoCommand.name,
+        description=RepoCommand.description,
+        help=RepoCommand.help,
     )
     repo_parser.add_argument(
         'key',
@@ -119,9 +135,9 @@ def _get_parser() -> ArgumentParser:
 
     # Command: `dotfiles install`
     install_parser = subparsers.add_parser(
-        'install',
-        description='Install helpers',
-        help='install helpers',
+        InstallCommand.name,
+        description=InstallCommand.description,
+        help=InstallCommand.help,
         formatter_class=HelpFormatter
     )
     install_subparsers = install_parser.add_subparsers(
@@ -163,9 +179,9 @@ def _get_parser() -> ArgumentParser:
 
     # Command: `dotfiles uninstall`
     uninstall_parser = subparsers.add_parser(
-        'uninstall',
-        description='Uninstall helpers',
-        help='uninstall helpers',
+        UninstallCommand.name,
+        description=UninstallCommand.description,
+        help=UninstallCommand.help,
         formatter_class=HelpFormatter
     )
     uninstall_subparsers = uninstall_parser.add_subparsers(
@@ -196,28 +212,39 @@ def _get_parser() -> ArgumentParser:
         help='the php version to uninstall'
     )
 
-    return parser
+    subparsers = OrderedDict({
+        InstallCommand.name: install_parser,
+        OsinfoCommand.name: info_parser,
+        RepoCommand.name: repo_parser,
+        UninstallCommand.name: uninstall_parser
+    })
+
+    return parser, subparsers
+
 
 def cli() -> None:
     """Command line interface entry point"""
+    parser, subparsers = _get_parsers()
+
     try:
-        parser = _get_parser()
-        arguments, extra_arguments = parser.parse_known_args()
-        command: Command = Command.from_namespace(arguments)
+        arguments = parser.parse_args()
+        command_class = _commands.get(arguments.command, None)
 
-        if '--completion' in extra_arguments:
-            command.completion = True
-
-        if command.name in commands.__all__:
-            commands.__dict__[command.name](command)
-        elif command.completion is True:
-            print(*commands.__all__, sep=' ')
+        if command_class:
+            command = command_class.from_arguments(arguments)
+            command.execute()
+        elif arguments.completion:
+            print(*_commands.keys(), sep=' ')
         else:
-            parser.print_help()
+            parser.error('the following arguments are required: command')
 
         sys.exit(console.SUCCESS)
     except (InvalidCommand, InvalidSubcommand, ValidationError) as ex:
-        parser.error(str(ex))
+        if ex.command in subparsers:
+            subparser = subparsers[ex.command]
+            subparser.error(str(ex))
+        else:
+            parser.error(str(ex))
     except KeyboardInterrupt:
         sys.exit(console.CTRL_C)
 

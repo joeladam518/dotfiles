@@ -149,7 +149,7 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
     )
 
     # Command: `dotfiles install composer`
-    install_subparsers.add_parser(
+    install_composer_parser = install_subparsers.add_parser(
         InstallComposerCommand.name,
         description=InstallComposerCommand.description,
         help=InstallComposerCommand.help
@@ -193,7 +193,7 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
     )
 
     # Command: `dotfiles uninstall composer`
-    uninstall_subparsers.add_parser(
+    uninstall_composer_parser = uninstall_subparsers.add_parser(
         UninstallComposerCommand.name,
         description=UninstallComposerCommand.description,
         help=UninstallComposerCommand.help
@@ -216,9 +216,13 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     subparsers = OrderedDict({
         InstallCommand.name: install_parser,
+        InstallComposerCommand.name: install_composer_parser,
+        InstallPhpCommand.name: install_php_parser,
         OsinfoCommand.name: info_parser,
         RepoCommand.name: repo_parser,
-        UninstallCommand.name: uninstall_parser
+        UninstallCommand.name: uninstall_parser,
+        UninstallComposerCommand.name: uninstall_composer_parser,
+        UninstallPhpCommand.name: uninstall_php_parser
     })
 
     return parser, subparsers

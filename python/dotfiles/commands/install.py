@@ -38,4 +38,4 @@ class InstallCommand(Command):
             subcommand = self.__subcommands[self.subcommand].from_arguments(self.arguments)
             subcommand.execute()
         else:
-            raise InvalidSubcommand('install', self.subcommand)
+            raise InvalidSubcommand(self.name, self.subcommand)

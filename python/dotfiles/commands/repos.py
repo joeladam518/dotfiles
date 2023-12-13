@@ -1,11 +1,9 @@
 import os
 import sys
-from argparse import Namespace
 from collections import OrderedDict
 from configparser import ConfigParser
-from typing import Optional, Union
 
-from dotfiles.cli import Command, Arguments
+from dotfiles.cli import Command, FromArgsNamespace
 from dotfiles.errors import ValidationError
 from dotfiles import console
 
@@ -36,7 +34,7 @@ class RepoCommand(Command):
         self.sep = sep
 
     @classmethod
-    def from_arguments(cls, namespace: Union[Arguments, Namespace]) -> 'Command':
+    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'Command':
         command: 'RepoCommand' = cls(
             key=getattr(namespace, 'key', None),
             repos_directory=getattr(namespace, 'directory_path', None),

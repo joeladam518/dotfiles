@@ -1,16 +1,16 @@
-from argparse import Namespace
-from typing import Dict, Type, Union
+from typing import Dict, Union
 
-from dotfiles.cli import Command, Arguments, arguments_to_dict
+from dotfiles.cli import Arguments, arguments_to_dict, Command, FromArgsNamespace, parse_install_uninstall_arguments
 from dotfiles.errors import InvalidSubcommand
-from dotfiles.installers import install_composer, install_php
+from dotfiles.commands.composer import InstallComposerCommand
+from dotfiles.commands.php import InstallPhpCommand
 
 
 class InstallCommand(Command):
     """`dotfiles install` command"""
-    __subcommands: Dict[str, callable] = {
-        'composer': install_composer,
-        'php': install_php
+    __subcommands: Dict[str, Command] = {
+        'composer': InstallComposerCommand,
+        'php': InstallPhpCommand
     }
     name: str = 'install'
     description: str = 'Install a program'
@@ -19,14 +19,10 @@ class InstallCommand(Command):
     def __init__(self, subcommand: str, arguments: Union[Arguments, dict] = None):
         super().__init__()
         self.subcommand: str = subcommand or ''
-        self.arguments: Arguments = (arguments
-                                     if isinstance(arguments, Arguments)
-                                     else (Arguments.from_dict(arguments)
-                                           if isinstance(arguments, dict)
-                                           else Arguments()))
+        self.arguments: Arguments = parse_install_uninstall_arguments(arguments)
 
     @classmethod
-    def from_arguments(cls, namespace: Union[Arguments, Namespace]) -> 'InstallCommand':
+    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'InstallCommand':
         command: 'InstallCommand' = cls(
             subcommand=getattr(namespace, 'subcommand', ''),
             arguments=arguments_to_dict(namespace)
@@ -39,6 +35,7 @@ class InstallCommand(Command):
 
     def _execute(self) -> None:
         if self.subcommand in self.__subcommands:
-            self.__subcommands[self.subcommand](self.arguments)
+            subcommand = self.__subcommands[self.subcommand].from_arguments(self.arguments)
+            subcommand.execute()
         else:
             raise InvalidSubcommand('install', self.subcommand)

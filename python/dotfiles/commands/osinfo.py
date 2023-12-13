@@ -1,8 +1,5 @@
-from argparse import Namespace
-from typing import Union
-
 from dotfiles import osinfo as _osinfo
-from dotfiles.cli import Command, Arguments
+from dotfiles.cli import Command, FromArgsNamespace
 from dotfiles.errors import ValidationError
 
 
@@ -30,7 +27,7 @@ class OsinfoCommand(Command):
         self.version = version
 
     @classmethod
-    def from_arguments(cls, namespace: Union[Arguments, Namespace]) -> 'OsinfoCommand':
+    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'OsinfoCommand':
         command: 'OsinfoCommand' = cls(
             codename=getattr(namespace, 'codename', False),
             id=getattr(namespace, 'id', False),

@@ -1,16 +1,17 @@
 from argparse import Namespace
 from typing import Dict, Union
 
-from dotfiles.cli import Arguments, Command, arguments_to_dict
+from dotfiles.cli import Arguments, arguments_to_dict, Command, FromArgsNamespace, parse_install_uninstall_arguments
 from dotfiles.errors import InvalidSubcommand
-from dotfiles.installers import uninstall_composer, uninstall_php
+from dotfiles.commands.composer import UninstallComposerCommand
+from dotfiles.commands.php import UninstallPhpCommand
 
 
 class UninstallCommand(Command):
     """`dotfiles uninstall` command"""
-    __subcommands: Dict[str, callable] = {
-        'composer': uninstall_composer,
-        'php': uninstall_php
+    __subcommands: Dict[str, Command] = {
+        'composer': UninstallComposerCommand,
+        'php': UninstallPhpCommand
     }
     name: str = 'uninstall'
     description: str = 'Uninstall a program'
@@ -19,14 +20,10 @@ class UninstallCommand(Command):
     def __init__(self, subcommand: str, arguments: Union[Arguments, dict] = None):
         super().__init__()
         self.subcommand: str = subcommand or ''
-        self.arguments: Arguments = (arguments
-                                     if isinstance(arguments, Arguments)
-                                     else (Arguments.from_dict(arguments)
-                                           if isinstance(arguments, dict)
-                                           else Arguments()))
+        self.arguments: Arguments = parse_install_uninstall_arguments(arguments)
 
     @classmethod
-    def from_arguments(cls, namespace: Union[Arguments, Namespace]) -> 'UninstallCommand':
+    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'UninstallCommand':
         command: 'UninstallCommand' = cls(
             subcommand=getattr(namespace, 'subcommand', ''),
             arguments=arguments_to_dict(namespace)
@@ -39,6 +36,7 @@ class UninstallCommand(Command):
 
     def _execute(self) -> None:
         if self.subcommand in self.__subcommands:
-            self.__subcommands[self.subcommand](self.arguments)
+            subcommand = self.__subcommands[self.subcommand].from_arguments(self.arguments)
+            subcommand.execute()
         else:
             raise InvalidSubcommand(self.name, self.subcommand)

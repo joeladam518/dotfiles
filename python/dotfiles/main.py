@@ -5,6 +5,8 @@ from typing import Dict, Tuple, Type
 
 from dotfiles import console
 from dotfiles.commands import InstallCommand, OsinfoCommand, RepoCommand, UninstallCommand
+from dotfiles.commands import InstallComposerCommand, InstallPhpCommand
+from dotfiles.commands import UninstallComposerCommand, UninstallPhpCommand
 from dotfiles.cli import Command, HelpFormatter
 from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
 from dotfiles.paths import home_path
@@ -148,16 +150,16 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     # Command: `dotfiles install composer`
     install_subparsers.add_parser(
-        'composer',
-        description='Install composer for php',
-        help='install composer for php'
+        InstallComposerCommand.name,
+        description=InstallComposerCommand.description,
+        help=InstallComposerCommand.help
     )
 
     # Command: `dotfiles install php`
     install_php_parser = install_subparsers.add_parser(
-        'php',
-        description='Install PHP',
-        help='install php'
+        InstallPhpCommand.name,
+        description=InstallPhpCommand.description,
+        help=InstallPhpCommand.help
     )
     install_php_parser.add_argument(
         'version',
@@ -192,16 +194,16 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     # Command: `dotfiles uninstall composer`
     uninstall_subparsers.add_parser(
-        'composer',
-        description='Install composer for php',
-        help='install composer for php'
+        UninstallComposerCommand.name,
+        description=UninstallComposerCommand.description,
+        help=UninstallComposerCommand.help
     )
 
     # Command: `dotfiles uninstall php`
     uninstall_php_parser = uninstall_subparsers.add_parser(
-        'php',
-        description='Uninstall PHP',
-        help='uninstall php'
+        UninstallPhpCommand.name,
+        description=UninstallPhpCommand.description,
+        help=UninstallPhpCommand.help
     )
     uninstall_php_parser.add_argument(
         'version',

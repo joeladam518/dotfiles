@@ -68,6 +68,9 @@ class Arguments:
         return f"{type_name}(\n{args_string}\n)"
 
 
+FromArgsNamespace = Union[Arguments, Namespace, dict, None]
+
+
 class Command(ABC):
     """Represents a command."""
 
@@ -76,7 +79,7 @@ class Command(ABC):
 
     @classmethod
     @abstractmethod
-    def from_arguments(cls, namespace: Union[Arguments, Namespace, dict, None]) -> 'Command':
+    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'Command':
         """Creates a new command from a Command object"""
 
     def get_command_arguments(self) -> dict:
@@ -129,7 +132,18 @@ class Command(ABC):
         return f"{type_name}(\n{args_string}\n)"
 
 
-def arguments_to_dict(namespace: Union[Arguments, Namespace, dict, None]) -> dict:
+def arguments_to_dict(namespace: FromArgsNamespace) -> dict:
     """Converts an object to a dict."""
     arguments = namespace.__dict__ if isinstance(namespace, object) else (namespace or {})
     return {k: arguments[k] for k in arguments.keys() - {'command', 'subcommand', 'shell_completion'}}
+
+
+def parse_install_uninstall_arguments(arguments: Union[Arguments, dict] = None) -> Arguments:
+    """Parses the arguments for the install and uninstall commands"""
+    if isinstance(arguments, Arguments):
+        return arguments
+
+    if isinstance(arguments, dict):
+        return Arguments.from_dict(arguments)
+
+    return Arguments()

@@ -11,13 +11,6 @@ from dotfiles.cli import Command, HelpFormatter
 from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
 from dotfiles.paths import home_path
 
-_commands: OrderedDict[str, Type[Command]] = OrderedDict({
-    InstallCommand.command_name: InstallCommand,
-    OsinfoCommand.command_name: OsinfoCommand,
-    RepoCommand.command_name: RepoCommand,
-    UninstallCommand.command_name: UninstallCommand
-})
-
 
 def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
     """Parse command line arguments"""
@@ -226,6 +219,14 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
     })
 
     return parser, subparsers
+
+
+_commands: OrderedDict[str, Type[Command]] = OrderedDict({
+    InstallCommand.command_name: InstallCommand,
+    OsinfoCommand.command_name: OsinfoCommand,
+    RepoCommand.command_name: RepoCommand,
+    UninstallCommand.command_name: UninstallCommand
+})
 
 
 def cli() -> None:

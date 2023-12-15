@@ -13,6 +13,7 @@ SECTION_NAME = 'repos'
 class RepoCommand(Command):
     """`dotfiles repos` command"""
     name: str = 'repos'
+    command_name: str = 'repos'
     description: str = 'Repo aliases'
     help: str = 'repo aliases'
 

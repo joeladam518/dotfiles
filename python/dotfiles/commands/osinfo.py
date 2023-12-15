@@ -6,6 +6,7 @@ from dotfiles.errors import ValidationError
 class OsinfoCommand(Command):
     """`dotfiles osinfo` command"""
     name: str = 'osinfo'
+    command_name: str = 'osinfo'
     description: str = 'Display basic info about your os'
     help: str = 'display basic info about your os'
 

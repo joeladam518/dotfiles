@@ -6,6 +6,7 @@ from typing import Optional, Tuple, List
 
 from dotfiles import array, console, osinfo, run, Version
 from dotfiles.cli import Arguments, Command
+from dotfiles.errors import ValidationError
 
 
 class PhpVars:
@@ -112,7 +113,9 @@ def _get_uninstallable_versions() -> Tuple[str]:
 
 
 class InstallPhpCommand(Command):
-    name: str = 'php'
+    """`dotfiles install php` command"""
+    name: str = 'install_php'
+    command_name: str = 'php'
     description: str = 'Install php'
     help: str = 'install php'
 
@@ -128,12 +131,12 @@ class InstallPhpCommand(Command):
             version=namespace.get('version', None)
         )
 
+    def validate(self) -> None:
+        if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
+            raise ValidationError(self.name, 'Your operating system is not supported')
+
     def _execute(self) -> None:
         """"Install php"""
-        if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
-            print('Your operating system is not supported', file=sys.stderr)
-            sys.exit(console.FAILURE)
-
         try:
             installable_versions: List[str] = [v for v in _get_available_php_versions() if Version(v).gt('7.4')]
 
@@ -154,7 +157,7 @@ class InstallPhpCommand(Command):
                     default='desktop'
                 )
                 if not self.env:
-                    print('Environment not supported', file=sys.stderr)
+                    console.error('Environment not supported')
                     sys.exit(console.FAILURE)
 
             # combine the packages to be installed
@@ -183,7 +186,9 @@ class InstallPhpCommand(Command):
 
 
 class UninstallPhpCommand(Command):
-    name: str = 'php'
+    """`dotfiles uninstall php` command"""
+    name: str = 'uninstall_php'
+    command_name: str = 'php'
     description: str = 'Uninstall php'
     help: str = 'uninstall php'
 
@@ -197,12 +202,11 @@ class UninstallPhpCommand(Command):
             version=namespace.get('version', None)
         )
 
-    def _execute(self) -> None:
-        """Uninstall php"""
+    def validate(self) -> None:
         if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
-            print('Your operating system is not supported', file=sys.stderr)
-            sys.exit(console.FAILURE)
+            raise ValidationError(self.name, 'Your operating system is not supported')
 
+    def _execute(self) -> None:
         try:
             uninstallable_versions: Tuple[str] = _get_uninstallable_versions()
 
@@ -226,7 +230,6 @@ class UninstallPhpCommand(Command):
 
             if len(packages) == 0:
                 print()
-                print(f"No packages found for php{self.version}")
                 print(f"No packages found for php{self.version}")
                 print()
                 sys.exit(console.SUCCESS)

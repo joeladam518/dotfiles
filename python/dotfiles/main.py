@@ -12,10 +12,10 @@ from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
 from dotfiles.paths import home_path
 
 _commands: OrderedDict[str, Type[Command]] = OrderedDict({
-    InstallCommand.name: InstallCommand,
-    OsinfoCommand.name: OsinfoCommand,
-    RepoCommand.name: RepoCommand,
-    UninstallCommand.name: UninstallCommand
+    InstallCommand.command_name: InstallCommand,
+    OsinfoCommand.command_name: OsinfoCommand,
+    RepoCommand.command_name: RepoCommand,
+    UninstallCommand.command_name: UninstallCommand
 })
 
 
@@ -38,9 +38,9 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
         required=False
     )
 
-    # Command: `osinfo`
+    # Command: `dotfiles osinfo`
     info_parser = subparsers.add_parser(
-        OsinfoCommand.name,
+        OsinfoCommand.command_name,
         description=OsinfoCommand.description,
         help=OsinfoCommand.help,
     )
@@ -87,9 +87,9 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
         help='get the os version'
     )
 
-    # Command: `repos`
+    # Command: `dotfiles repos`
     repo_parser = subparsers.add_parser(
-        RepoCommand.name,
+        RepoCommand.command_name,
         description=RepoCommand.description,
         help=RepoCommand.help,
     )
@@ -137,7 +137,7 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     # Command: `dotfiles install`
     install_parser = subparsers.add_parser(
-        InstallCommand.name,
+        InstallCommand.command_name,
         description=InstallCommand.description,
         help=InstallCommand.help,
         formatter_class=HelpFormatter
@@ -150,14 +150,14 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     # Command: `dotfiles install composer`
     install_composer_parser = install_subparsers.add_parser(
-        InstallComposerCommand.name,
+        InstallComposerCommand.command_name,
         description=InstallComposerCommand.description,
         help=InstallComposerCommand.help
     )
 
     # Command: `dotfiles install php`
     install_php_parser = install_subparsers.add_parser(
-        InstallPhpCommand.name,
+        InstallPhpCommand.command_name,
         description=InstallPhpCommand.description,
         help=InstallPhpCommand.help
     )
@@ -181,7 +181,7 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     # Command: `dotfiles uninstall`
     uninstall_parser = subparsers.add_parser(
-        UninstallCommand.name,
+        UninstallCommand.command_name,
         description=UninstallCommand.description,
         help=UninstallCommand.help,
         formatter_class=HelpFormatter
@@ -194,14 +194,14 @@ def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
 
     # Command: `dotfiles uninstall composer`
     uninstall_composer_parser = uninstall_subparsers.add_parser(
-        UninstallComposerCommand.name,
+        UninstallComposerCommand.command_name,
         description=UninstallComposerCommand.description,
         help=UninstallComposerCommand.help
     )
 
     # Command: `dotfiles uninstall php`
     uninstall_php_parser = uninstall_subparsers.add_parser(
-        UninstallPhpCommand.name,
+        UninstallPhpCommand.command_name,
         description=UninstallPhpCommand.description,
         help=UninstallPhpCommand.help
     )
@@ -234,10 +234,9 @@ def cli() -> None:
 
     try:
         arguments = parser.parse_args()
-        command_class = _commands.get(arguments.command, None)
 
-        if command_class:
-            command = command_class.from_arguments(arguments)
+        if arguments.command in _commands:
+            command = _commands[arguments.command].from_arguments(arguments)
             command.execute()
         elif arguments.completion:
             print(*_commands.keys(), sep=' ')

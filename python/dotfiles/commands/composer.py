@@ -13,7 +13,8 @@ from dotfiles.paths import home_path
 
 class InstallComposerCommand(Command):
     """`dotfiles install composer` command"""
-    name: str = 'composer'
+    name: str = 'install_composer'
+    command_name: str = 'composer'
     description: str = 'Install php-composer'
     help: str = 'install php-composer'
 
@@ -61,7 +62,8 @@ class InstallComposerCommand(Command):
 
 class UninstallComposerCommand(Command):
     """`dotfiles uninstall composer` command"""
-    name: str = 'composer'
+    name: str = 'uninstall_composer'
+    command_name: str = 'composer'
     description: str = 'Uninstall php-composer'
     help: str = 'uninstall php-composer'
 

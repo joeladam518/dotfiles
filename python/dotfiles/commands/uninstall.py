@@ -1,19 +1,20 @@
-from argparse import Namespace
-from typing import Dict, Union
+from typing import Dict, Type, Union
 
 from dotfiles.cli import Arguments, arguments_to_dict, Command, FromArgsNamespace, parse_install_uninstall_arguments
 from dotfiles.errors import InvalidSubcommand
 from dotfiles.commands.composer import UninstallComposerCommand
 from dotfiles.commands.php import UninstallPhpCommand
 
+_subcommands: Dict[str, Type[Command]] = {
+    UninstallComposerCommand.command_name: UninstallComposerCommand,
+    UninstallPhpCommand.command_name: UninstallPhpCommand
+}
+
 
 class UninstallCommand(Command):
     """`dotfiles uninstall` command"""
-    __subcommands: Dict[str, Command] = {
-        'composer': UninstallComposerCommand,
-        'php': UninstallPhpCommand
-    }
     name: str = 'uninstall'
+    command_name: str = 'uninstall'
     description: str = 'Uninstall a program'
     help: str = 'uninstall a program'
 
@@ -32,11 +33,13 @@ class UninstallCommand(Command):
         return command
 
     def get_sell_completion_string(self) -> str:
-        return ' '.join(self.__subcommands.keys())
+        return ' '.join(_subcommands.keys())
 
     def _execute(self) -> None:
-        if self.subcommand in self.__subcommands:
-            subcommand = self.__subcommands[self.subcommand].from_arguments(self.arguments)
+        subcommand_class = _subcommands.get(self.subcommand, None)
+
+        if subcommand_class:
+            subcommand = subcommand_class.from_arguments(self.arguments)
             subcommand.execute()
         else:
             raise InvalidSubcommand(self.name, self.subcommand)

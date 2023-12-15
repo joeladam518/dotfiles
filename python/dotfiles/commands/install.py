@@ -1,18 +1,20 @@
-from typing import Dict, Union
+from typing import Dict, Type, Union
 
 from dotfiles.cli import Arguments, arguments_to_dict, Command, FromArgsNamespace, parse_install_uninstall_arguments
 from dotfiles.errors import InvalidSubcommand
 from dotfiles.commands.composer import InstallComposerCommand
 from dotfiles.commands.php import InstallPhpCommand
 
+_subcommands: Dict[str, Type[Command]] = {
+    InstallComposerCommand.command_name: InstallComposerCommand,
+    InstallPhpCommand.command_name: InstallPhpCommand
+}
+
 
 class InstallCommand(Command):
     """`dotfiles install` command"""
-    __subcommands: Dict[str, Command] = {
-        'composer': InstallComposerCommand,
-        'php': InstallPhpCommand
-    }
     name: str = 'install'
+    command_name: str = 'install'
     description: str = 'Install a program'
     help: str = 'install a program'
 
@@ -31,11 +33,13 @@ class InstallCommand(Command):
         return command
 
     def get_sell_completion_string(self) -> str:
-        return ' '.join(self.__subcommands.keys())
+        return ' '.join(_subcommands.keys())
 
     def _execute(self) -> None:
-        if self.subcommand in self.__subcommands:
-            subcommand = self.__subcommands[self.subcommand].from_arguments(self.arguments)
+        subcommand_class = _subcommands.get(self.subcommand, None)
+
+        if subcommand_class:
+            subcommand = subcommand_class.from_arguments(self.arguments)
             subcommand.execute()
         else:
             raise InvalidSubcommand(self.name, self.subcommand)

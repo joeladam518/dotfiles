@@ -113,11 +113,6 @@ def choice(
     return None
 
 
-def get_root_directory() -> str:
-    """Get the root directory of the current operating system"""
-    return os.path.abspath(os.sep)
-
-
 def error(*args, **kwargs) -> None:
     """doc_inherit print"""
     print(*args, **kwargs, file=sys.stderr)

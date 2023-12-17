@@ -7,10 +7,13 @@ from urllib import request
 
 from dotfiles import console, run, osinfo
 from dotfiles.cli import Arguments, Command
-from dotfiles.console import get_root_directory
+from dotfiles.paths import get_os_root_directory
 from dotfiles.errors import ValidationError
 from dotfiles.installed import installed
 from dotfiles.paths import home_path
+
+
+_OS_COMPOSER_PATH = os.path.join(get_os_root_directory(), 'usr', 'local', 'bin', 'composer')
 
 
 class InstallComposerCommand(Command):
@@ -54,7 +57,7 @@ class InstallComposerCommand(Command):
 
         try:
             run.command(f'php {composer_setup_path}')
-            run.command(f'mv "{composer_path}" "/usr/local/bin/composer"', root=True)
+            run.command(f'mv "{composer_path}" "{_OS_COMPOSER_PATH}"', root=True)
             run.command(f'rm "{composer_setup_path}"')
         except CalledProcessError as ex:
             run.command(f'rm "{composer_setup_path}"')
@@ -76,9 +79,9 @@ class UninstallComposerCommand(Command):
         if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
             raise ValidationError(self.name, 'Your operating system is not supported')
 
-        if os.path.exists(os.path.join(get_root_directory(), 'usr', 'local', 'bin', 'composer')):
+        if os.path.exists(_OS_COMPOSER_PATH):
             raise ValidationError(self.name, 'php-composer is not installed')
 
     def _execute(self) -> None:
         """Uninstalls php-composer"""
-        run.command('rm "/usr/local/bin/composer"', root=True)
+        run.command(f'rm "{_OS_COMPOSER_PATH}"', root=True)

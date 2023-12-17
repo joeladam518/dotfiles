@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import Any, Dict, List, Tuple, Union
 
@@ -110,6 +111,11 @@ def choice(
         attempts = attempts - 1
 
     return None
+
+
+def get_root_directory() -> str:
+    """Get the root directory of the current operating system"""
+    return os.path.abspath(os.sep)
 
 
 def error(*args, **kwargs) -> None:

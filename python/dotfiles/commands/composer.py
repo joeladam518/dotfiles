@@ -5,8 +5,10 @@ import sys
 from subprocess import CalledProcessError
 from urllib import request
 
-from dotfiles import console, run
+from dotfiles import console, run, osinfo
 from dotfiles.cli import Arguments, Command
+from dotfiles.console import get_root_directory
+from dotfiles.errors import ValidationError
 from dotfiles.installed import installed
 from dotfiles.paths import home_path
 
@@ -22,12 +24,15 @@ class InstallComposerCommand(Command):
     def from_arguments(cls, arguments: Arguments = None) -> 'InstallComposerCommand':
         return cls()
 
+    def validate(self) -> None:
+        if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
+            raise ValidationError(self.name, 'Your operating system is not supported')
+
+        if not installed('php'):
+            raise ValidationError(self.name, 'You must install php before you can install composer')
+
     def _execute(self) -> None:
         """Installs php-composer"""
-        if not installed('php'):
-            print('You must install php before you can install composer', file=sys.stderr)
-            sys.exit(console.FAILURE)
-
         os.chdir(home_path())
         composer_setup_path = home_path('composer-setup.php')
         composer_path = home_path('composer.phar')
@@ -66,6 +71,13 @@ class UninstallComposerCommand(Command):
     @classmethod
     def from_arguments(cls, arguments: Arguments = None) -> 'UninstallComposerCommand':
         return cls()
+
+    def validate(self) -> None:
+        if osinfo.id() not in ['debian', 'raspbian', 'ubuntu']:
+            raise ValidationError(self.name, 'Your operating system is not supported')
+
+        if os.path.exists(os.path.join(get_root_directory(), 'usr', 'local', 'bin', 'composer')):
+            raise ValidationError(self.name, 'php-composer is not installed')
 
     def _execute(self) -> None:
         """Uninstalls php-composer"""

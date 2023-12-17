@@ -149,8 +149,7 @@ class InstallPhpCommand(Command):
                     default=PhpVars.current_version
                 )
                 if not self.version:
-                    console.error('Invalid php version')
-                    sys.exit(console.FAILURE)
+                    raise ValidationError(self.name, 'Invalid php version')
 
             if self.env is None or self.env not in PhpVars.extension_types:
                 self.env = console.choice(
@@ -159,8 +158,7 @@ class InstallPhpCommand(Command):
                     default='desktop'
                 )
                 if not self.env:
-                    console.error('Environment not supported')
-                    sys.exit(console.FAILURE)
+                    raise ValidationError(self.name, 'Invalid environment')
 
             # combine the packages to be installed
             extensions = array.unique([*PhpVars.get_extensions(self.env)])
@@ -180,8 +178,6 @@ class InstallPhpCommand(Command):
                 run.command('apt install -y', *packages, root=True)
             else:
                 print("Exiting...")
-
-            print()
         except KeyboardInterrupt as ex:
             print()
             raise ex
@@ -227,8 +223,7 @@ class UninstallPhpCommand(Command):
                     default=0
                 )
                 if not self.version:
-                    console.error('Invalid php version')
-                    sys.exit(console.FAILURE)
+                    raise ValidationError(self.name, 'Invalid php version')
 
             packages = _get_installed_php_packages(self.version)
 
@@ -248,8 +243,6 @@ class UninstallPhpCommand(Command):
                 run.command('apt autoremove -y', root=True)
             else:
                 print("Exiting...")
-
-            print()
         except KeyboardInterrupt as ex:
             print()
             raise ex

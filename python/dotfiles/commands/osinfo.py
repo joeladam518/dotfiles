@@ -1,5 +1,5 @@
 from dotfiles import osinfo as _osinfo
-from dotfiles.cli import Command, FromArgsNamespace
+from dotfiles.cli import Command, Arguments
 from dotfiles.errors import ValidationError
 
 
@@ -28,24 +28,24 @@ class OsinfoCommand(Command):
         self.version = version
 
     @classmethod
-    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'OsinfoCommand':
+    def from_arguments(cls, arguments: Arguments = None) -> 'OsinfoCommand':
+        if arguments is None:
+            arguments = Arguments()
         command: 'OsinfoCommand' = cls(
-            codename=getattr(namespace, 'codename', False),
-            id=getattr(namespace, 'id', False),
-            like=getattr(namespace, 'like', False),
-            pretty=getattr(namespace, 'pretty', False),
-            simplified=getattr(namespace, 'simplified', False),
-            version=getattr(namespace, 'version', False)
+            codename=arguments.get('codename', False),
+            id=arguments.get('id', False),
+            like=arguments.get('like', False),
+            pretty=arguments.get('pretty', False),
+            simplified=arguments.get('simplified', False),
+            version=arguments.get('version', False),
         )
-        command.shell_completion = getattr(namespace, 'completion', False)
+        command.shell_completion = arguments.get('completion', False)
         return command
 
     def validate(self):
-        chosen_options = []
-        for key, value in self.get_command_arguments().items():
-            if value:
-                chosen_options.append(key)
-        if len(chosen_options) > 1:
+        keys = ('codename', 'id', 'like', 'pretty', 'simplified', 'version')
+        given_options = [k for k in keys if getattr(self, k, False) is True]
+        if len(given_options) > 1:
             raise ValidationError(self.name, "You're only allowed to choose a single option.")
 
     def _execute(self) -> None:

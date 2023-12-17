@@ -1,6 +1,6 @@
-from typing import Dict, Type, Union
+from typing import Dict, Type
 
-from dotfiles.cli import Arguments, arguments_to_dict, Command, FromArgsNamespace, parse_install_uninstall_arguments
+from dotfiles.cli import Arguments, Command
 from dotfiles.errors import InvalidSubcommand
 from dotfiles.commands.composer import UninstallComposerCommand
 from dotfiles.commands.php import UninstallPhpCommand
@@ -18,18 +18,20 @@ class UninstallCommand(Command):
     description: str = 'Uninstall a program'
     help: str = 'uninstall a program'
 
-    def __init__(self, subcommand: str, arguments: Union[Arguments, dict] = None):
+    def __init__(self, subcommand: str, arguments: Arguments = None):
         super().__init__()
         self.subcommand: str = subcommand or ''
-        self.arguments: Arguments = parse_install_uninstall_arguments(arguments)
+        self.arguments: Arguments = arguments or Arguments()
 
     @classmethod
-    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'UninstallCommand':
+    def from_arguments(cls, arguments: Arguments = None) -> 'UninstallCommand':
+        if arguments is None:
+            arguments = Arguments()
         command: 'UninstallCommand' = cls(
-            subcommand=getattr(namespace, 'subcommand', ''),
-            arguments=arguments_to_dict(namespace)
+            subcommand=arguments.get('subcommand', ''),
+            arguments=arguments.clone(without={'command', 'subcommand', 'completion'})
         )
-        command.shell_completion = getattr(namespace, 'completion', False)
+        command.shell_completion = arguments.get('completion', False)
         return command
 
     def get_sell_completion_string(self) -> str:

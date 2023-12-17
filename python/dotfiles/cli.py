@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from argparse import Namespace, RawDescriptionHelpFormatter, PARSER
-from collections import OrderedDict
-from typing import Union
+from typing import Union, Set, List, Tuple, Any
 
 
 def _get_arg_strings(attributes: dict) -> list:
@@ -33,19 +32,40 @@ class Arguments:
     """Basic arguments object. Kinda like a namespace"""
 
     def __init__(self, **kwargs):
-        self.__dict__ = OrderedDict(kwargs)
+        for name, value in kwargs.items():
+            setattr(self, name, value)
 
     @classmethod
     def from_dict(cls, dictionary: dict) -> 'Arguments':
         """Creates a new Arguments object from a dict"""
         return cls(**dictionary)
 
-    def get(self, key, default=None):
+    @classmethod
+    def from_namespace(cls, namespace: Namespace) -> 'Arguments':
+        """Creates a new Arguments object from a Namespace object"""
+        return cls(**vars(namespace))
+
+    def get(self, key, default=None) -> Any:
         """Gets a value from the arguments object"""
-        return self.__dict__.get(key, default)
+        return getattr(self, key, default)
+
+    def keys(self):
+        """Returns the keys of the arguments object"""
+        return self.to_dict().keys()
+
+    def to_dict(self) -> dict:
+        """Converts the Arguments object to a dict"""
+        return vars(self)
+
+    def clone(self, without: Union[List[str], Set[str], Tuple[str], None] = None) -> 'Arguments':
+        """Clones the Arguments object"""
+        if without:
+            return self.from_dict({k: v for k, v in self.to_dict().items() if k not in without})
+
+        return self.from_dict(self.to_dict())
 
     def __bool__(self):
-        return bool(self.__dict__)
+        return bool(self.to_dict())
 
     def __contains__(self, key):
         return key in self.__dict__
@@ -54,6 +74,9 @@ class Arguments:
         if not isinstance(other, Arguments):
             return NotImplemented
         return vars(self) == vars(other)
+
+    def __getattr__(self, name) -> Any:
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
     def __repr__(self):
         type_name = type(self).__name__
@@ -68,9 +91,6 @@ class Arguments:
         return f"{type_name}(\n{args_string}\n)"
 
 
-FromArgsNamespace = Union[Arguments, Namespace, dict, None]
-
-
 class Command(ABC):
     """Represents a command."""
 
@@ -79,12 +99,8 @@ class Command(ABC):
 
     @classmethod
     @abstractmethod
-    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'Command':
+    def from_arguments(cls, arguments: Arguments = None) -> 'Command':
         """Creates a new command from a Command object"""
-
-    def get_command_arguments(self) -> dict:
-        """Returns an Arguments object for the command"""
-        return {k: self.__dict__[k] for k in self.__dict__.keys() - {'shell_completion'}}
 
     def get_sell_completion_string(self) -> str:
         """Returns the shell completion string for the command"""
@@ -96,8 +112,7 @@ class Command(ABC):
 
     @abstractmethod
     def _execute(self) -> None:
-        """The method that every command must implement.
-        This is them main logic of the command."""
+        """The method that every command must implement. This is them main logic of the command."""
 
     def execute(self) -> None:
         """Executes the command."""
@@ -107,12 +122,6 @@ class Command(ABC):
             print(self.get_sell_completion_string())
         else:
             self._execute()
-
-    def __bool__(self):
-        return bool(self.get_command_arguments())
-
-    def __contains__(self, key):
-        return key in self.__dict__
 
     def __eq__(self, other):
         if not isinstance(other, Command):
@@ -130,20 +139,3 @@ class Command(ABC):
         arg_strings = _get_arg_strings(self.__dict__)
         args_string = ',\n'.join(map(lambda s: f"  {s}", arg_strings))
         return f"{type_name}(\n{args_string}\n)"
-
-
-def arguments_to_dict(namespace: FromArgsNamespace) -> dict:
-    """Converts an object to a dict."""
-    arguments = namespace.__dict__ if isinstance(namespace, object) else (namespace or {})
-    return {k: arguments[k] for k in arguments.keys() - {'command', 'subcommand', 'shell_completion'}}
-
-
-def parse_install_uninstall_arguments(arguments: Union[Arguments, dict] = None) -> Arguments:
-    """Parses the arguments for the install and uninstall commands"""
-    if isinstance(arguments, Arguments):
-        return arguments
-
-    if isinstance(arguments, dict):
-        return Arguments.from_dict(arguments)
-
-    return Arguments()

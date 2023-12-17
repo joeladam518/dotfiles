@@ -3,7 +3,7 @@ import sys
 from collections import OrderedDict
 from configparser import ConfigParser
 
-from dotfiles.cli import Command, FromArgsNamespace
+from dotfiles.cli import Arguments, Command
 from dotfiles.errors import ValidationError
 from dotfiles import console
 
@@ -35,16 +35,18 @@ class RepoCommand(Command):
         self.sep = sep
 
     @classmethod
-    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'Command':
+    def from_arguments(cls, arguments: Arguments = None) -> 'RepoCommand':
+        if arguments is None:
+            arguments = Arguments()
         command: 'RepoCommand' = cls(
-            key=getattr(namespace, 'key', None),
-            repos_directory=getattr(namespace, 'directory_path', None),
-            aliases_file=getattr(namespace, 'file_path', None),
-            list_keys=getattr(namespace, 'list_keys', False),
-            list_paths=getattr(namespace, 'list_paths', False),
-            sep=getattr(namespace, 'sep', "\n")
+            key=arguments.get('key', None),
+            repos_directory=arguments.get('directory_path', None),
+            aliases_file=arguments.get('file_path', None),
+            list_keys=arguments.get('list_keys', None),
+            list_paths=arguments.get('list_paths', None),
+            sep=arguments.get('sep', None),
         )
-        command.shell_completion = getattr(namespace, 'completion', False)
+        command.shell_completion = arguments.get('completion', None)
         return command
 
     def get_sell_completion_string(self) -> str:

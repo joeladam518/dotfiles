@@ -6,7 +6,7 @@ from subprocess import CalledProcessError
 from urllib import request
 
 from dotfiles import console, run
-from dotfiles.cli import Command, FromArgsNamespace
+from dotfiles.cli import Arguments, Command
 from dotfiles.installed import installed
 from dotfiles.paths import home_path
 
@@ -18,11 +18,8 @@ class InstallComposerCommand(Command):
     description: str = 'Install php-composer'
     help: str = 'install php-composer'
 
-    def __init__(self):
-        super().__init__()
-
     @classmethod
-    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'Command':
+    def from_arguments(cls, arguments: Arguments = None) -> 'InstallComposerCommand':
         return cls()
 
     def _execute(self) -> None:
@@ -42,7 +39,7 @@ class InstallComposerCommand(Command):
             with open(composer_setup_path, 'wb') as setup_file:
                 shutil.copyfileobj(response, setup_file)
 
-        with open(composer_setup_path, 'r') as setup_file:
+        with open(composer_setup_path, 'r', encoding='utf-8') as setup_file:
             actual_signature = hashlib.sha384(setup_file.read().encode())
             actual_signature = actual_signature.hexdigest()
 
@@ -53,11 +50,10 @@ class InstallComposerCommand(Command):
         try:
             run.command(f'php {composer_setup_path}')
             run.command(f'mv "{composer_path}" "/usr/local/bin/composer"', root=True)
+            run.command(f'rm "{composer_setup_path}"')
         except CalledProcessError as ex:
             run.command(f'rm "{composer_setup_path}"')
             raise ex
-        else:
-            run.command(f'rm "{composer_setup_path}"')
 
 
 class UninstallComposerCommand(Command):
@@ -67,11 +63,8 @@ class UninstallComposerCommand(Command):
     description: str = 'Uninstall php-composer'
     help: str = 'uninstall php-composer'
 
-    def __init__(self):
-        super().__init__()
-
     @classmethod
-    def from_arguments(cls, namespace: FromArgsNamespace = None) -> 'Command':
+    def from_arguments(cls, arguments: Arguments = None) -> 'UninstallComposerCommand':
         return cls()
 
     def _execute(self) -> None:

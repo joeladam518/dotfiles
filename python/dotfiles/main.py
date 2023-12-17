@@ -7,7 +7,7 @@ from dotfiles import console
 from dotfiles.commands import InstallCommand, OsinfoCommand, RepoCommand, UninstallCommand
 from dotfiles.commands import InstallComposerCommand, InstallPhpCommand
 from dotfiles.commands import UninstallComposerCommand, UninstallPhpCommand
-from dotfiles.cli import Command, HelpFormatter
+from dotfiles.cli import Arguments, Command, HelpFormatter
 from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
 from dotfiles.paths import home_path
 
@@ -234,7 +234,8 @@ def cli() -> None:
     parser, subparsers = _get_parsers()
 
     try:
-        arguments = parser.parse_args()
+        namespace = parser.parse_args()
+        arguments = Arguments.from_namespace(namespace)
 
         if arguments.command in _commands:
             command = _commands[arguments.command].from_arguments(arguments)

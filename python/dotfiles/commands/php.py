@@ -125,10 +125,12 @@ class InstallPhpCommand(Command):
         self.version: Optional[str] = version
 
     @classmethod
-    def from_arguments(cls, namespace: Arguments = None) -> 'Command':
+    def from_arguments(cls, arguments: Arguments = None) -> 'InstallPhpCommand':
+        if arguments is None:
+            arguments = Arguments()
         return cls(
-            env=namespace.get('env', None),
-            version=namespace.get('version', None)
+            env=arguments.get('env', None),
+            version=arguments.get('version', None)
         )
 
     def validate(self) -> None:
@@ -197,9 +199,11 @@ class UninstallPhpCommand(Command):
         self.version: Optional[str] = version
 
     @classmethod
-    def from_arguments(cls, namespace: Arguments = None) -> 'Command':
+    def from_arguments(cls, arguments: Arguments = None) -> 'UninstallPhpCommand':
+        if arguments is None:
+            arguments = Arguments()
         return cls(
-            version=namespace.get('version', None)
+            version=arguments.get('version', None)
         )
 
     def validate(self) -> None:

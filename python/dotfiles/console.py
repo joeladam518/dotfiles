@@ -6,10 +6,6 @@ from typing import Any, Dict, List, Tuple, Union, Literal, Iterable
 from dotfiles import array
 from dotfiles.errors import EmptyAnswerError, InvalidAnswerError
 
-SUCCESS = 0
-FAILURE = 1
-CTRL_C = 130
-
 AttributeType = Literal[
     "bold",
     "dark",
@@ -19,7 +15,6 @@ AttributeType = Literal[
     "reverse",
     "concealed",
 ]
-
 ColorType = Literal[
     "black",
     "grey",
@@ -40,6 +35,12 @@ ColorType = Literal[
     "white",
 ]
 
+# Exit codes
+SUCCESS = 0
+FAILURE = 1
+CTRL_C = 130
+
+# ANSI escape codes
 ATTRIBUTES: dict[AttributeType, int] = {
     "bold": 1,
     "dark": 2,
@@ -49,27 +50,6 @@ ATTRIBUTES: dict[AttributeType, int] = {
     "reverse": 7,
     "concealed": 8,
 }
-
-HIGHLIGHTS: dict[ColorType, int] = {
-    "black": 40,
-    "grey": 40,  # Actually black but kept for backwards compatibility
-    "red": 41,
-    "green": 42,
-    "yellow": 43,
-    "blue": 44,
-    "magenta": 45,
-    "cyan": 46,
-    "light_grey": 47,
-    "dark_grey": 100,
-    "light_red": 101,
-    "light_green": 102,
-    "light_yellow": 103,
-    "light_blue": 104,
-    "light_magenta": 105,
-    "light_cyan": 106,
-    "white": 107,
-}
-
 COLORS: dict[ColorType, int] = {
     "black": 30,
     "grey": 30,  # Actually black but kept for backwards compatibility
@@ -89,7 +69,25 @@ COLORS: dict[ColorType, int] = {
     "light_cyan": 96,
     "white": 97,
 }
-
+HIGHLIGHTS: dict[ColorType, int] = {
+    "black": 40,
+    "grey": 40,  # Actually black but kept for backwards compatibility
+    "red": 41,
+    "green": 42,
+    "yellow": 43,
+    "blue": 44,
+    "magenta": 45,
+    "cyan": 46,
+    "light_grey": 47,
+    "dark_grey": 100,
+    "light_red": 101,
+    "light_green": 102,
+    "light_yellow": 103,
+    "light_blue": 104,
+    "light_magenta": 105,
+    "light_cyan": 106,
+    "white": 107,
+}
 RESET = "\033[0m"
 
 
@@ -169,6 +167,31 @@ def colorize(
     result += RESET
 
     return result
+
+
+def cprint(
+    text: object,
+    color: Union[ColorType, None] = None,
+    background: Union[ColorType, None] = None,
+    attrs: Union[Iterable[AttributeType], None] = None,
+    no_color: bool | None = None,
+    force_color: bool | None = None,
+    **kwargs: Any,
+) -> None:
+    """Print colorized text
+
+    doc_inherit print
+    """
+    print(
+        colorize(text, color, background, attrs, no_color, force_color),
+        **kwargs
+    )
+
+
+def error(*args, **kwargs) -> None:
+    """doc_inherit print"""
+    kwargs['file'] = sys.stderr
+    print(*args, **kwargs)
 
 
 def confirm(question: str, tries: int = 2) -> bool:
@@ -272,28 +295,3 @@ def choice(
         attempts = attempts - 1
 
     return None
-
-
-def cprint(
-    text: object,
-    color: Union[ColorType, None] = None,
-    background: Union[ColorType, None] = None,
-    attrs: Union[Iterable[AttributeType], None] = None,
-    no_color: bool | None = None,
-    force_color: bool | None = None,
-    **kwargs: Any,
-) -> None:
-    """Print colorized text
-
-    doc_inherit print
-    """
-    print(
-        colorize(text, color, background, attrs, no_color, force_color),
-        **kwargs
-    )
-
-
-def error(*args, **kwargs) -> None:
-    """doc_inherit print"""
-    kwargs['file'] = sys.stderr
-    print(*args, **kwargs)

@@ -42,7 +42,7 @@ class OsinfoCommand(Command):
         command.shell_completion = arguments.get('completion', False)
         return command
 
-    def validate(self):
+    def validate(self) -> None:
         keys = ('codename', 'id', 'like', 'pretty', 'simplified', 'version')
         given_options = [k for k in keys if getattr(self, k, False) is True]
         if len(given_options) > 1:

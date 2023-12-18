@@ -91,7 +91,7 @@ HIGHLIGHTS: dict[ColorType, int] = {
 RESET = "\033[0m"
 
 
-def _can_do_colour(
+def _can_do_color(
     no_color: Union[bool, None] = None,
     force_color: Union[bool, None] = None
 ) -> bool:
@@ -150,7 +150,7 @@ def colorize(
         colorize('Hello, World!', 'green')
     """
     result = str(text)
-    if not _can_do_colour(no_color, force_color):
+    if not _can_do_color(no_color, force_color):
         return result
 
     fmt_str = "\033[%dm%s"
@@ -174,8 +174,8 @@ def cprint(
     color: Union[ColorType, None] = None,
     background: Union[ColorType, None] = None,
     attrs: Union[Iterable[AttributeType], None] = None,
-    no_color: bool | None = None,
-    force_color: bool | None = None,
+    no_color: Union[bool, None] = None,
+    force_color: Union[bool, None] = None,
     **kwargs: Any,
 ) -> None:
     """Print colorized text

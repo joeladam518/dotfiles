@@ -11,8 +11,6 @@ from dotfiles.errors import ValidationError
 
 class PhpVars:
     """Php variables for installation and uninstallation"""
-    current_version: str = '8.3'
-    versions: tuple = ('5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3')
     extension_types: tuple = ('desktop', 'server')
     desktop_extensions: tuple = (
         'bcmath',
@@ -68,34 +66,33 @@ def _install_php_sources() -> None:
 
 def _php_sources_are_not_installed() -> bool:
     """Check see if the php apt repository is installed"""
-    cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep '%s' | grep 'php'"
     if osinfo.id() in ['debian', 'raspbian']:
         if os.path.exists('/etc/apt/sources.list.d/sury-php.list'):
             return False
-        proc = run.command(cmd % 'sury', check=False, supress_output=True)
+        cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep 'sury' | grep 'php'"
+        proc = run.command(cmd, check=False, supress_output=True)
         return proc.returncode == 0
 
     if osinfo.id() == 'ubuntu':
         if os.path.exists(f"/etc/apt/sources.list.d/ondrej-ubuntu-php-{osinfo.codename()}.list"):
             return False
-        proc = run.command(cmd % 'ondrej', check=False, supress_output=True)
+        # TODO: this is broken because of the new '*.sources' file type
+        cmd = "find /etc/apt/ -name '*.list' -name '*.sources' | xargs cat | grep 'ondrej' | grep 'php'"
+        proc = run.command(cmd, check=False, supress_output=True)
         return proc.returncode == 0
 
     return True
 
 
-def _get_available_php_versions() -> tuple:
-    """Find php versions by searching for packages with versions. i.e: 'php8.1-intl' """
-    if _php_sources_are_not_installed():
-        return PhpVars.versions
-
+def _get_available_php_versions() -> list:
+    """Get the available php versions"""
     try:
-        cmd = "apt-cache search php | grep -oP '^php[0-9]?[0-9]\.[0-9]' | awk -F\php '{print $2}' | sort -u"
+        cmd = r"apt-cache search php | grep -oP '^php[0-9]?[0-9]\.[0-9]' | awk -Fphp '{print $2}' | sort -ru"
         versions = run.command(cmd, capture_output=True)
         versions = versions.split('\n') if versions else []
-        return tuple(filter(bool, versions))
+        return list(filter(bool, versions))
     except CalledProcessError:
-        return PhpVars.versions
+        return []
 
 
 def _get_installed_php_packages(version: Optional[str] = None) -> list:
@@ -140,13 +137,19 @@ class InstallPhpCommand(Command):
     def _execute(self) -> None:
         """"Install php"""
         try:
-            installable_versions: List[str] = [v for v in _get_available_php_versions() if Version(v).gt('7.4')]
+            installable_versions: List[str] = _get_available_php_versions()
+
+            if not installable_versions:
+                print("")
+                print("No php versions found", file=sys.stderr)
+                print("")
+                sys.exit(console.FAILURE)
 
             if self.version is None or self.version not in installable_versions:
                 self.version = console.choice(
                     "Which version would you like to install?",
                     installable_versions,
-                    default=PhpVars.current_version
+                    default=0
                 )
                 if not self.version:
                     raise ValidationError(self.name, 'Invalid php version')

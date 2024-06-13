@@ -3,9 +3,9 @@ live_config_reload = true
 [window]
 decorations = "Full"
 decorations_theme_variant = "None"
-dimensions = { columns = 0, lines = 0 }
-dynamic_padding = false
+dynamic_padding = true
 resize_increments = false
+padding = { x = 3, y = 3 }
 title = "Terminal"
 
 [scrolling]
@@ -17,7 +17,7 @@ size = 16.0
 
 [font.normal]
 family = "RobotoMono Nerd Font Mono"
-style = "Regular" 
+style = "Regular"
 
 [font.bold]
 family = "RobotoMono Nerd Font Mono"
@@ -64,7 +64,7 @@ white = "#EEEEEC"
 
 [bell]
 animation = "EaseOutExpo"
-duration = 1
+duration = 0
 
 [selection]
 save_to_clipboard = false
@@ -73,12 +73,32 @@ save_to_clipboard = false
 style = { shape = "Block", blinking = "On" }
 thickness = 0.075
 
-#[terminal]
-
 [mouse]
-hide_when_typing = true
+hide_when_typing = false
 
-#[hints]
+[[keyboard.bindings]]
+key = "B"
+mods = "Control|Shift"
+mode = "~Search"
+action = "ReceiveChar"
+
+[[keyboard.bindings]]
+key = "B"
+mods = "Control"
+mode = "~Search"
+action = "SearchBackward"
+
+[[keyboard.bindings]]
+key = "F"
+mods = "Control|Shift"
+mode = "~Search"
+action = "ReceiveChar"
+
+[[keyboard.bindings]]
+key = "F"
+mods = "Control"
+mode = "~Search"
+action = "SearchForward"
 
 [[keyboard.bindings]]
 key = "Enter"

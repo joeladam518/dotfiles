@@ -3,9 +3,10 @@ live_config_reload = true
 [window]
 decorations = "Full"
 decorations_theme_variant = "None"
-dynamic_padding = true
+dynamic_padding = false
 resize_increments = false
-padding = { x = 3, y = 3 }
+padding = { x = 3, y = 0 }
+position = { x = 0, y = 0 }
 title = "Terminal"
 
 [scrolling]
@@ -13,10 +14,10 @@ history = 100000
 multiplier = 3
 
 [font]
-size = 20.0
+size = 16.0
 
 [font.normal]
-family = "RobotoMono Nerd Font Mono"
+family = "CommitMono Nerd Font"
 style = "Regular"
 
 [font.bold]

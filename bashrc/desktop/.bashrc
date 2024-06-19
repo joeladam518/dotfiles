@@ -130,8 +130,10 @@ if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
 fi
 
 # .fzf command line fuzzy finder
-export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+if [ -f ~/.fzf.bash ]; then
+    export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+    source ~/.fzf.bash
+fi
 
 # Andriod
 if [ -d "${HOME}/Android/Sdk" ]; then
@@ -160,4 +162,3 @@ if [ -d "${HOME}/.nvm" ]; then
 fi
 
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

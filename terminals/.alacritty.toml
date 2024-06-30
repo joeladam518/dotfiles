@@ -5,7 +5,7 @@ decorations = "Full"
 decorations_theme_variant = "None"
 dynamic_padding = false
 resize_increments = false
-padding = { x = 3, y = 0 }
+padding = { x = 3, y = 2 }
 position = { x = 0, y = 0 }
 title = "Terminal"
 

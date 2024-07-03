@@ -7,9 +7,11 @@ auu()
     # Update your computer
 
     if [ "$EUID" -eq "0" ]; then
-        apt update && apt upgrade -y && apt autoremove -y
+        #apt update && apt upgrade -y && apt autoremove -y
+        apt-get update && apt-get upgrade -y
     else
-        sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+        #sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+        sudo apt-get update && sudo apt-get upgrade -y
     fi
 }
 

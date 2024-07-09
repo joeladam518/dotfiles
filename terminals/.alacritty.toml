@@ -21,15 +21,15 @@ family = "CommitMono Nerd Font"
 style = "Regular"
 
 [font.bold]
-family = "RobotoMono Nerd Font Mono"
+family = "CommitMono Nerd Font Mono"
 style = "Bold"
 
 [font.italic]
-family = "RobotoMono Nerd Font Mono"
+family = "CommitMono Nerd Font Mono"
 style = "Italic"
 
 [font.bold_italic]
-family = "RobotoMono Nerd Font Mono"
+family = "CommitMono Nerd Font Mono"
 style = "Bold Italic"
 
 [colors]

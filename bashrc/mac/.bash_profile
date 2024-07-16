@@ -88,15 +88,25 @@ if [[ -r "${HOME}/.git-completion.bash" ]]; then
 fi
 
 # Bash-Git-Prompt
-if [ -r "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh" ]; then
+# if [ -r "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh" ]; then
+#     GIT_PROMPT_ONLY_IN_REPO=1
+#     __GIT_PROMPT_DIR="${HOMEBREW_DIR}/opt/bash-git-prompt/share"
+#     . "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh"
+# fi
+if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
-    __GIT_PROMPT_DIR="${HOMEBREW_DIR}/opt/bash-git-prompt/share"
-    . "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh"
+    source "$HOME/.bash-git-prompt/gitprompt.sh"
 fi
 
 # .fzf command line fuzzy finder
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Java
+if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
+    export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
+    export CPPFLAGS="-I/opt/homebrew/opt/openjdk@17/include"
+fi
 
 # Andriod development
 if [ -d "${HOME}/Library/Android/sdk" ]; then
@@ -108,9 +118,10 @@ if [ -d "${HOME}/Library/Android/sdk" ]; then
 fi
 
 # ruby
-if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
-    export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
-fi
+# if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+#     export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
+# fi
+eval "$(rbenv init - bash)"
 
 # yarn
 if [ -d "${HOME}/.yarn/bin" ]; then

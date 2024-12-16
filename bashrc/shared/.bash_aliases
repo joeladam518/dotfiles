@@ -3,11 +3,12 @@
 # Shared aliases
 
 # Directory navigation aliases
-alias cd..='cd ..' # change to parent directory, even when you forget the space.
+# change to parent directory, even when you forget the space.
+alias cd..='cd ..' 
 alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .....='cd ../../../..'
+#alias ...='cd ../..'
+#alias ....='cd ../../..'
+#alias .....='cd ../../../..'
 
 # Reload shell
 alias reload-bashrc='source ~/.bashrc;'

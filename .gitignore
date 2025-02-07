@@ -1,14 +1,17 @@
-# Editiors
-.idea
-.vscode
-.phpintel
-.fleet
+# Editors
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+/.phpintel
+/.netrwhist
 *.swp
 *.orig
-.netrwhist
+*.idea
 
-# Packages
-# it's better to unpack these files and commit the raw source
+# Compressed files
+# It's better to unpack these files and commit the raw source
 # git has its own built in compression methods
 *.7z
 *.dmg

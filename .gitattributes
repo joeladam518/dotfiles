@@ -1,1 +1,6 @@
-.gitconfig filter=gitignore
+* text=auto eol=lf
+
+*.md diff=markdown
+*.sh diff=shell
+
+/.github export-ignore

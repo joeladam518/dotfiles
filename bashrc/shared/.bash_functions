@@ -78,3 +78,22 @@ zipthis()
     zip -r "${1%%/}.zip" "$1"
     return "$?"
 }
+
+printcsv()
+{
+    local has_headers="0"
+    local csv_path="$1"
+    shift
+
+    if [ "$1" == "--headers" ]; then
+        has_headers="1"
+        shift
+    fi
+
+    if [ "$has_headers" == "1" ]; then
+        tail -n+2 "$csv_path" | column -t -s "," -N "$(head -n 1 "$csv_path")" "$@"
+    else
+        column -s, -t "$@" < "$csv_path"
+    fi
+}
+

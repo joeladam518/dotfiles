@@ -157,8 +157,9 @@ fi
 # Node Version Manager
 if [ -d "${HOME}/.nvm" ]; then
     export NVM_DIR="${HOME}/.nvm"
-    [ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"  # This loads nvm
-    [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 fi
 
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR
+

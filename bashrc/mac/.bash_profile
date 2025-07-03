@@ -123,10 +123,10 @@ fi
 # fi
 eval "$(rbenv init - bash)"
 
-# yarn
-if [ -d "${HOME}/.yarn/bin" ]; then
-    export PATH="${PATH}:${HOME}/.yarn/bin"
-fi
+# # yarn
+# if [ -d "${HOME}/.yarn/bin" ]; then
+#     export PATH="${PATH}:${HOME}/.yarn/bin"
+# fi
 if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
     export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
 fi
@@ -137,6 +137,12 @@ if [ -d "${HOME}/.nvm" ]; then
     [ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"  # This loads nvm
     [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
 fi
+
+if [ -d "${HOME}/tizen-studio" ]; then
+    export PATH="${PATH}:${HOME}/tizen-studio/tools/"
+    export PATH="${PATH}:${HOME}/tizen-studio/tools/ide/bin"
+fi
+
 
 source "${HOME}/.docker/init-bash.sh" || true # Added by Docker Desktop
 

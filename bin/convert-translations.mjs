@@ -25,7 +25,7 @@ function printUsage(error = false) {
 
 function printHelp() {
     printUsage();
-    const help = `
+    console.log(`
 Converts a translation files from json to csv and back again.
 
 Arguments:
@@ -36,9 +36,7 @@ Options:
 -l, --language <file|directory>  Use a reference file to filter translations.
 -n, --only-needed                Only include translations that differ from the reference.
 -o, --output <directory>         Write the output to a specific directory.
-    `;
-
-    console.log(help);
+    `);
 }
 
 /**

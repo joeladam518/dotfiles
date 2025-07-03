@@ -96,4 +96,3 @@ printcsv()
         column -s, -t "$@" < "$csv_path"
     fi
 }
-

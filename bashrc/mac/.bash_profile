@@ -143,7 +143,6 @@ if [ -d "${HOME}/tizen-studio" ]; then
     export PATH="${PATH}:${HOME}/tizen-studio/tools/ide/bin"
 fi
 
-
 source "${HOME}/.docker/init-bash.sh" || true # Added by Docker Desktop
 
 # Unset any variables that were used in this script

@@ -154,8 +154,9 @@ if [ "$(dotfiles osinfo -s)" != "linux" ] && [ "$(dotfiles osinfo -s)" != "mac" 
 fi
 
 # Source the ".env" file so the environment variables are available...
-if [ -f "./.env" ]; then
-    source "./.env"
+if [ -f ".env" ]; then
+    # Strip comment lines, empty lines and source the .env file
+    grep -v '^#' .env | grep -v '^[[:space:]]*$' > .env.tmp && source .env.tmp && rm .env.tmp
 fi
 
 # Define environment variables...

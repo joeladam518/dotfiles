@@ -12,13 +12,13 @@ if [ -f "${BASHRC_DIR}/shared/.bash_dev_functions" ]; then
     . "${BASHRC_DIR}/shared/.bash_dev_functions"
 fi
 
-swap-env()
+swapenv()
 {
     local env
     env="$1"
 
     if [ -z "$env" ]; then
-       cmsg -r "You must provide an env name" 1>&2
+       cmsg -r "You must provide an env" 1>&2
        return 1
     fi
 
@@ -28,11 +28,26 @@ swap-env()
     fi
 
     ln -sf ".env-${env}" .env
+    
     return "$?"
 }
 
-swap-theme()
+swaptheme()
 {
-    swap-env "$1"
-    npm run "dev:$1"
+    local theme
+    theme="$1"
+
+    if [ -z "$theme" ]; then
+       cmsg -r "You must provide a theme" 1>&2
+       return 1
+    fi
+
+    if ! swapenv "$theme"; then
+        return 1
+    fi
+    
+    npm run "dev:$theme"
+
+    return "$?"
 }
+

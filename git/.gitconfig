@@ -23,9 +23,9 @@
     d = diff --histogram
     dt = difftool
     # git logging
-    la = log --pretty=format:'%C(auto,yellow)%h%Creset - %C(auto,blue)%an%Creset -%C(auto)%d%Creset %s %C(auto,green)(%cr)%Creset' --abbrev-commit --date=relative
-    lg = la -10
-    lgr = la --graph
+    l = log --pretty=format:'%C(auto,yellow)%h%Creset - %C(auto,blue)%an%Creset -%C(auto)%d%Creset %s %C(auto,green)(%cr)%Creset' --abbrev-commit --date=relative
+    lg = l -10
+    lgr = l --graph
     wtf = log --pretty=format:'%C(auto,yellow)%H%Creset%C(auto)%d%Creset - %C(auto,blue)%cn%Creset - %C(auto,green)(%ar)%Creset%n %-s%n' --stat
     st = status
     # git add/remove with fzf

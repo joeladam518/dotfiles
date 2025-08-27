@@ -14,7 +14,7 @@ fi
 
 # Helps you swap the env and build for development
 # If no arguments are provided this is what happens
-#   - swaps the env and default instance will be satellite
+#   - swaps the env and the default instance will be satellite
 #   - runs the dev:[theme] command
 oda()
 {

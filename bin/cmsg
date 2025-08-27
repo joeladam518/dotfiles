@@ -88,17 +88,16 @@ if [ "$NO_NEWLINE" == "1" ]; then
 fi
 
 # Add color and bold
-if [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
-    CMD="${CMD} \"${BOLD}${CHOSEN_COLOR}${INPUT}${RESET}\""
-elif [ -n "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "0" ]; then
-    CMD="${CMD} \"${CHOSEN_COLOR}${INPUT}${RESET}\""
-elif [ -z "$CHOSEN_COLOR" ] && [ "$IS_BOLD" == "1" ]; then
-    CMD="${CMD} \"${BOLD}${INPUT}${RESET}\""
+if [ -n "$CHOSEN_COLOR" ]; then
+    if [ "$IS_BOLD" == "1" ]; then
+        $CMD "${BOLD}${CHOSEN_COLOR}${INPUT}${RESET}"
+    else
+        $CMD "${CHOSEN_COLOR}${INPUT}${RESET}"
+    fi
 else
-    CMD="${CMD} \"${INPUT}\""
+    if [ "$IS_BOLD" == "1" ]; then
+        $CMD "${BOLD}${INPUT}${RESET}"
+    else
+        $CMD "${INPUT}${RESET}"
+    fi
 fi
-
-# Finally, print the message with color!
-#echo "$CMD"
-eval "$CMD"
-exit

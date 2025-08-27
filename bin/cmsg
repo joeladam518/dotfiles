@@ -1,40 +1,31 @@
 #!/usr/bin/env bash
 
-## Can we use tput?
-tput_found="$(command -v tput)"
-tput_status="$?"
+# Color
+RESET="\033[0m"
+BOLD="\033[1m"
+RED="38;5;1"
+GREEN="38;5;2"
+YELLOW="38;5;3"
+BLUE="38;5;4"
+MAGENTA="38;5;5"
+CYAN="38;5;6"
+GRAY="38;5;240"
+WHITE="38;5;7"
 
-if [ -n "$tput_found" ] && [ "$tput_status" == "0" ]; then
-    RESET=$(tput sgr0)
-    BOLD=$(tput bold)
-    RED=$(tput setaf 1)
-    GREEN=$(tput setaf 2)
-    BLUE=$(tput setaf 4)
-    CYAN=$(tput setaf 6)
-    MAGENTA=$(tput setaf 5)
-    YELLOW=$(tput setaf 3)
-    GRAY=$(tput setaf 245)
-    WHITE=$(tput setaf 15)
-else
-    RESET="\e[0m"
-    BOLD="\e[1m"
-    RED="\e[0;31m"
-    GREEN="\e[0;32m"
-    BLUE="\e[0;34m"
-    CYAN="\e[0;36m"
-    MAGENTA="\e[0;35m"
-    YELLOW="\e[0;33m"
-    GRAY="\e[39m\e[2m"
-    WHITE="\033[1;37m"
-fi
+# Options
+CHOSEN_COLOR=""
+NO_NEWLINE="0"
+IS_BOLD="0"
+OPTIND=1
 
 ## Functions
-usage() {
-    echo "usage: $(basename "${0}") [options] [message]"
+usage()
+{
+    echo "Usage: $(basename "${0}") [options] [message]"
     echo ""
     echo "Adds color to your output."
     echo ""
-    echo "options:"
+    echo "Options:"
     echo "  -n  no newline"
     echo "  -d  bold the message"
     echo "  -r  color message red"
@@ -54,17 +45,12 @@ invalid_option() {
     exit 1
 }
 
-## Options
-CHOSEN_COLOR=""
-NO_NEWLINE="0"
-IS_BOLD="0"
-OPTIND=1
-
+# parse args
 while getopts ":hndrgbcmyaw" opt; do
     case "$opt" in
-        h) usage; exit           ;; # print help
-        n) NO_NEWLINE="1"        ;; # no new line
-        d) IS_BOLD="1"           ;; # make it bold
+        h) usage; exit             ;; # print help
+        n) NO_NEWLINE="1"          ;; # no new line
+        d) IS_BOLD="1"             ;; # make it bold
         r) CHOSEN_COLOR="$RED"     ;;
         g) CHOSEN_COLOR="$GREEN"   ;;
         b) CHOSEN_COLOR="$BLUE"    ;;
@@ -87,13 +73,16 @@ if [ "$NO_NEWLINE" == "1" ]; then
     CMD="${CMD}n"
 fi
 
-# Add color and bold
 if [ -n "$CHOSEN_COLOR" ]; then
+    COLOR_SEQUENCE="\033["
+
     if [ "$IS_BOLD" == "1" ]; then
-        $CMD "${BOLD}${CHOSEN_COLOR}${INPUT}${RESET}"
-    else
-        $CMD "${CHOSEN_COLOR}${INPUT}${RESET}"
+        COLOR_SEQUENCE="${COLOR_SEQUENCE}1;"
     fi
+
+    COLOR_SEQUENCE="${COLOR_SEQUENCE}${CHOSEN_COLOR}m"
+
+    $CMD "${COLOR_SEQUENCE}${INPUT}${RESET}"
 else
     if [ "$IS_BOLD" == "1" ]; then
         $CMD "${BOLD}${INPUT}${RESET}"

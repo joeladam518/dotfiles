@@ -9,6 +9,7 @@
     editor = vim
 [diff]
     tool = vimdiff
+    colorMoved = default
     algorithm = patience
 [init]
     templatedir = ./.git_template
@@ -20,6 +21,7 @@
     amend = commit --amend
     br = branch
     #commit = commit -S
+    cp = cherry-pick
     d = diff --histogram
     dt = difftool
     # git logging

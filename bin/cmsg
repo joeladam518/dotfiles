@@ -11,6 +11,7 @@ MAGENTA="38;5;5"
 CYAN="38;5;6"
 GRAY="38;5;240"
 WHITE="38;5;7"
+BLACK="38;5;0"
 
 # Options
 CHOSEN_COLOR=""
@@ -21,21 +22,24 @@ OPTIND=1
 ## Functions
 usage()
 {
-    echo "Usage: $(basename "${0}") [options] [message]"
-    echo ""
-    echo "Adds color to your output."
-    echo ""
-    echo "Options:"
-    echo "  -n  no newline"
-    echo "  -d  bold the message"
-    echo "  -r  color message red"
-    echo "  -g  color message green"
-    echo "  -b  color message blue"
-    echo "  -c  color message cyan"
-    echo "  -y  color message yellow"
-    echo "  -m  color message magenta"
-    echo "  -a  color message gray"
-    echo "  -w  color message white"
+    cat <<HERE
+Usage: $(basename "$0") [options] {message}
+
+Adds color to your output.
+
+Options:
+  -n  no newline
+  -d  bold the message
+  -r  color message red
+  -g  color message green
+  -b  color message blue
+  -c  color message cyan
+  -y  color message yellow
+  -m  color message magenta
+  -a  color message gray
+  -w  color message white
+  -z  color message black
+HERE
 }
 
 invalid_option() {
@@ -46,19 +50,20 @@ invalid_option() {
 }
 
 # parse args
-while getopts ":hndrgbcmyaw" opt; do
+while getopts ":hndrgbcmyawz" opt; do
     case "$opt" in
-        h) usage; exit             ;; # print help
-        n) NO_NEWLINE="1"          ;; # no new line
-        d) IS_BOLD="1"             ;; # make it bold
-        r) CHOSEN_COLOR="$RED"     ;;
-        g) CHOSEN_COLOR="$GREEN"   ;;
-        b) CHOSEN_COLOR="$BLUE"    ;;
-        c) CHOSEN_COLOR="$CYAN"    ;;
-        m) CHOSEN_COLOR="$MAGENTA" ;;
-        y) CHOSEN_COLOR="$YELLOW"  ;;
-        a) CHOSEN_COLOR="$GRAY"    ;;
-        w) CHOSEN_COLOR="$WHITE"   ;;
+        h) usage; exit;                ;; # print help
+        n) NO_NEWLINE="1"              ;; # no new line
+        d) IS_BOLD="1"                 ;; # make it bold
+        r) CHOSEN_COLOR="$RED"         ;;
+        g) CHOSEN_COLOR="$GREEN"       ;;
+        b) CHOSEN_COLOR="$BLUE"        ;;
+        c) CHOSEN_COLOR="$CYAN"        ;;
+        m) CHOSEN_COLOR="$MAGENTA"     ;;
+        y) CHOSEN_COLOR="$YELLOW"      ;;
+        a) CHOSEN_COLOR="$GRAY"        ;;
+        w) CHOSEN_COLOR="$WHITE"       ;;
+        z) CHOSEN_COLOR="$BLACK"       ;;
         \?) invalid_option "${OPTARG}" ;;
     esac
 done

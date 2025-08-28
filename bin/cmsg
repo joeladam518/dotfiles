@@ -79,19 +79,9 @@ if [ "$NO_NEWLINE" == "1" ]; then
 fi
 
 if [ -n "$CHOSEN_COLOR" ]; then
-    COLOR_SEQUENCE="\033["
-
-    if [ "$IS_BOLD" == "1" ]; then
-        COLOR_SEQUENCE="${COLOR_SEQUENCE}1;"
-    fi
-
-    COLOR_SEQUENCE="${COLOR_SEQUENCE}${CHOSEN_COLOR}m"
-
-    $CMD "${COLOR_SEQUENCE}${INPUT}${RESET}"
+    $CMD "\033[${IS_BOLD};${CHOSEN_COLOR}m${INPUT}${RESET}"
+elif [ "$IS_BOLD" == "1" ]; then
+    $CMD "${BOLD}${INPUT}${RESET}"
 else
-    if [ "$IS_BOLD" == "1" ]; then
-        $CMD "${BOLD}${INPUT}${RESET}"
-    else
-        $CMD "${INPUT}${RESET}"
-    fi
+    $CMD "$INPUT"
 fi

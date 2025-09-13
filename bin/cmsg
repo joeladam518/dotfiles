@@ -3,72 +3,97 @@
 # Color
 RESET="\033[0m"
 BOLD="\033[1m"
-RED="38;5;1"
-GREEN="38;5;2"
-YELLOW="38;5;3"
-BLUE="38;5;4"
-MAGENTA="38;5;5"
-CYAN="38;5;6"
-GRAY="38;5;240"
-WHITE="38;5;7"
-BLACK="38;5;0"
+BLACK="30"
+RED="31"
+GREEN="32"
+YELLOW="33"
+BLUE="34"
+MAGENTA="35"
+CYAN="36"
+GRAY="38;5;239"
+WHITE="37"
+BRIGHT_BLACK="90"
+BRIGHT_RED="91"
+BRIGHT_GREEN="92"
+BRIGHT_YELLOW="93"
+BRIGHT_BLUE="94"
+BRIGHT_MAGENTA="95"
+BRIGHT_CYAN="96"
+BRIGHT_GRAY="38;5;244"
+BRIGHT_WHITE="97"
 
 # Options
 CHOSEN_COLOR=""
-NO_NEWLINE="0"
 IS_BOLD="0"
-OPTIND=1
+NO_NEWLINE="0"
+OPTIND=0
 
 ## Functions
-usage()
-{
+usage() {
     cat <<HERE
 Usage: $(basename "$0") [options] {message}
 
 Adds color to your output.
 
 Options:
-  -n  no newline
-  -d  bold the message
-  -r  color message red
-  -g  color message green
-  -b  color message blue
-  -c  color message cyan
-  -y  color message yellow
-  -m  color message magenta
-  -a  color message gray
-  -w  color message white
-  -z  color message black
+  -h    Print usage and exit
+  -n    no newline
+  -d    bold the message
+  -r    color the message red
+  -R    color the message bright red
+  -g    color the message green
+  -G    color the message bright green
+  -b    color the message blue
+  -B    color the message bright blue
+  -c    color the message cyan
+  -C    color the message bright cyan
+  -y    color the message yellow
+  -Y    color the message bright yellow
+  -m    color the message magenta
+  -M    color the message birght magenta
+  -w    color the message white
+  -W    color the message bright white
+  -a    color the message gray
+  -A    color the message bright gray
+  -k    color the message black
+  -K    color the message bright black
 HERE
 }
 
 invalid_option() {
-    echo "Invalid option -- '-${1}'" 1>&2
-    echo ""
-    usage
+    echo -e "\033[${RED}mInvalid option -- '-${1}' ${RESET}" 1>&2
     exit 1
 }
 
-# parse args
-while getopts ":hndrgbcmyawz" opt; do
+# parse arguments
+while getopts ":hndrRgGbBcCyYmMwWaAkK" opt; do
     case "$opt" in
-        h) usage; exit;                ;; # print help
-        n) NO_NEWLINE="1"              ;; # no new line
-        d) IS_BOLD="1"                 ;; # make it bold
-        r) CHOSEN_COLOR="$RED"         ;;
-        g) CHOSEN_COLOR="$GREEN"       ;;
-        b) CHOSEN_COLOR="$BLUE"        ;;
-        c) CHOSEN_COLOR="$CYAN"        ;;
-        m) CHOSEN_COLOR="$MAGENTA"     ;;
-        y) CHOSEN_COLOR="$YELLOW"      ;;
-        a) CHOSEN_COLOR="$GRAY"        ;;
-        w) CHOSEN_COLOR="$WHITE"       ;;
-        z) CHOSEN_COLOR="$BLACK"       ;;
-        \?) invalid_option "${OPTARG}" ;;
+        h) usage; exit                    ;; # print help
+        n) NO_NEWLINE="1"                 ;; # no new line
+        d) IS_BOLD="1"                    ;; # make it bold
+        r) CHOSEN_COLOR="$RED"            ;;
+        R) CHOSEN_COLOR="$BRIGHT_RED"     ;;
+        g) CHOSEN_COLOR="$GREEN"          ;;
+        G) CHOSEN_COLOR="$BRIGHT_GREEN"   ;;
+        b) CHOSEN_COLOR="$BLUE"           ;;
+        B) CHOSEN_COLOR="$BRIGHT_BLUE"    ;;
+        c) CHOSEN_COLOR="$CYAN"           ;;
+        C) CHOSEN_COLOR="$BRIGHT_CYAN"    ;;
+        y) CHOSEN_COLOR="$YELLOW"         ;;
+        Y) CHOSEN_COLOR="$BRIGHT_YELLOW"  ;;
+        m) CHOSEN_COLOR="$MAGENTA"        ;;
+        M) CHOSEN_COLOR="$BRIGHT_MAGENTA" ;;
+        w) CHOSEN_COLOR="$WHITE"          ;;
+        W) CHOSEN_COLOR="$BRIGHT_WHITE"   ;;
+        a) CHOSEN_COLOR="$GRAY"           ;;
+        A) CHOSEN_COLOR="$BRIGHT_GRAY"    ;;
+        k) CHOSEN_COLOR="$BLACK"          ;;
+        K) CHOSEN_COLOR="$BRIGHT_BLACK"   ;;
+        \?) invalid_option "${OPTARG}"    ;;
     esac
 done
 
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 INPUT="$*"
 CMD="echo -e"

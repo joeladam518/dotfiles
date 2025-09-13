@@ -61,7 +61,7 @@ yellow = "#FCE94F"
 blue = "#729FCF"
 magenta = "#AD7FA8"
 cyan = "#34E2E2"
-white = "#EEEEEC"
+white = "#f0f0f0"
 
 [bell]
 animation = "EaseOutExpo"

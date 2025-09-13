@@ -13,9 +13,6 @@ DOTFILES_DIR="${HOME}/repos/dotfiles"
 BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 SERVER_BASHRC_DIR="${BASHRC_DIR}/server"
 
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
 # Cmdhist
 shopt -s cmdhist
 
@@ -29,6 +26,15 @@ shopt -s histappend
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
 shopt -s globstar
+
+# Set the editor
+if command -v "vim" >/dev/null 2>&1; then
+    export EDITOR=vim
+fi
+
+# Force the localization
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options

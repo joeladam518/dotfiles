@@ -7,9 +7,6 @@ BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 MAC_BASHRC_DIR="${BASHRC_DIR}/mac"
 HOMEBREW_DIR="/opt/homebrew"
 
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
 # Check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
@@ -22,6 +19,15 @@ shopt -s histappend
 
 # double ** search !
 shopt -s globstar
+
+# Set the editor
+if command -v "vim" >/dev/null 2>&1; then
+    export EDITOR=vim
+fi
+
+# Force the localization
+# export LANG="en_US.UTF-8"
+# export LC_ALL="en_US.UTF-8"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -38,9 +44,9 @@ export GPG_TTY="$(tty)"
 # Prompt shell
 export PS1="\A \[\033[94m\]\w\[\033[m\]\$ "
 
-# include brew's bin dir in the PATH
-if [ -d "${HOMEBREW_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOMEBREW_DIR}/bin"(:|$) ]]; then
-    export PATH="${HOMEBREW_DIR}/bin:${PATH}"
+# Include the user's bin dir in the PATH
+if [ -d "${HOME}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOME}/bin"(:|$) ]]; then
+    export PATH="${HOME}/bin:${PATH}"
 fi
 
 # if the dotfiles bin folder exists, add it to PATH
@@ -48,17 +54,10 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
     export PATH="${DOTFILES_DIR}/bin:${PATH}"
 fi
 
-# include the user's bin dir in the PATH
-if [ -d "${HOME}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOME}/bin"(:|$) ]]; then
-    export PATH="${HOME}/bin:${PATH}"
+# Include brew's bin dir in the PATH
+if [ -d "${HOMEBREW_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOMEBREW_DIR}/bin"(:|$) ]]; then
+    export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 fi
-
-# Add the python directory to $PYTHONPATH so scripts can find the custom modules
-# if [ -z "$PYTHONPATH" ]; then
-#     export PYTHONPATH="${DOTFILES_DIR}/python"
-# elif [[ ! "$PYTHONPATH" =~ (^|:)"${DOTFILES_DIR}/python"(:|$) ]]; then
-#     export PYTHONPATH="${PYTHONPATH}:${DOTFILES_DIR}/python"
-# fi
 
 # Load functions file
 if [ -f "${MAC_BASHRC_DIR}/.bash_functions" ]; then
@@ -73,26 +72,21 @@ fi
 # Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [[ -r "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh" ]]; then
+if [ -r "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh" ]; then
     . "${HOMEBREW_DIR}/etc/profile.d/bash_completion.sh"
 fi
 
 # Load custom bash completeions
-if [[ -r "${DOTFILES_DIR}/bash-completion/bash_completion" ]]; then
+if [ -r "${DOTFILES_DIR}/bash-completion/bash_completion" ]; then
     . "${DOTFILES_DIR}/bash-completion/bash_completion"
 fi
 
-# Enable Git bash compleation
-if [[ -r "${HOME}/.git-completion.bash" ]]; then
+# Enable git bash compleation
+if [ -r "${HOME}/.git-completion.bash" ]; then
     . "${HOME}/.git-completion.bash"
 fi
 
-# Bash-Git-Prompt
-# if [ -r "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh" ]; then
-#     GIT_PROMPT_ONLY_IN_REPO=1
-#     __GIT_PROMPT_DIR="${HOMEBREW_DIR}/opt/bash-git-prompt/share"
-#     . "${HOMEBREW_DIR}/opt/bash-git-prompt/share/gitprompt.sh"
-# fi
+# bash-git-prompt
 if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     source "$HOME/.bash-git-prompt/gitprompt.sh"
@@ -123,19 +117,19 @@ fi
 # fi
 eval "$(rbenv init - bash)"
 
-# # yarn
+# Node version manager
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"  # This loads nvm
+    [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
+fi
+
+# yarn
 # if [ -d "${HOME}/.yarn/bin" ]; then
 #     export PATH="${PATH}:${HOME}/.yarn/bin"
 # fi
 if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
     export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
-fi
-
-# Node Version Manager
-if [ -d "${HOME}/.nvm" ]; then
-    export NVM_DIR="${HOME}/.nvm"
-    [ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"  # This loads nvm
-    [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
 fi
 
 if [ -d "${HOME}/tizen-studio" ]; then

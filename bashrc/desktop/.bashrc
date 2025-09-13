@@ -12,10 +12,6 @@ DOTFILES_DIR="${HOME}/repos/dotfiles"
 BASHRC_DIR="${DOTFILES_DIR}/bashrc"
 DESKTOP_BASHRC_DIR="${BASHRC_DIR}/desktop"
 
-export EDITOR=vim
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
 # Cmdhist
 shopt -s cmdhist
 
@@ -29,6 +25,15 @@ shopt -s histappend
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
 shopt -s globstar
+
+# set the editor
+if command -v "vim" >/dev/null 2>&1; then
+    export EDITOR=vim
+fi
+
+# force the localization
+# export LANG="en_US.UTF-8"
+# export LC_ALL="en_US.UTF-8"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -84,13 +89,6 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
-# Add the python directory to $PYTHONPATH so scripts can find the custom modules
-# if [ -z "$PYTHONPATH" ]; then
-#     export PYTHONPATH="${DOTFILES_DIR}/python"
-# elif [[ ! "$PYTHONPATH" =~ (^|:)"${DOTFILES_DIR}/python"(:|$) ]]; then
-#     export PYTHONPATH="${PYTHONPATH}:${DOTFILES_DIR}/python"
-# fi
-
 # Load functions
 if [ -f "${DESKTOP_BASHRC_DIR}/.bash_functions" ]; then
     . "${DESKTOP_BASHRC_DIR}/.bash_functions"
@@ -113,12 +111,12 @@ if ! shopt -oq posix; then
 fi
 
 # Load custom bash completeions
-if [[ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]]; then
+if [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
     . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
 fi
 
 # Enable Git bash compleation
-if [[ -r "/usr/share/bash-completion/completions/git" ]]; then
+if [ -r "/usr/share/bash-completion/completions/git" ]; then
     . "/usr/share/bash-completion/completions/git"
 fi
 
@@ -130,9 +128,20 @@ if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
 fi
 
 # .fzf command line fuzzy finder
-if [ -f ~/.fzf.bash ]; then
-    export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-    source ~/.fzf.bash
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Node version manager
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+fi
+
+# Bun
+if [ -r "${HOME}/.bun" ]; then
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
 # Andriod
@@ -144,7 +153,7 @@ if [ -d "${HOME}/Android/Sdk" ]; then
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
 
-# GO
+# Go
 if [ -d "/usr/local/go/bin" ] && [[ ! "$PATH" =~ (^|:)"/usr/local/go/bin"(:|$) ]]; then
     PATH="${PATH}:/usr/local/go/bin"
 fi
@@ -154,12 +163,4 @@ if [ -f "${HOME}/.cargo/env" ]; then
     . "${HOME}/.cargo/env"
 fi
 
-# Node Version Manager
-if [ -d "${HOME}/.nvm" ]; then
-    export NVM_DIR="${HOME}/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-fi
-
 unset DOTFILES_DIR BASHRC_DIR DESKTOP_BASHRC_DIR
-

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Color
+set -Eeo pipefail
+
+# colors
 RESET="\033[0m"
 BOLD="\033[1m"
 BLACK="30"
@@ -22,13 +24,14 @@ BRIGHT_CYAN="96"
 BRIGHT_GRAY="38;5;244"
 BRIGHT_WHITE="97"
 
-# Options
-CHOSEN_COLOR=""
+# variables
+CMD="echo -e"
+COLOR=""
 IS_BOLD="0"
 NO_NEWLINE="0"
 OPTIND=0
 
-## Functions
+# functions
 usage() {
     cat <<HERE
 Usage: $(basename "$0") [options] {message}
@@ -61,50 +64,51 @@ HERE
 }
 
 invalid_option() {
-    echo -e "\033[${RED}mInvalid option -- '-${1}' ${RESET}" 1>&2
+    echo -e "\033[${RED}mInvalid option -- '-${1}'${RESET}" 1>&2
     exit 1
 }
 
 # parse arguments
 while getopts ":hndrRgGbBcCyYmMwWaAkK" opt; do
     case "$opt" in
-        h) usage; exit                    ;; # print help
-        n) NO_NEWLINE="1"                 ;; # no new line
-        d) IS_BOLD="1"                    ;; # make it bold
-        r) CHOSEN_COLOR="$RED"            ;;
-        R) CHOSEN_COLOR="$BRIGHT_RED"     ;;
-        g) CHOSEN_COLOR="$GREEN"          ;;
-        G) CHOSEN_COLOR="$BRIGHT_GREEN"   ;;
-        b) CHOSEN_COLOR="$BLUE"           ;;
-        B) CHOSEN_COLOR="$BRIGHT_BLUE"    ;;
-        c) CHOSEN_COLOR="$CYAN"           ;;
-        C) CHOSEN_COLOR="$BRIGHT_CYAN"    ;;
-        y) CHOSEN_COLOR="$YELLOW"         ;;
-        Y) CHOSEN_COLOR="$BRIGHT_YELLOW"  ;;
-        m) CHOSEN_COLOR="$MAGENTA"        ;;
-        M) CHOSEN_COLOR="$BRIGHT_MAGENTA" ;;
-        w) CHOSEN_COLOR="$WHITE"          ;;
-        W) CHOSEN_COLOR="$BRIGHT_WHITE"   ;;
-        a) CHOSEN_COLOR="$GRAY"           ;;
-        A) CHOSEN_COLOR="$BRIGHT_GRAY"    ;;
-        k) CHOSEN_COLOR="$BLACK"          ;;
-        K) CHOSEN_COLOR="$BRIGHT_BLACK"   ;;
-        \?) invalid_option "${OPTARG}"    ;;
+        h) usage; exit                 ;; # print help
+        n) NO_NEWLINE="1"              ;; # no new line
+        d) IS_BOLD="1"                 ;; # make it bold
+        r) COLOR="$RED"                ;;
+        R) COLOR="$BRIGHT_RED"         ;;
+        g) COLOR="$GREEN"              ;;
+        G) COLOR="$BRIGHT_GREEN"       ;;
+        b) COLOR="$BLUE"               ;;
+        B) COLOR="$BRIGHT_BLUE"        ;;
+        c) COLOR="$CYAN"               ;;
+        C) COLOR="$BRIGHT_CYAN"        ;;
+        y) COLOR="$YELLOW"             ;;
+        Y) COLOR="$BRIGHT_YELLOW"      ;;
+        m) COLOR="$MAGENTA"            ;;
+        M) COLOR="$BRIGHT_MAGENTA"     ;;
+        w) COLOR="$WHITE"              ;;
+        W) COLOR="$BRIGHT_WHITE"       ;;
+        a) COLOR="$GRAY"               ;;
+        A) COLOR="$BRIGHT_GRAY"        ;;
+        k) COLOR="$BLACK"              ;;
+        K) COLOR="$BRIGHT_BLACK"       ;;
+        \?) invalid_option "${OPTARG}" ;;
     esac
 done
 
 shift $((OPTIND - 1))
 
+# the rest of the arguments are the message to be colored
 INPUT="$*"
-CMD="echo -e"
 
-# add -n flag if we want no new line
+# add -n flag if no new line
 if [ "$NO_NEWLINE" == "1" ]; then
     CMD="${CMD}n"
 fi
 
-if [ -n "$CHOSEN_COLOR" ]; then
-    $CMD "\033[${IS_BOLD};${CHOSEN_COLOR}m${INPUT}${RESET}"
+# output the message in color!
+if [ -n "$COLOR" ]; then
+    $CMD "\033[${IS_BOLD};${COLOR}m${INPUT}${RESET}"
 elif [ "$IS_BOLD" == "1" ]; then
     $CMD "${BOLD}${INPUT}${RESET}"
 else

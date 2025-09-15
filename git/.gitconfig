@@ -8,12 +8,21 @@
 [core]
     editor = vim
     # pager = delta # delta has to be installed -> https://github.com/dandavison/delta
+# [delta]
+    # features = joel
+    # #side-by-side = true
+    # navigate = true
+    # dark = true
+    # true-color = always
 [diff]
     tool = vimdiff
     colorMoved = default
     algorithm = patience
+# [include]
+    # path = ./themes.gitconfig
 [init]
     templatedir = ./.git_template
+    defaultBranch = master
 # [interactive]
     # diffFilter = delta --color-only
 [merge]

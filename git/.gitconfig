@@ -3,17 +3,21 @@
 [color]
     ui = true
     status = auto
-#[commit]
-#    gpgsign = true
+# [commit]
+    # gpgsign = true
 [core]
     editor = vim
+    # pager = delta # delta has to be installed -> https://github.com/dandavison/delta
 [diff]
     tool = vimdiff
     colorMoved = default
     algorithm = patience
 [init]
     templatedir = ./.git_template
+# [interactive]
+    # diffFilter = delta --color-only
 [merge]
+    # conflictstyle = zdiff3 # delta requires this
     renamelimit = 2415
 [pull]
     rebase = true

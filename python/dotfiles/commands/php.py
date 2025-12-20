@@ -19,7 +19,6 @@ class PhpVars:
         'curl',
         'intl',
         'mbstring',
-        'opcache',
         'readline',
         'xml',
         'zip'

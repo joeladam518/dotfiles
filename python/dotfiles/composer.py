@@ -7,10 +7,9 @@ from urllib import request
 
 from dotfiles import console, run, osinfo
 from dotfiles.cli import Arguments, Command
-from dotfiles.paths import get_os_root_directory
 from dotfiles.errors import ValidationError
-from dotfiles.installed import installed
-from dotfiles.paths import home_path
+from dotfiles.paths import home_path, get_os_root_directory
+from dotfiles.utils import installed
 
 
 _OS_COMPOSER_PATH = os.path.join(get_os_root_directory(), 'usr', 'local', 'bin', 'composer')

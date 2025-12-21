@@ -1,9 +1,9 @@
 from typing import Dict, Type
 
 from dotfiles.cli import Arguments, Command
+from dotfiles.composer import UninstallComposerCommand
 from dotfiles.errors import InvalidSubcommand
-from dotfiles.commands.composer import UninstallComposerCommand
-from dotfiles.commands.php import UninstallPhpCommand
+from dotfiles.php import UninstallPhpCommand
 
 _subcommands: Dict[str, Type[Command]] = {
     UninstallComposerCommand.command_name: UninstallComposerCommand,

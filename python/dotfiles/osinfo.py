@@ -4,6 +4,9 @@ import platform
 import sys
 from typing import Optional
 
+from dotfiles.cli import Command, Arguments
+from dotfiles.errors import ValidationError
+
 
 def __get_release_path() -> Optional[str]:
     """Get the path to the os-release file."""
@@ -147,3 +150,65 @@ def version() -> str:
         return mac_ver[0]
 
     return get_release_value('VERSION_ID')
+
+
+class OsinfoCommand(Command):
+    """`dotfiles osinfo` command"""
+    name: str = 'osinfo'
+    command_name: str = 'osinfo'
+    description: str = 'Display basic info about your os'
+    help: str = 'display basic info about your os'
+
+    def __init__(
+        self,
+        codename: bool = False,
+        id: bool = False,
+        like: bool = False,
+        pretty: bool = False,
+        simplified: bool = False,
+        version: bool = False
+    ):
+        super().__init__()
+        self.codename = codename
+        self.id = id
+        self.like = like
+        self.pretty = pretty
+        self.simplified = simplified
+        self.version = version
+
+    @classmethod
+    def from_arguments(cls, arguments: Arguments = None) -> 'OsinfoCommand':
+        if arguments is None:
+            arguments = Arguments()
+        command: 'OsinfoCommand' = cls(
+            codename=arguments.get('codename', False),
+            id=arguments.get('id', False),
+            like=arguments.get('like', False),
+            pretty=arguments.get('pretty', False),
+            simplified=arguments.get('simplified', False),
+            version=arguments.get('version', False),
+        )
+        command.shell_completion = arguments.get('completion', False)
+        return command
+
+    def validate(self) -> None:
+        keys = ('codename', 'id', 'like', 'pretty', 'simplified', 'version')
+        given_options = [k for k in keys if getattr(self, k, False) is True]
+        if len(given_options) > 1:
+            raise ValidationError(self.name, "You're only allowed to choose a single option.")
+
+    def _execute(self) -> None:
+        if self.version:
+            print(version())
+        elif self.id:
+            print(id())
+        elif self.like:
+            print(' '.join(id_like()))
+        elif self.simplified:
+            print(ostype())
+        elif self.codename:
+            print(codename())
+        elif self.pretty:
+            print(pretty_name())
+        else:
+            print(name())

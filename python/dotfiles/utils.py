@@ -1,7 +1,6 @@
 import shutil
 from dotfiles import run
 
-
 def installed(program: str) -> bool:
     """Checks is a program is installed.
     NOTE: Works in most cases, but not in every case. Doesn't recognize jetbrains programs.

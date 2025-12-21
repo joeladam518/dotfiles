@@ -4,12 +4,15 @@ from collections import OrderedDict
 from typing import Dict, Tuple, Type
 
 from dotfiles import console
-from dotfiles.commands import InstallCommand, OsinfoCommand, RepoCommand, UninstallCommand
-from dotfiles.commands import InstallComposerCommand, InstallPhpCommand
-from dotfiles.commands import UninstallComposerCommand, UninstallPhpCommand
 from dotfiles.cli import Arguments, Command, HelpFormatter
+from dotfiles.composer import InstallComposerCommand, UninstallComposerCommand
 from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
+from dotfiles.install import InstallCommand
+from dotfiles.osinfo import OsinfoCommand
 from dotfiles.paths import home_path
+from dotfiles.php import InstallPhpCommand, UninstallPhpCommand
+from dotfiles.repos import RepoCommand
+from dotfiles.uninstall import UninstallCommand
 
 
 def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:

@@ -1,10 +1,10 @@
 from typing import Dict, Type
 
-from dotfiles.cli import Arguments, Command
-from dotfiles.errors import InvalidSubcommand
-from dotfiles.commands.composer import InstallComposerCommand
-from dotfiles.commands.php import InstallPhpCommand
 
+from dotfiles.cli import Arguments, Command
+from dotfiles.composer import InstallComposerCommand
+from dotfiles.errors import InvalidSubcommand
+from dotfiles.php import InstallPhpCommand
 
 _subcommands: Dict[str, Type[Command]] = {
     InstallComposerCommand.command_name: InstallComposerCommand,

@@ -92,7 +92,15 @@ class Arguments:
 
 
 class Command(ABC):
-    """Represents a command."""
+    """Represents a command.
+
+    Attributes:
+        name: str
+        command_name: str
+        description: str
+        help: str
+        shell_completion: bool
+    """
 
     def __init__(self):
         self.shell_completion: bool = False

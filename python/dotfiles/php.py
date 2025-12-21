@@ -4,7 +4,7 @@ import sys
 from subprocess import CalledProcessError
 from typing import Optional, Tuple, List
 
-from dotfiles import array, console, osinfo, run, Version
+from dotfiles import array, console, osinfo, run
 from dotfiles.cli import Arguments, Command
 from dotfiles.errors import ValidationError
 
@@ -48,6 +48,13 @@ class PhpVars:
 
 def _install_php_sources() -> None:
     """Install the php apt repository"""
+
+    if osinfo.id() == 'ubuntu':
+        packages = ['apt-transport-https', 'ca-certificates', 'software-properties-common', 'lsb-release']
+        run.command('apt install -y', *packages, root=True)
+        run.command('add-apt-repository ppa:ondrej/php -y', root=True)
+        return
+
     if osinfo.id() in ['debian', 'raspbian']:
         packages = ['apt-transport-https', 'ca-certificates', 'software-properties-common', 'lsb-release', 'gnupg2']
         run.command('apt install -y', *packages, root=True)
@@ -55,28 +62,26 @@ def _install_php_sources() -> None:
         source = 'deb https://packages.sury.org/php/ $(lsb_release -sc) main'
         source_file_path = '/etc/apt/sources.list.d/sury-php.list'
         run.command(f'echo "{source}" | sudo tee "{source_file_path}"')
-    elif osinfo.id() == 'ubuntu':
-        packages = ['software-properties-common', 'lsb-release']
-        run.command('apt install -y', *packages, root=True)
-        run.command('add-apt-repository ppa:ondrej/php -y', root=True)
-    else:
-        raise Exception('Unsupported OS')
+        return
+
+    raise Exception('Unsupported OS')
 
 
 def _php_sources_are_not_installed() -> bool:
     """Check see if the php apt repository is installed"""
-    if osinfo.id() in ['debian', 'raspbian']:
-        if os.path.exists('/etc/apt/sources.list.d/sury-php.list'):
-            return False
-        cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep 'sury' | grep 'php'"
-        proc = run.command(cmd, check=False, supress_output=True)
-        return proc.returncode == 0
 
     if osinfo.id() == 'ubuntu':
         if os.path.exists(f"/etc/apt/sources.list.d/ondrej-ubuntu-php-{osinfo.codename()}.list"):
             return False
         # TODO: this is broken because of the new '*.sources' file type
         cmd = "find /etc/apt/ -name '*.list' -name '*.sources' | xargs cat | grep 'ondrej' | grep 'php'"
+        proc = run.command(cmd, check=False, supress_output=True)
+        return proc.returncode == 0
+
+    if osinfo.id() in ['debian', 'raspbian']:
+        if os.path.exists('/etc/apt/sources.list.d/sury-php.list'):
+            return False
+        cmd = "find /etc/apt/ -name *.list | xargs cat | grep ^[[:space:]]*deb | grep 'sury' | grep 'php'"
         proc = run.command(cmd, check=False, supress_output=True)
         return proc.returncode == 0
 

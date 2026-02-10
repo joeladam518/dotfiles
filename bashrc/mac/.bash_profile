@@ -49,6 +49,10 @@ if [ -d "${HOME}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOME}/bin"(:|$) ]]; then
     export PATH="${HOME}/bin:${PATH}"
 fi
 
+if [ -d "${HOME}/.local/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOME}/.local/bin"(:|$) ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # if the dotfiles bin folder exists, add it to PATH
 if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|$) ]]; then
     export PATH="${DOTFILES_DIR}/bin:${PATH}"
@@ -136,6 +140,8 @@ if [ -d "${HOME}/tizen-studio" ]; then
     export PATH="${PATH}:${HOME}/tizen-studio/tools/"
     export PATH="${PATH}:${HOME}/tizen-studio/tools/ide/bin"
 fi
+
+. "$HOME/.cargo/env"
 
 source "${HOME}/.docker/init-bash.sh" || true # Added by Docker Desktop
 

@@ -23,7 +23,7 @@ $ sudo ./uninstall.sh
 Once dotfiles are installed these scripts should be available in your path
 
 1. `cmsg` - add color you your messages
-2. `dkr` - docker helper script. based on laravel/sail
+2. `dkr` - docker helper script.
 3. `dotfiles` - cli tool built in python that has a bunch of helper commands
 4. `repo` - aliases for cd-ing into to your repo directories without having to commit those aliases to this repo
 5. `transMP4grify` - convert to mp4 and strip audio. useful for uploading videos to Jira

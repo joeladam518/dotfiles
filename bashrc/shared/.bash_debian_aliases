@@ -19,8 +19,8 @@ fi
 
 # ls aliases
 alias ls='ls --color=auto --group-directories-first'
+alias l='ls -lhpv'    # ll without hidden files/directories
 alias ll='ls -alphv'    # Detailed ls with hidden files/directories
-alias lll='ls -lhpv'    # ll without hidden files/directories
 # alias lm='ll | more'    # Pipe through 'more'
 # alias lc='ls -lhtcr'    # Sort by/show change time,most recent last
 # alias lk='ls -lhrS'     # Sort by size, biggest last

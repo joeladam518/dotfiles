@@ -17,14 +17,14 @@ alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder 
 
 # ls aliases
 alias ls='ls -Gh'
+alias l='ls -Fl'
 alias ll='ls -aFl'
-alias lll='ls -Fl'
-alias lr='ll -R'
 
 # fzf aliases - checks to see if the command exists before adding the alias
 if command -v code > /dev/null; then
     alias codeit='code $(fzf -m);'
 fi
+
 if command -v open > /dev/null; then
     alias openit='open $(fzf -m);'
 fi

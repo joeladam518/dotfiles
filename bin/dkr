@@ -95,22 +95,18 @@ disconnect() {
 find_docker_compose_file() {
     if [ -f "./docker-compose.yml" ]; then
         echo "./docker-compose.yml"
-        return 0
     fi
 
     if [ -f "./docker/docker-compose.yml" ]; then
         echo "./docker/docker-compose.yml"
-        return 0
     fi
-
-    return 1
 }
 
 # --- Detect project type ---
 
 is_sourcetoad_laravel_project() {
     local compose_file
-    compose_file="$(find_docker_compose_file)" || return 1
+    compose_file="$(find_docker_compose_file)"
 
     [ -f "./artisan" ] || return 1
     [ -n "$compose_file" ] || return 1
@@ -168,8 +164,9 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # --- Confirm docker-compose file exists ---
+docker_compose_file_path="$(find_docker_compose_file)"
 
-if ! find_docker_compose_file > /dev/null; then
+if [ -z "$docker_compose_file_path" ]; then
     cmsg -r "No docker-compose.yml found." 1>&2
     exit 1
 fi
@@ -181,5 +178,5 @@ if is_sourcetoad_laravel_project; then
 elif is_laravel_sail_project; then
     exec ./vendor/bin/sail "$@"
 else
-    exec "${DOCKER_COMPOSE[@]}" "$@"
+    exec "${DOCKER_COMPOSE[@]}" -f "$docker_compose_file_path" "$@"
 fi

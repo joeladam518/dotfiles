@@ -107,6 +107,11 @@ mode = "Search|~Vi"
 action = "ReceiveChar"
 
 [[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001b\n"
+
+[[keyboard.bindings]]
 key = "G"
 mods = "Control"
 mode = "Search|~Vi"

@@ -86,7 +86,7 @@ symlink_rc() {
     fi
 
     if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
-        cmsg -c "Already linked: $(basename "$dest")"
+        cmsg -y "Already linked: $(basename "$dest")"
         return
     fi
 

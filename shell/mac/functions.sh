@@ -1,15 +1,15 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Mac Functions
+# macOS workstation functions
 
-# Import the global bash functions
-if [ -f "${BASHRC_DIR}/shared/functions.sh" ]; then
-    . "${BASHRC_DIR}/shared/functions.sh"
+DOTFILES_DIR="${DOTFILES_DIR:-"${HOME}/repos/dotfiles"}"
+
+if [ -f "${DOTFILES_DIR}/shell/functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/functions.sh"
 fi
 
-# Import the shared dev functions
-if [ -f "${BASHRC_DIR}/shared/dev_functions.sh" ]; then
-    . "${BASHRC_DIR}/shared/dev_functions.sh"
+if [ -f "${DOTFILES_DIR}/shell/dev_functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/dev_functions.sh"
 fi
 
 # Helps you swap the env and build for development
@@ -132,3 +132,4 @@ Arguments:
 
     return 0
 }
+

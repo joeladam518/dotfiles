@@ -1,6 +1,6 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Shared desktop/server aliases
+# Shared desktop/server aliases — sourced by both bash and zsh
 
 # Enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -20,7 +20,7 @@ fi
 # ls aliases
 alias ls='ls --color=auto --group-directories-first'
 alias l='ls -lhpv'    # ll without hidden files/directories
-alias ll='ls -alphv'    # Detailed ls with hidden files/directories
+alias ll='ls -Alphv'    # Detailed ls with hidden files/directories
 # alias lm='ll | more'    # Pipe through 'more'
 # alias lc='ls -lhtcr'    # Sort by/show change time,most recent last
 # alias lk='ls -lhrS'     # Sort by size, biggest last

@@ -8,10 +8,7 @@ case $- in
       *) return;;
 esac
 
-# bashrc directory
 DOTFILES_DIR="${HOME}/repos/dotfiles"
-BASHRC_DIR="${DOTFILES_DIR}/bashrc"
-SERVER_BASHRC_DIR="${BASHRC_DIR}/server"
 
 # Cmdhist
 shopt -s cmdhist
@@ -27,14 +24,14 @@ shopt -s histappend
 # match all files and zero or more directories and subdirectories.
 shopt -s globstar
 
-# Set the editor
+# set the editor
 if command -v "vim" >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
-# Force the localization
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
+# force the localization
+# export LANG="en_US.UTF-8"
+# export LC_ALL="en_US.UTF-8"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -48,7 +45,7 @@ export HISTIGNORE="&:[ ]*:ls:ll:cd:cd ~:clear:exit"
 # Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# Set variable identifying the chroot you work in (used in the prompt below)
+# Set variable identifying the chroot you workserverin (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
@@ -62,7 +59,6 @@ esac
 # off by default to not distract the user: the focus in a terminal window
 # should be on the output of commands, not on the prompt
 #force_color_prompt=yes
-
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
 	   ## We have color support; assume it's compliant with Ecma-48
@@ -74,6 +70,7 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
+# Set the terminal prompt
 if [ "$color_prompt" = yes ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
@@ -90,14 +87,35 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
-# Load functions
-if [ -f "${SERVER_BASHRC_DIR}/functions.sh" ]; then
-    . "${SERVER_BASHRC_DIR}/functions.sh"
+# Load aliases
+if [ -f "${DOTFILES_DIR}/shell/linux/aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/linux/aliases.sh"
 fi
 
-# Load aliases
-if [ -f "${SERVER_BASHRC_DIR}/aliases.sh" ]; then
-    . "${SERVER_BASHRC_DIR}/aliases.sh"
+# Load functions
+if [ -f "${DOTFILES_DIR}/shell/linux/functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/linux/functions.sh"
+fi
+
+# Enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# Load custom bash completeions
+if [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
+    . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
+fi
+
+# Enable Git bash compleation
+if [ -r "/usr/share/bash-completion/completions/git" ]; then
+    . "/usr/share/bash-completion/completions/git"
 fi
 
 # Bash-Git-Prompt
@@ -109,17 +127,38 @@ fi
 
 # .fzf command line fuzzy finder
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+eval "$(fzf --bash)"
 
-# Enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-    if [ -f "/usr/share/bash-completion/bash_completion" ]; then
-        . "/usr/share/bash-completion/bash_completion"
-    elif [ -f "/etc/bash_completion" ]; then
-        . "/etc/bash_completion"
-    fi
+# Node version manager
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 fi
 
-unset DOTFILES_DIR BASHRC_DIR SERVER_BASHRC_DIR
+# Bun
+if [ -r "${HOME}/.bun" ]; then
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
+fi
+
+# Andriod
+if [ -d "${HOME}/Android/Sdk" ]; then
+    export ANDROID_HOME="${HOME}/Android/Sdk"
+    export PATH="${PATH}:${ANDROID_HOME}/emulator"
+    export PATH="${PATH}:${ANDROID_HOME}/tools"
+    export PATH="${PATH}:${ANDROID_HOME}/tools/bin"
+    export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+fi
+
+# Go
+if [ -d "/usr/local/go/bin" ] && [[ ! "$PATH" =~ (^|:)"/usr/local/go/bin"(:|$) ]]; then
+    PATH="${PATH}:/usr/local/go/bin"
+fi
+
+# Rust
+if [ -f "${HOME}/.cargo/env" ]; then
+    . "${HOME}/.cargo/env"
+fi
+
+unset DOTFILES_DIR BASHRC_DIR

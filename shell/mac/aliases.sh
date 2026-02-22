@@ -1,15 +1,15 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Mac Aliases
+# macOS workstation aliases
 
-# Import the global aliases
-if [ -f "${BASHRC_DIR}/shared/aliases.sh" ]; then
-    . "${BASHRC_DIR}/shared/aliases.sh"
+DOTFILES_DIR="${DOTFILES_DIR:-"${HOME}/repos/dotfiles"}"
+
+if [ -f "${DOTFILES_DIR}/shell/aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/aliases.sh"
 fi
 
-# Import the development aliases
-if [ -f "${BASHRC_DIR}/shared/dev_aliases.sh" ]; then
-    . "${BASHRC_DIR}/shared/dev_aliases.sh"
+if [ -f "${DOTFILES_DIR}/shell/dev_aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/dev_aliases.sh"
 fi
 
 # Flush dns cache

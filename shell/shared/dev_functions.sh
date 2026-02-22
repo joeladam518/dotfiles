@@ -1,6 +1,6 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Shared development functions
+# Shared development functions — sourced by both bash and zsh
 
 __git_delete_dead_local_branches_not_on_remote()
 {
@@ -23,7 +23,7 @@ repo()
 {
     # Lets you have aliases for your repos so you can quickly cd into them.
     # The function relies on a .repo-aliases file in your home directory.
-    # It has to be a bash function because you wouldn't be able to cd
+    # It has to be a shell function because you wouldn't be able to cd
     # otherwise.
     #
     # Usage: repo [-l] {REPO_NAME}

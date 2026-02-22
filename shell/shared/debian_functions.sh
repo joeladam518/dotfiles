@@ -1,12 +1,12 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Shared desktop/server functions
+# Shared desktop/server functions — sourced by both bash and zsh
 
 auu()
 {
     # Update your computer
 
-    if [ "$EUID" -eq "0" ]; then
+    if [ "$(id -u)" -eq "0" ]; then
         #apt update && apt upgrade -y && apt autoremove -y
         apt-get update && apt-get upgrade -y
     else

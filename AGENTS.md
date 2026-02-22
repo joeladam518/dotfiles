@@ -4,16 +4,24 @@ This file provides guidance to AI Agents when working with code in this reposito
 
 ## What This Is
 
-A personal dotfiles repository containing shell configurations, editor settings, terminal configs, and utility scripts. Installed via symlinks to support three system types: `desktop`, `mac`, and `server`.
+A personal dotfiles repository containing shell configurations, editor settings, terminal configs, and utility scripts. Installed via symlinks to support three system types: `linux`, `mac`, and `server`.
 
 ## Installation
 
+The install script is self-bootstrapping — it clones the repo to `~/repos/dotfiles` if not already present, then re-execs from there.
+
 ```shell
-sudo ./install.sh {desktop|mac|server}
-sudo ./uninstall.sh {desktop|mac|server}
+bash <(curl -fsSL https://raw.githubusercontent.com/joeladam518/dotfiles/master/install.sh) [--bash|--zsh] [-e {linux|mac|server}]
 ```
 
-The install script symlinks bashrc, vimrc, vim plugins, and tmux config into `$HOME`. Git config is copied (not symlinked) for desktop/mac only. Existing `.bashrc` is preserved as `.bashrc.old`.
+Or manually:
+
+```shell
+./install.sh [--bash|--zsh] [-e {linux|mac|server}]
+./uninstall.sh [--bash|--zsh] [-e {linux|mac|server}]
+```
+
+The environment (`linux`, `mac`, `server`) is detected automatically via `uname` and `systemctl get-default`. Use `-e`/`--env` to override. Shell defaults to bash; pass `--zsh` for zsh. The install script symlinks the rc file, vimrc, vim plugins, and tmux config into `$HOME`. Git config is copied (not symlinked) for linux/mac only. Existing rc files are preserved as `.bashrc.old` / `.zshrc.old`. Re-running install on a machine with a stale symlink (e.g. from an old `bashrc/` path) will automatically update it to the new `shell/` location.
 
 ## Linting
 
@@ -25,13 +33,22 @@ There are no automated tests in this repository.
 
 ## Architecture
 
-### Bash Configuration (`bashrc/`)
+### Shell Configuration (`shell/`)
 
-Platform-specific entry points source shared components:
+Platform-specific entry points source shared components. Both bash and zsh configs live together per platform:
 
-- `bashrc/{desktop,server}/.bashrc` or `bashrc/mac/.bash_profile` — platform entry points
-- `bashrc/shared/` — common aliases, functions, dev aliases, dev functions, debian aliases, debian functions
-- Each platform directory also has its own `.bash_aliases` and `.bash_functions`
+```
+shell/
+├── linux/     — .bashrc, .zshrc, aliases.sh, functions.sh
+├── mac/       — .bash_profile, .zshrc, aliases.sh, functions.sh
+├── server/    — .bashrc, aliases.sh, functions.sh
+└── shared/    — aliases.sh, functions.sh, dev_aliases.sh, dev_functions.sh,
+                 debian_aliases.sh, debian_functions.sh
+```
+
+- `shell/{linux,server}/.bashrc` or `shell/mac/.bash_profile` — bash entry points
+- `shell/{linux,mac}/.zshrc` — zsh entry points (oh-my-zsh)
+- `shell/shared/` — common aliases and functions sourced by all platforms and both shells
 
 ### Python CLI (`python/dotfiles/`)
 

@@ -1,17 +1,20 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Shared aliases
+# Shared aliases — sourced by both bash and zsh
 
 # Directory navigation aliases
-# change to parent directory, even when you forget the space.
-alias cd..='cd ..' 
+alias cd..='cd ..'
 alias ..='cd ..'
 #alias ...='cd ../..'
 #alias ....='cd ../../..'
 #alias .....='cd ../../../..'
 
-# Reload shell
-alias reload-bashrc='source ~/.bashrc;'
+# Reload shell config
+if [ -n "$ZSH_VERSION" ]; then
+    alias reload-zshrc='source ~/.zshrc;'
+elif [ -n "$BASH_VERSION" ]; then
+    alias reload-bashrc='source ~/.bashrc;'
+fi
 alias reload-shell='exec ${SHELL}; echo "shell reloaded";'
 
 # Osinfo

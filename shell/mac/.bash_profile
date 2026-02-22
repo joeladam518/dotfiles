@@ -2,9 +2,7 @@
 # shellcheck shell=bash
 # ~/.bash_profile: executed by bash(1) for non-login shells on mac
 
-DOTFILES_DIR="${HOME}/repos/dotfiles"
-BASHRC_DIR="${DOTFILES_DIR}/bashrc"
-MAC_BASHRC_DIR="${BASHRC_DIR}/mac"
+DOTFILES_DIR="$HOME/repos/dotfiles"
 HOMEBREW_DIR="/opt/homebrew"
 
 # Check the window size after each command and, if necessary,
@@ -63,14 +61,14 @@ if [ -d "${HOMEBREW_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOMEBREW_DIR}/bin"(:|
     export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 fi
 
-# Load functions
-if [ -f "${MAC_BASHRC_DIR}/functions.sh" ]; then
-    . "${MAC_BASHRC_DIR}/functions.sh"
+# Load aliases
+if [ -f "${DOTFILES_DIR}/shell/mac_aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/mac_aliases.sh"
 fi
 
-# Load aliases
-if [ -f "${MAC_BASHRC_DIR}/aliases.sh" ]; then
-    . "${MAC_BASHRC_DIR}/aliases.sh"
+# Load functions
+if [ -f "${DOTFILES_DIR}/shell/mac_functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/mac_functions.sh"
 fi
 
 # Enable programmable completion features (you don't need to enable
@@ -93,12 +91,12 @@ fi
 # bash-git-prompt
 if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
-    source "$HOME/.bash-git-prompt/gitprompt.sh"
+    . "$HOME/.bash-git-prompt/gitprompt.sh"
 fi
 
 # .fzf command line fuzzy finder
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+eval "$(fzf --bash)"
 
 # Java
 if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
@@ -145,7 +143,7 @@ fi
 
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-source "${HOME}/.docker/init-bash.sh" || true # Added by Docker Desktop
+[ -f "$HOME/.docker/init-bash.sh" ] && . "${HOME}/.docker/init-bash.sh"
 
 # Unset any variables that were used in this script
-unset DOTFILES_DIR BASHRC_DIR MAC_BASHRC_DIR HOMEBREW_DIR
+unset DOTFILES_DIR HOMEBREW_DIR

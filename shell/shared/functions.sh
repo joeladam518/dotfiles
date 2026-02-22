@@ -1,6 +1,6 @@
 # -*- shell-script -*-
 # shellcheck shell=bash
-# Shared functions
+# Shared functions — sourced by both bash and zsh
 
 confirm()
 {
@@ -9,7 +9,13 @@ confirm()
     local CONFIRM_PROMPT CONFIRM_ANSWER CONFIRM_RESPONSE
 
     CONFIRM_PROMPT="$(cmsg -g "$* ")"
-    read -er -t 10 -p "$CONFIRM_PROMPT" CONFIRM_ANSWER
+
+    if [ -n "$ZSH_VERSION" ]; then
+        # zsh read syntax: read -r -t TIMEOUT "VARNAME?PROMPT"
+        read -r -t 10 "CONFIRM_ANSWER?${CONFIRM_PROMPT}"
+    else
+        read -er -t 10 -p "$CONFIRM_PROMPT" CONFIRM_ANSWER
+    fi
 
     for CONFIRM_RESPONSE in y Y yes Yes YES sure Sure SURE ok Ok OK
     do

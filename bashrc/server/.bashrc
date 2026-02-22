@@ -91,13 +91,13 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
 fi
 
 # Load functions
-if [ -f "${SERVER_BASHRC_DIR}/.bash_functions" ]; then
-    . "${SERVER_BASHRC_DIR}/.bash_functions"
+if [ -f "${SERVER_BASHRC_DIR}/functions.sh" ]; then
+    . "${SERVER_BASHRC_DIR}/functions.sh"
 fi
 
 # Load aliases
-if [ -f "${SERVER_BASHRC_DIR}/.bash_aliases" ]; then
-    . "${SERVER_BASHRC_DIR}/.bash_aliases"
+if [ -f "${SERVER_BASHRC_DIR}/aliases.sh" ]; then
+    . "${SERVER_BASHRC_DIR}/aliases.sh"
 fi
 
 # Bash-Git-Prompt

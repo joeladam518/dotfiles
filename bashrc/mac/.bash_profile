@@ -63,14 +63,14 @@ if [ -d "${HOMEBREW_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOMEBREW_DIR}/bin"(:|
     export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 fi
 
-# Load functions file
-if [ -f "${MAC_BASHRC_DIR}/.bash_functions" ]; then
-    . "${MAC_BASHRC_DIR}/.bash_functions"
+# Load functions
+if [ -f "${MAC_BASHRC_DIR}/functions.sh" ]; then
+    . "${MAC_BASHRC_DIR}/functions.sh"
 fi
 
-# Load alias definitions
-if [ -f "${MAC_BASHRC_DIR}/.bash_aliases" ]; then
-    . "${MAC_BASHRC_DIR}/.bash_aliases"
+# Load aliases
+if [ -f "${MAC_BASHRC_DIR}/aliases.sh" ]; then
+    . "${MAC_BASHRC_DIR}/aliases.sh"
 fi
 
 # Enable programmable completion features (you don't need to enable
@@ -119,7 +119,9 @@ fi
 # if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
 #     export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
 # fi
-eval "$(rbenv init - bash)"
+if command -v rbenv > /dev/null; then
+    eval "$(rbenv init - bash)"
+fi
 
 # Node version manager
 if [ -d "${HOME}/.nvm" ]; then
@@ -141,7 +143,7 @@ if [ -d "${HOME}/tizen-studio" ]; then
     export PATH="${PATH}:${HOME}/tizen-studio/tools/ide/bin"
 fi
 
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 source "${HOME}/.docker/init-bash.sh" || true # Added by Docker Desktop
 

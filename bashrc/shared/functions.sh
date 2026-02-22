@@ -73,55 +73,59 @@ tmux()
 
 zipthis()
 {
-    local CWD PATH DIR_NAME PARENT_DIR PATH_TO_DIR
+    local CWD INPUT_PATH DIR_NAME PARENT_DIR PATH_TO_DIR RESULT
 
     CWD="$(pwd -P)"
-    PATH="${1:-""}"
+    INPUT_PATH="${1:-""}"
 
-    if [ -z "$PATH" ]; then
-        echo "Usage: $0 <path-to-dir>"
+    # ensure the user provided a path to zip
+    if [ -z "$INPUT_PATH" ]; then
+        echo "Usage: zipthis <path-to-dir>"
         return 1
     fi
 
-    if [ ! -r "$PATH" ]; then
+    # ensure the provided path is readable
+    if [ ! -r "$INPUT_PATH" ]; then
         echo "Not readable" 1>&2
         return 1
     fi
 
-    if [ -f "$PATH" ]; then
+    # if its a single file, zip it and return the result
+    if [ -f "$INPUT_PATH" ]; then
         zip -r "${1%%/}.zip" "$1"
-        return "$?"
+        RESULT=$?
+        cd "$CWD" || return 1
+        return "$RESULT"
     fi
 
-    if [ -d "$PATH" ]; then
-        DIR_NAME="$(basename "$PATH_TO_DIR")"
-        PARENT_DIR="$(cd "$(dirname "$DIR")" > /dev/null 2>&1 && pwd -P)"
+    # if its a directory, zip it. By default the directory itself is included so
+    # that extracting produces the directory. Pass --contents to zip only the
+    # contents without the enclosing directory.
+    if [ -d "$INPUT_PATH" ]; then
+        DIR_NAME="$(basename "$INPUT_PATH")"
+        PARENT_DIR="$(cd "$(dirname "$INPUT_PATH")" > /dev/null 2>&1 && pwd -P)"
         PATH_TO_DIR="${PARENT_DIR%%/}/${DIR_NAME%%/}"
 
-        echo "CWD: $CWD"
-        echo "DIR: $DIR"
-        echo "DIR_NAME: $DIR_NAME"
-        echo "PARENT_DIR: $PARENT_DIR"
-        echo "PATH_TO_DIR: $PATH_TO_DIR"
-
-        if [ -z "$PATH_TO_DIR" ]; then
-            echo "Usage: $0 <path-to-dir>"
+        if [ -z "$PATH_TO_DIR" ] || [ ! -d "$PATH_TO_DIR" ]; then
+            echo "Usage: zipthis <path> [--contents]"
             return 1
         fi
 
-        if [ ! -d "$PATH_TO_DIR" ]; then
-            echo "Usage: $0 <path-to-dir>"
-            return 1
+        if [ "${2:-}" = "--contents" ]; then
+            cd "$PATH_TO_DIR" || return 1
+            zip -r "${CWD}/${DIR_NAME}.zip" .
+        else
+            cd "$PARENT_DIR" || return 1
+            zip -r "${CWD}/${DIR_NAME}.zip" "${DIR_NAME}"
         fi
 
-        cd "$PATH_TO_DIR" || return 1
-        zip -r "${CWD}/${DIR_NAME}.zip" *
-
-        return "$?"
+        RESULT=$?
+        cd "$CWD" || return 1
+        return "$RESULT"
     fi
 
-
-    echo "Error: can not zip $PATH" 1>&2
+    # if we get here, the provided path is not a file or directory, so we can't zip it
+    echo "Error: can not zip \"$INPUT_PATH\" it's not a file or directory" 1>&2
     return 1
 }
 

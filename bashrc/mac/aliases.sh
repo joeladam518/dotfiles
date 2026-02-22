@@ -3,13 +3,13 @@
 # Mac Aliases
 
 # Import the global aliases
-if [ -f "${BASHRC_DIR}/shared/.bash_aliases" ]; then
-    . "${BASHRC_DIR}/shared/.bash_aliases"
+if [ -f "${BASHRC_DIR}/shared/aliases.sh" ]; then
+    . "${BASHRC_DIR}/shared/aliases.sh"
 fi
 
 # Import the development aliases
-if [ -f "${BASHRC_DIR}/shared/.bash_dev_aliases" ]; then
-    . "${BASHRC_DIR}/shared/.bash_dev_aliases"
+if [ -f "${BASHRC_DIR}/shared/dev_aliases.sh" ]; then
+    . "${BASHRC_DIR}/shared/dev_aliases.sh"
 fi
 
 # Flush dns cache
@@ -22,9 +22,9 @@ alias ll='ls -aFl'
 
 # fzf aliases - checks to see if the command exists before adding the alias
 if command -v code > /dev/null; then
-    alias codeit='code $(fzf -m);'
+    alias codeit='code "$(fzf -m)";'
 fi
 
 if command -v open > /dev/null; then
-    alias openit='open $(fzf -m);'
+    alias openit='open "$(fzf -m)";'
 fi

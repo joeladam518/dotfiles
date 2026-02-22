@@ -21,7 +21,7 @@ alias osinfo='dotfiles osinfo'
 alias clear='clear;pwd;'
 
 # Alias for fuzzy finder
-alias vimit='vim $(fzf -m);'
+alias vimit='vim "$(fzf -m)";'
 
 # Use htop instead of top
 if command -v htop > /dev/null; then

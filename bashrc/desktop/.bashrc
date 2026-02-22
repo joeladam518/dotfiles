@@ -90,13 +90,13 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
 fi
 
 # Load functions
-if [ -f "${DESKTOP_BASHRC_DIR}/.bash_functions" ]; then
-    . "${DESKTOP_BASHRC_DIR}/.bash_functions"
+if [ -f "${DESKTOP_BASHRC_DIR}/functions.sh" ]; then
+    . "${DESKTOP_BASHRC_DIR}/functions.sh"
 fi
 
 # Load aliases
-if [ -f "${DESKTOP_BASHRC_DIR}/.bash_aliases" ]; then
-    . "${DESKTOP_BASHRC_DIR}/.bash_aliases"
+if [ -f "${DESKTOP_BASHRC_DIR}/aliases.sh" ]; then
+    . "${DESKTOP_BASHRC_DIR}/aliases.sh"
 fi
 
 # Enable programmable completion features (you don't need to enable

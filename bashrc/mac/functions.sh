@@ -3,13 +3,13 @@
 # Mac Functions
 
 # Import the global bash functions
-if [ -f "${BASHRC_DIR}/shared/.bash_functions" ]; then
-    . "${BASHRC_DIR}/shared/.bash_functions"
+if [ -f "${BASHRC_DIR}/shared/functions.sh" ]; then
+    . "${BASHRC_DIR}/shared/functions.sh"
 fi
 
 # Import the shared dev functions
-if [ -f "${BASHRC_DIR}/shared/.bash_dev_functions" ]; then
-    . "${BASHRC_DIR}/shared/.bash_dev_functions"
+if [ -f "${BASHRC_DIR}/shared/dev_functions.sh" ]; then
+    . "${BASHRC_DIR}/shared/dev_functions.sh"
 fi
 
 # Helps you swap the env and build for development

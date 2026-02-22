@@ -73,10 +73,56 @@ tmux()
 
 zipthis()
 {
-    # Create a ZIP archive of a file or folder
+    local CWD PATH DIR_NAME PARENT_DIR PATH_TO_DIR
 
-    zip -r "${1%%/}.zip" "$1"
-    return "$?"
+    CWD="$(pwd -P)"
+    PATH="${1:-""}"
+
+    if [ -z "$PATH" ]; then
+        echo "Usage: $0 <path-to-dir>"
+        return 1
+    fi
+
+    if [ ! -r "$PATH" ]; then
+        echo "Not readable" 1>&2
+        return 1
+    fi
+
+    if [ -f "$PATH" ]; then
+        zip -r "${1%%/}.zip" "$1"
+        return "$?"
+    fi
+
+    if [ -d "$PATH" ]; then
+        DIR_NAME="$(basename "$PATH_TO_DIR")"
+        PARENT_DIR="$(cd "$(dirname "$DIR")" > /dev/null 2>&1 && pwd -P)"
+        PATH_TO_DIR="${PARENT_DIR%%/}/${DIR_NAME%%/}"
+
+        echo "CWD: $CWD"
+        echo "DIR: $DIR"
+        echo "DIR_NAME: $DIR_NAME"
+        echo "PARENT_DIR: $PARENT_DIR"
+        echo "PATH_TO_DIR: $PATH_TO_DIR"
+
+        if [ -z "$PATH_TO_DIR" ]; then
+            echo "Usage: $0 <path-to-dir>"
+            return 1
+        fi
+
+        if [ ! -d "$PATH_TO_DIR" ]; then
+            echo "Usage: $0 <path-to-dir>"
+            return 1
+        fi
+
+        cd "$PATH_TO_DIR" || return 1
+        zip -r "${CWD}/${DIR_NAME}.zip" *
+
+        return "$?"
+    fi
+
+
+    echo "Error: can not zip $PATH" 1>&2
+    return 1
 }
 
 printcsv()

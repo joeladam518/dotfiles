@@ -31,24 +31,31 @@ repo()
     # Options:
     # -l, --list  List the aliases
 
-    local REPO_ALIAS REPO_PATH
+    local USAGE INPUT REPO_PATH
 
-    REPO_ALIAS="${1:-""}"
-    if [ -z "${REPO_ALIAS}" ]; then
-        cmsg -r "Invalid alias ''" 1>&2
+    USAGE="Usage: repo [-h] [-l] {REPO_NAME}"
+    INPUT="${1:-""}"
+
+    if [ "$INPUT" = "-h" ] || [ "$INPUT" = "--help" ] || [ "$INPUT" = "help" ]; then
+        cmsg "$USAGE"
+        return 0
+    fi
+
+    if [ -z "$INPUT" ]; then
+        cmsg "$USAGE" 1>&2
         return 1
     fi
 
-    if [ "$REPO_ALIAS" = "-l" ] || [ "$REPO_ALIAS" = "--list" ]; then
+    if [ "$INPUT" = "-l" ] || [ "$INPUT" = "--list" ]; then
         cmsg -d "Available repos"
         dotfiles repos --list-keys
         return 0
     fi
 
-    REPO_PATH="$(dotfiles repos "${REPO_ALIAS}")"
+    REPO_PATH="$(dotfiles repos "${INPUT}")"
 
     if [ -z "$REPO_PATH" ]; then
-        cmsg -r "Invalid alias '${REPO_ALIAS}'" 1>&2
+        cmsg -r "Invalid alias '${INPUT}'" 1>&2
         return 1
     fi
 

@@ -173,6 +173,19 @@ fi
 
 cd "$HOME" || exit 1
 
+# Remove the other shell's rc symlink if it points into our dotfiles.
+# This ensures switching shells (e.g. --bash → --zsh) is a clean swap.
+if [ "$shell_type" = "zsh" ]; then
+    other_rcfile="$( [ "$env" = "mac" ] && echo ".bash_profile" || echo ".bashrc" )"
+else
+    other_rcfile=".zshrc"
+fi
+if [ -L "${HOME}/${other_rcfile}" ] && \
+   [[ "$(readlink "${HOME}/${other_rcfile}")" == "${DOTFILES_DIR}/shell/"* ]]; then
+    rm "${HOME}/${other_rcfile}"
+    cmsg -c "Removed old ${other_rcfile} symlink"
+fi
+
 # Link the rc file (replaces stale symlinks from old bashrc/ or zshrc/ paths)
 symlink_rc "$rc_src" "${HOME}/${rcfile}"
 

@@ -41,6 +41,11 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+# Load custom zsh completions
+if [ -d "${DOTFILES_DIR}/zsh-completion" ]; then
+    fpath=(${DOTFILES_DIR}/zsh-completion $fpath)
+fi
+
 # Oh-my-zsh
 export ZSH="${HOME}/.oh-my-zsh"
 ZSH_THEME="robbyrussell"

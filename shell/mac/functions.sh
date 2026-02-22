@@ -4,12 +4,12 @@
 
 DOTFILES_DIR="${DOTFILES_DIR:-"${HOME}/repos/dotfiles"}"
 
-if [ -f "${DOTFILES_DIR}/shell/functions.sh" ]; then
-    . "${DOTFILES_DIR}/shell/functions.sh"
+if [ -f "${DOTFILES_DIR}/shell/shared/functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/shared/functions.sh"
 fi
 
-if [ -f "${DOTFILES_DIR}/shell/dev_functions.sh" ]; then
-    . "${DOTFILES_DIR}/shell/dev_functions.sh"
+if [ -f "${DOTFILES_DIR}/shell/shared/dev_functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/shared/dev_functions.sh"
 fi
 
 # Helps you swap the env and build for development
@@ -92,7 +92,7 @@ Arguments:
        return 1
     fi
 
-    if [ "$swap_env" == 1 ]; then
+    if [ "$swap_env" = 1 ]; then
         if [ ! -f "./.github/public/${theme}/alpha.env" ]; then
             cmsg -r "\"./.github/public/${theme}/alpha.env\" does not exist" 1>&2
             return 1
@@ -118,11 +118,11 @@ Arguments:
         cmsg -g "Swapped .env file for ${theme}" 1>&2
     fi
 
-    if [ "$build_theme" == 1 ]; then
+    if [ "$build_theme" = 1 ]; then
         if ! yarn run "theme:${theme}"; then
             return 1
         fi
-    elif [ "$run_dev" == 1 ]; then
+    elif [ "$run_dev" = 1 ]; then
         if ! yarn run "dev:${theme}"; then
             return 1
         fi
@@ -132,4 +132,3 @@ Arguments:
 
     return 0
 }
-

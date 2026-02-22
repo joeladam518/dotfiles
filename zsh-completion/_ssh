@@ -1,0 +1,10 @@
+#compdef ssh
+# zsh completions for ssh (from ~/.ssh/config)
+
+if [[ ! -f "${HOME}/.ssh/config" || ! -r "${HOME}/.ssh/config" ]]; then
+    return 1
+fi
+
+local -a opts
+opts=( $(grep '^Host' ~/.ssh/config 2>/dev/null | grep -v '[?*]' | cut -d ' ' -f 2-) )
+compadd -a opts

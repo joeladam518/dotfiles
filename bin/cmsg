@@ -102,14 +102,14 @@ shift $((OPTIND - 1))
 INPUT="$*"
 
 # add -n flag if no new line
-if [ "$NO_NEWLINE" == "1" ]; then
+if [ "$NO_NEWLINE" = "1" ]; then
     CMD="${CMD}n"
 fi
 
 # output the message in color!
 if [ -n "$COLOR" ]; then
     $CMD "\033[${IS_BOLD};${COLOR}m${INPUT}${RESET}"
-elif [ "$IS_BOLD" == "1" ]; then
+elif [ "$IS_BOLD" = "1" ]; then
     $CMD "${BOLD}${INPUT}${RESET}"
 else
     $CMD "$INPUT"

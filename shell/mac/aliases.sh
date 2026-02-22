@@ -4,12 +4,12 @@
 
 DOTFILES_DIR="${DOTFILES_DIR:-"${HOME}/repos/dotfiles"}"
 
-if [ -f "${DOTFILES_DIR}/shell/aliases.sh" ]; then
-    . "${DOTFILES_DIR}/shell/aliases.sh"
+if [ -f "${DOTFILES_DIR}/shell/shared/aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/shared/aliases.sh"
 fi
 
-if [ -f "${DOTFILES_DIR}/shell/dev_aliases.sh" ]; then
-    . "${DOTFILES_DIR}/shell/dev_aliases.sh"
+if [ -f "${DOTFILES_DIR}/shell/shared/dev_aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/shared/dev_aliases.sh"
 fi
 
 # Flush dns cache

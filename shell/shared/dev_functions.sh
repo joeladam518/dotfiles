@@ -39,7 +39,7 @@ repo()
         return 1
     fi
 
-    if [ "$REPO_ALIAS" == "-l" ] || [ "$REPO_ALIAS" == "--list" ]; then
+    if [ "$REPO_ALIAS" = "-l" ] || [ "$REPO_ALIAS" = "--list" ]; then
         cmsg -d "Available repos"
         dotfiles repos --list-keys
         return 0

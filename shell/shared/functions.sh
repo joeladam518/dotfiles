@@ -19,7 +19,7 @@ confirm()
 
     for CONFIRM_RESPONSE in y Y yes Yes YES sure Sure SURE ok Ok OK
     do
-        if [ "_${CONFIRM_ANSWER}" == "_${CONFIRM_RESPONSE}" ]; then
+        if [ "_${CONFIRM_ANSWER}" = "_${CONFIRM_RESPONSE}" ]; then
             return 0
         fi
     done
@@ -141,12 +141,12 @@ printcsv()
     local csv_path="$1"
     shift
 
-    if [ "$1" == "--headers" ]; then
+    if [ "$1" = "--headers" ]; then
         has_headers="1"
         shift
     fi
 
-    if [ "$has_headers" == "1" ]; then
+    if [ "$has_headers" = "1" ]; then
         tail -n+2 "$csv_path" | column -t -s "," -N "$(head -n 1 "$csv_path")" "$@"
     else
         column -s, -t "$@" < "$csv_path"

@@ -26,7 +26,7 @@ showdns()
         NAMESERVER="$(cat /etc/resolv.conf | grep 'nameserver' | head -1 |cut -d' ' -f2)"
     fi
 
-    if [ -z "$NAMESERVER" ] || [ "$NAMESERVER" == "127.0.0.53" ]; then
+    if [ -z "$NAMESERVER" ] || [ "$NAMESERVER" = "127.0.0.53" ]; then
         NAMESERVER="$(ip route | grep default | cut -d' ' -f3)"
     fi
 

@@ -62,13 +62,13 @@ if [ -d "${HOMEBREW_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${HOMEBREW_DIR}/bin"(:|
 fi
 
 # Load aliases
-if [ -f "${DOTFILES_DIR}/shell/mac_aliases.sh" ]; then
-    . "${DOTFILES_DIR}/shell/mac_aliases.sh"
+if [ -f "${DOTFILES_DIR}/shell/mac/aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/mac/aliases.sh"
 fi
 
 # Load functions
-if [ -f "${DOTFILES_DIR}/shell/mac_functions.sh" ]; then
-    . "${DOTFILES_DIR}/shell/mac_functions.sh"
+if [ -f "${DOTFILES_DIR}/shell/mac/functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/mac/functions.sh"
 fi
 
 # Enable programmable completion features (you don't need to enable
@@ -96,7 +96,7 @@ fi
 
 # .fzf command line fuzzy finder
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-eval "$(fzf --bash)"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Java
 if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
@@ -113,12 +113,8 @@ if [ -d "${HOME}/Library/Android/sdk" ]; then
     export PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 fi
 
-# ruby
-# if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
-#     export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
-# fi
 if command -v rbenv > /dev/null; then
-    eval "$(rbenv init - bash)"
+    eval "$(rbenv init -)"
 fi
 
 # Node version manager
@@ -128,10 +124,6 @@ if [ -d "${HOME}/.nvm" ]; then
     [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
 fi
 
-# yarn
-# if [ -d "${HOME}/.yarn/bin" ]; then
-#     export PATH="${PATH}:${HOME}/.yarn/bin"
-# fi
 if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
     export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
 fi

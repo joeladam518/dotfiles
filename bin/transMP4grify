@@ -23,7 +23,7 @@ confirm() {
     read -er -t 10 -p "$prompt" answer
     for response in y Y yes Yes YES sure Sure SURE ok Ok OK
     do
-        if [ "_$answer" == "_$response" ]; then
+        if [ "_$answer" = "_$response" ]; then
             return 0
         fi
     done
@@ -103,8 +103,8 @@ do
     filename_without_extension="${filename%.*}"
     converted_filename="${filename_without_extension}.mp4"
 
-    if [ "$dont_confirm" == "1" ] || confirm "Convert ${filename} to ${converted_filename}? (yes/No):\n> "; then
-        if [ "$include_audio" == "1" ]; then
+    if [ "$dont_confirm" = "1" ] || confirm "Convert ${filename} to ${converted_filename}? (yes/No):\n> "; then
+        if [ "$include_audio" = "1" ]; then
             ffmpeg -i "${directory}/${filename}" "${directory}/${converted_filename}"
         else
             ffmpeg -i "${directory}/${filename}" -an "${directory}/${converted_filename}"

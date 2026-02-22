@@ -1,0 +1,10 @@
+#compdef repo
+# zsh completions for the repo command
+
+if ! command -v dotfiles >/dev/null 2>&1; then
+    return 1
+fi
+
+local -a opts
+opts=( $(dotfiles repos --list-keys --sep=" ") )
+compadd -a opts

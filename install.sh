@@ -78,11 +78,11 @@ symlink_rc() {
 
     if [ -f "$dest" ] && [ ! -L "$dest" ]; then
         if [ -f "${dest}.old" ]; then
-            echo "Error: ${dest}.old already exists, aborting to avoid data loss" 1>&2
+            cmsg -r "Error: ${dest}.old already exists, aborting to avoid data loss" 1>&2
             exit 1
         fi
         mv "$dest" "${dest}.old"
-        cmsg -c "Backed up ${dest} → ${dest}.old"
+        cmsg -y "Backed up ${dest} → ${dest}.old"
     fi
 
     if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
@@ -96,7 +96,7 @@ symlink_rc() {
     fi
 
     ln -s "$src" "$dest"
-    cmsg -c "Linked: $(basename "$dest") → $src"
+    cmsg -g "Linked: $(basename "$dest") → $src"
 }
 
 # Parse options
@@ -117,14 +117,14 @@ while :; do
             ;;
         -e | --env)
             if [ -z "${2-}" ]; then
-                echo "Error: --env requires a value {linux|mac|server}" 1>&2
+                cmsg -r "Error: --env requires a value {linux|mac|server}" 1>&2
                 exit 1
             fi
             env_override="$2"
             shift
             ;;
         -?*)
-            echo "Unknown option: ${1}" 1>&2
+            cmsg -r "Unknown option: ${1}" 1>&2
             exit 1
             ;;
         *)
@@ -183,7 +183,7 @@ fi
 if [ -L "${HOME}/${other_rcfile}" ] && \
    [[ "$(readlink "${HOME}/${other_rcfile}")" == "${DOTFILES_DIR}/shell/"* ]]; then
     rm "${HOME}/${other_rcfile}"
-    cmsg -c "Removed old ${other_rcfile} symlink"
+    cmsg -g "Removed old ${other_rcfile} symlink"
 fi
 
 # Link the rc file (replaces stale symlinks from old bashrc/ or zshrc/ paths)

@@ -1,110 +1,123 @@
 import os
 import sys
+from argparse import ArgumentParser, Namespace, _SubParsersAction
 from collections import OrderedDict
 from configparser import ConfigParser
 
-from dotfiles.cli import Arguments, Command
-from dotfiles.errors import ValidationError
 from dotfiles import console
+from dotfiles.errors import ValidationError
+from dotfiles.paths import home_path
 
 SECTION_NAME = 'repos'
 
 
-class RepoCommand(Command):
-    """`dotfiles repos` command"""
-    name: str = 'repos'
-    command_name: str = 'repos'
-    description: str = 'Repo aliases'
-    help: str = 'repo aliases'
+def _get_repo_aliases(repos_directory: str, aliases_file: str) -> dict:
+    """Gets the repo aliases from the repo aliases file."""
+    aliases_config = {}
 
-    def __init__(
-        self,
-        key: str,
-        repos_directory: str,
-        aliases_file: str,
-        list_keys: bool,
-        list_paths: bool,
-        sep: str
-    ):
-        super().__init__()
-        self.key = key
-        self.repos_directory = repos_directory
-        self.aliases_file = aliases_file
-        self.list_keys = list_keys
-        self.list_paths = list_paths
-        self.sep = sep
+    try:
+        with open(aliases_file, 'r', encoding='utf-8') as file:
+            config_parser = ConfigParser()
+            config_parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
+            aliases_config = config_parser.items(SECTION_NAME)
+    except FileNotFoundError:
+        pass
 
-    @classmethod
-    def from_arguments(cls, arguments: Arguments = None) -> 'RepoCommand':
-        if arguments is None:
-            arguments = Arguments()
-        command: 'RepoCommand' = cls(
-            key=arguments.get('key', None),
-            repos_directory=arguments.get('directory_path', None),
-            aliases_file=arguments.get('file_path', None),
-            list_keys=arguments.get('list_keys', None),
-            list_paths=arguments.get('list_paths', None),
-            sep=arguments.get('sep', None),
-        )
-        command.shell_completion = arguments.get('completion', None)
-        return command
+    aliases = {key: os.path.expanduser(path) for (key, path) in aliases_config}
+    aliases_paths = list(aliases.values())
+    repos_directory_path = os.path.expanduser(repos_directory)
 
-    def get_sell_completion_string(self) -> str:
-        return ' '.join(self._get_repo_aliases().keys())
+    if os.path.exists(repos_directory_path) and os.path.isdir(repos_directory_path):
+        for f in os.scandir(repos_directory_path):
+            if not f.is_dir():
+                continue
 
-    def validate(self) -> None:
-        if not self.aliases_file:
-            raise ValidationError(self.name, 'Invalid repo aliases file path')
-        if not self.repos_directory:
-            raise ValidationError(self.name, 'Invalid repos directory path')
-        if self.list_keys and self.list_paths:
-            raise ValidationError(self.name, 'You can only one of "--list-keys" or "--list-paths" options')
-        if not self.sep:
-            raise ValidationError(self.name, 'Invalid sep')
+            path = os.path.abspath(f.path)
 
-    def _get_repo_aliases(self) -> dict:
-        """Gets the repo aliases from the repo aliases file."""
-        aliases_config = {}
+            if path not in aliases_paths:
+                aliases[f.name] = path
 
-        try:
-            with open(self.aliases_file, 'r', encoding='utf-8') as file:
-                config_parser = ConfigParser()
-                config_parser.read_string(f'[{SECTION_NAME}]\n' + file.read())
-                aliases_config = config_parser.items(SECTION_NAME)
-        except FileNotFoundError:
-            pass
+    return OrderedDict(sorted(aliases.items()))
 
-        aliases = {key: os.path.expanduser(path) for (key, path) in aliases_config}
-        aliases_paths = list(aliases.values())
-        repos_directory_path = os.path.expanduser(self.repos_directory)
 
-        if os.path.exists(repos_directory_path) and os.path.isdir(repos_directory_path):
-            for f in os.scandir(repos_directory_path):
-                if not f.is_dir():
-                    continue
+def _configure_parser(p: ArgumentParser) -> None:
+    """Add repos arguments to a parser or subparser"""
+    p.add_argument(
+        'key',
+        nargs='?',
+        type=str,
+        default=None,
+        help='get path by alias key'
+    )
+    p.add_argument(
+        '--repos-path',
+        type=str,
+        default=home_path('repos'),
+        help='the directory where your git repositories are located'
+    )
+    p.add_argument(
+        '--file-path',
+        type=str,
+        default=home_path('.repo-aliases'),
+        help='repo aliases file path'
+    )
+    p.add_argument(
+        '--list-keys',
+        action='store_true',
+        default=False,
+        help='list keys'
+    )
+    p.add_argument(
+        '--list-paths',
+        action='store_true',
+        default=False,
+        help='list paths'
+    )
+    p.add_argument(
+        '--sep',
+        type=str,
+        default="\n",
+        help='set the separator for listing keys and paths'
+    )
+    p.set_defaults(handler=cmd_repos)
 
-                path = os.path.abspath(f.path)
 
-                if path not in aliases_paths:
-                    aliases[f.name] = path
+def add_parser(subparsers: _SubParsersAction) -> ArgumentParser:
+    """Register the repos subcommand with a parent subparsers group"""
+    p = subparsers.add_parser(
+        'repos',
+        description='Repo aliases',
+        help='repo aliases',
+    )
+    _configure_parser(p)
+    return p
 
-        return OrderedDict(sorted(aliases.items()))
 
-    def _execute(self) -> None:
-        repo_aliases = self._get_repo_aliases()
+def cmd_repos(args: Namespace) -> None:
+    """Handle the `dotfiles repos` command"""
+    if not args.file_path:
+        raise ValidationError('repos', 'Invalid repo aliases file path')
+    if not args.repos_path:
+        raise ValidationError('repos', 'Invalid repos directory path')
+    if args.list_keys and args.list_paths:
+        raise ValidationError('repos', 'You can only use one of "--list-keys" or "--list-paths" options')
+    if not args.sep:
+        raise ValidationError('repos', 'Invalid sep')
 
-        if not repo_aliases:
-            sys.exit(console.SUCCESS)
+    repo_aliases = _get_repo_aliases(args.repos_path, args.file_path)
 
-        if self.key is not None:
-            if self.key not in repo_aliases:
-                sys.exit(console.FAILURE)
-            print(repo_aliases.get(self.key, ''))
-        elif self.list_paths:
-            print(*repo_aliases.values(), sep=self.sep.encode().decode('unicode-escape'))
-        elif self.list_keys:
-            print(*repo_aliases.keys(), sep=self.sep.encode().decode('unicode-escape'))
-        else:
-            length = max(len(x) for x in repo_aliases.keys())
-            for key, path in repo_aliases.items():
-                print(f'{key:{length}} {path}')
+    if not repo_aliases:
+        sys.exit(console.SUCCESS)
+
+    if args.key is not None:
+        if args.key not in repo_aliases:
+            sys.exit(console.FAILURE)
+        print(repo_aliases.get(args.key, ''))
+    elif args.list_paths:
+        print(*repo_aliases.values(), sep=args.sep.encode().decode('unicode-escape'))
+    elif args.list_keys:
+        print(*repo_aliases.keys(), sep=args.sep.encode().decode('unicode-escape'))
+    else:
+        length = max(len(x) for x in repo_aliases.keys())
+        for key, path in repo_aliases.items():
+            print(f'{key:{length}} {path}')

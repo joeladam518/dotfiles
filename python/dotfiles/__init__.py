@@ -2,7 +2,6 @@
 
 from dotfiles import osinfo
 from dotfiles.utils import installed, is_cmd_installed, is_pkg_installed
-from dotfiles.version import Version
 
 
 __all__ = [
@@ -10,5 +9,4 @@ __all__ = [
     'installed',
     'is_cmd_installed',
     'is_pkg_installed',
-    'Version'
 ]

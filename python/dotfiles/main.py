@@ -1,260 +1,120 @@
+import argparse
 import sys
-from argparse import ArgumentParser
-from collections import OrderedDict
-from typing import Dict, Tuple, Type
+from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter, PARSER
 
 from dotfiles import console
-from dotfiles.cli import Arguments, Command, HelpFormatter
-from dotfiles.composer import InstallComposerCommand, UninstallComposerCommand
-from dotfiles.errors import InvalidCommand, InvalidSubcommand, ValidationError
-from dotfiles.install import InstallCommand
-from dotfiles.osinfo import OsinfoCommand
-from dotfiles.paths import home_path
-from dotfiles.php import InstallPhpCommand, UninstallPhpCommand
-from dotfiles.repos import RepoCommand
-from dotfiles.uninstall import UninstallCommand
+from dotfiles.errors import ValidationError
+from dotfiles.osinfo import add_parser as _add_osinfo_parser
+from dotfiles.php import add_install_parser as _add_php_install_parser
+from dotfiles.php import add_uninstall_parser as _add_php_uninstall_parser
+from dotfiles.repos import _get_repo_aliases, add_parser as _add_repos_parser
 
 
-def _get_parsers() -> Tuple[ArgumentParser, Dict[str, ArgumentParser]]:
-    """Parse command line arguments"""
+class _HelpFormatter(RawDescriptionHelpFormatter):
+    """Custom help formatter that removes the default positional arguments header"""
+
+    def _format_action(self, action):
+        # noinspection PyProtectedMember
+        parts = super(RawDescriptionHelpFormatter, self)._format_action(action)
+        if action.nargs == PARSER:
+            parts = "\n".join(parts.split("\n")[1:])
+        return parts
+
+
+def _build_parser() -> ArgumentParser:
+    """Build the argument parser"""
     parser = ArgumentParser(
         prog='dotfiles',
         description='Helper commands',
-        formatter_class=HelpFormatter,
+        formatter_class=_HelpFormatter,
     )
     parser.add_argument(
         '--completion',
         action='store_true',
         default=False,
-        help='shell completion'
+        help=argparse.SUPPRESS,
     )
     subparsers = parser.add_subparsers(
         title='commands',
         dest='command',
-        required=False
     )
 
     # Command: `dotfiles osinfo`
-    info_parser = subparsers.add_parser(
-        OsinfoCommand.command_name,
-        description=OsinfoCommand.description,
-        help=OsinfoCommand.help,
-    )
-    info_parser.add_argument(
-        '-c',
-        '--codename',
-        action='store_true',
-        default=False,
-        help='get the codename'
-    )
-    info_parser.add_argument(
-        '-i',
-        '--id',
-        action='store_true',
-        default=False,
-        help='get the distro'
-    )
-    info_parser.add_argument(
-        '-l',
-        '--like',
-        action='store_true',
-        default=False,
-        help='get the distro that the current distro is like (for Linux)'
-    )
-    info_parser.add_argument(
-        '-p',
-        '--pretty',
-        action='store_true',
-        default=False,
-        help='get the pretty name'
-    )
-    info_parser.add_argument(
-        '-s',
-        '--simplified',
-        action='store_true',
-        default=False,
-        help='get the simplified os type (windows|mac|linux)'
-    )
-    info_parser.add_argument(
-        '-v',
-        '--version',
-        action='store_true',
-        default=False,
-        help='get the os version'
-    )
+    _add_osinfo_parser(subparsers)
 
     # Command: `dotfiles repos`
-    repo_parser = subparsers.add_parser(
-        RepoCommand.command_name,
-        description=RepoCommand.description,
-        help=RepoCommand.help,
-    )
-    repo_parser.add_argument(
-        'key',
-        nargs='?',
-        type=str,
-        action='store',
-        default=None,
-        help="get path by alias key"
-    )
-    repo_parser.add_argument(
-        '--directory-path',
-        type=str,
-        action='store',
-        default=home_path('repos'),
-        help="the directory where your git repositories are located"
-    )
-    repo_parser.add_argument(
-        '--file-path',
-        type=str,
-        action='store',
-        default=home_path('.repo-aliases'),
-        help="repo aliases file path"
-    )
-    repo_parser.add_argument(
-        '--list-keys',
-        action='store_true',
-        default=False,
-        help="list keys"
-    )
-    repo_parser.add_argument(
-        '--list-paths',
-        action='store_true',
-        default=False,
-        help="list paths"
-    )
-    repo_parser.add_argument(
-        '--sep',
-        type=str,
-        action='store',
-        default="\n",
-        help="set the separator for listing keys and paths"
-    )
+    _add_repos_parser(subparsers)
 
     # Command: `dotfiles install`
     install_parser = subparsers.add_parser(
-        InstallCommand.command_name,
-        description=InstallCommand.description,
-        help=InstallCommand.help,
-        formatter_class=HelpFormatter
+        'install',
+        description='Install something',
+        help='install somthing',
+        formatter_class=_HelpFormatter,
     )
     install_subparsers = install_parser.add_subparsers(
         title='commands',
         dest='subcommand',
-        required=False
-    )
-
-    # Command: `dotfiles install composer`
-    install_composer_parser = install_subparsers.add_parser(
-        InstallComposerCommand.command_name,
-        description=InstallComposerCommand.description,
-        help=InstallComposerCommand.help
     )
 
     # Command: `dotfiles install php`
-    install_php_parser = install_subparsers.add_parser(
-        InstallPhpCommand.command_name,
-        description=InstallPhpCommand.description,
-        help=InstallPhpCommand.help
-    )
-    install_php_parser.add_argument(
-        'version',
-        nargs='?',
-        type=str,
-        action='store',
-        default=None,
-        help='the php version to install'
-    )
-    install_php_parser.add_argument(
-        '-e',
-        '--env',
-        type=str,
-        action='store',
-        choices=('desktop', 'server'),
-        default='desktop',
-        help='the type of environment php will be installed on'
-    )
+    _add_php_install_parser(install_subparsers)
 
     # Command: `dotfiles uninstall`
     uninstall_parser = subparsers.add_parser(
-        UninstallCommand.command_name,
-        description=UninstallCommand.description,
-        help=UninstallCommand.help,
-        formatter_class=HelpFormatter
+        'uninstall',
+        description='Uninstall something',
+        help='uninstall somthing',
+        formatter_class=_HelpFormatter,
     )
     uninstall_subparsers = uninstall_parser.add_subparsers(
         title='commands',
         dest='subcommand',
-        required=False
-    )
-
-    # Command: `dotfiles uninstall composer`
-    uninstall_composer_parser = uninstall_subparsers.add_parser(
-        UninstallComposerCommand.command_name,
-        description=UninstallComposerCommand.description,
-        help=UninstallComposerCommand.help
     )
 
     # Command: `dotfiles uninstall php`
-    uninstall_php_parser = uninstall_subparsers.add_parser(
-        UninstallPhpCommand.command_name,
-        description=UninstallPhpCommand.description,
-        help=UninstallPhpCommand.help
-    )
-    uninstall_php_parser.add_argument(
-        'version',
-        nargs='?',
-        type=str,
-        action='store',
-        default=None,
-        help='the php version to uninstall'
-    )
+    _add_php_uninstall_parser(uninstall_subparsers)
 
-    subparsers = OrderedDict({
-        InstallCommand.name: install_parser,
-        InstallComposerCommand.name: install_composer_parser,
-        InstallPhpCommand.name: install_php_parser,
-        OsinfoCommand.name: info_parser,
-        RepoCommand.name: repo_parser,
-        UninstallCommand.name: uninstall_parser,
-        UninstallComposerCommand.name: uninstall_composer_parser,
-        UninstallPhpCommand.name: uninstall_php_parser
-    })
-
-    return parser, subparsers
+    return parser
 
 
-_commands: OrderedDict[str, Type[Command]] = OrderedDict({
-    InstallCommand.command_name: InstallCommand,
-    OsinfoCommand.command_name: OsinfoCommand,
-    RepoCommand.command_name: RepoCommand,
-    UninstallCommand.command_name: UninstallCommand
-})
+def _handle_completion(args: Namespace) -> None:
+    """Print shell completion tokens for the given command level"""
+    command = getattr(args, 'command', None)
+
+    if not command:
+        print('install osinfo repos uninstall')
+    elif command == 'install':
+        print('php')
+    elif command == 'uninstall':
+        print('php')
+    elif command == 'repos':
+        aliases = _get_repo_aliases(
+            args.repos_path,
+            args.file_path,
+        )
+        print(*aliases.keys(), sep=' ')
+
+    sys.exit(0)
 
 
 def cli() -> None:
     """Command line interface entry point"""
-    parser, subparsers = _get_parsers()
+    parser = _build_parser()
+    args = parser.parse_args()
+
+    if args.completion:
+        _handle_completion(args)
+
+    if not hasattr(args, 'handler') or args.handler is None:
+        parser.print_help()
+        sys.exit(1)
 
     try:
-        namespace = parser.parse_args()
-        arguments = Arguments.from_namespace(namespace)
-
-        if arguments.command in _commands:
-            command = _commands[arguments.command].from_arguments(arguments)
-            command.execute()
-        elif arguments.completion:
-            print(*_commands.keys(), sep=' ')
-        else:
-            parser.error('the following arguments are required: command')
-
-        sys.exit(console.SUCCESS)
-    except (InvalidCommand, InvalidSubcommand, ValidationError) as ex:
-        if ex.command in subparsers:
-            subparser = subparsers[ex.command]
-            subparser.error(str(ex))
-        else:
-            parser.error(str(ex))
+        args.handler(args)
+    except ValidationError as ex:
+        print(f"error: {ex}", file=sys.stderr)
+        sys.exit(1)
     except KeyboardInterrupt:
         sys.exit(console.CTRL_C)
 

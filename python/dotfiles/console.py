@@ -3,8 +3,8 @@ import os
 import sys
 from typing import Any, Dict, List, Tuple, Union, Literal, Iterable
 
-from dotfiles import array
 from dotfiles.errors import EmptyAnswerError, InvalidAnswerError
+from dotfiles.utils import unique, wrap
 
 AttributeType = Literal[
     "bold",
@@ -245,7 +245,7 @@ def choice(
             raise EmptyAnswerError()
 
         if multiple:
-            answer = array.unique(tuple([a.strip() for a in answer.split(',') if a]))
+            answer = unique(tuple([a.strip() for a in answer.split(',') if a]))
 
         if not choices_is_dict:
             try:
@@ -256,7 +256,7 @@ def choice(
                 pass
 
         # validate
-        for a in array.wrap(answer, tuple):
+        for a in wrap(answer, tuple):
             if not is_choice(a):
                 raise InvalidAnswerError(f'Value "{a}" is invalid!')
 

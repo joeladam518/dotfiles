@@ -2,10 +2,8 @@ import csv
 import os
 import platform
 import sys
+from argparse import ArgumentParser, Namespace, _SubParsersAction
 from typing import Optional
-
-from dotfiles.cli import Command, Arguments
-from dotfiles.errors import ValidationError
 
 
 def __get_release_path() -> Optional[str]:
@@ -93,7 +91,7 @@ def id_like() -> tuple:
     if system_type in ['linux', 'freebsd']:
         id_like_ = get_release_value('ID_LIKE')
 
-        if not id_like:
+        if not id_like_:
             id_ = get_release_value('ID')
             return (id_,) if id_ else ()
 
@@ -152,63 +150,84 @@ def version() -> str:
     return get_release_value('VERSION_ID')
 
 
-class OsinfoCommand(Command):
-    """`dotfiles osinfo` command"""
-    name: str = 'osinfo'
-    command_name: str = 'osinfo'
-    description: str = 'Display basic info about your os'
-    help: str = 'display basic info about your os'
+def _configure_parser(p: ArgumentParser) -> None:
+    """Add osinfo arguments to a parser or subparser"""
+    p.add_argument(
+        '-c',
+        '--codename',
+        action='store_true',
+        default=False,
+        help='get the codename'
+    )
+    p.add_argument(
+        '-i',
+        '--id',
+        action='store_true',
+        default=False,
+        help='get the distro'
+    )
+    p.add_argument(
+        '-l',
+        '--like',
+        action='store_true',
+        default=False,
+        help='get the distro that the current distro is like (for Linux)'
+    )
+    p.add_argument(
+        '-p',
+        '--pretty',
+        action='store_true',
+        default=False,
+        help='get the pretty name'
+    )
+    p.add_argument(
+        '-s',
+        '--simplified',
+        action='store_true',
+        default=False,
+        help='get the simplified os type (windows|mac|linux)'
+    )
+    p.add_argument(
+        '-v',
+        '--version',
+        action='store_true',
+        default=False,
+        help='get the os version'
+    )
+    p.set_defaults(handler=cmd_osinfo)
 
-    def __init__(
-        self,
-        codename: bool = False,
-        id: bool = False,
-        like: bool = False,
-        pretty: bool = False,
-        simplified: bool = False,
-        version: bool = False
-    ):
-        super().__init__()
-        self.codename = codename
-        self.id = id
-        self.like = like
-        self.pretty = pretty
-        self.simplified = simplified
-        self.version = version
 
-    @classmethod
-    def from_arguments(cls, arguments: Arguments = None) -> 'OsinfoCommand':
-        if arguments is None:
-            arguments = Arguments()
-        command: 'OsinfoCommand' = cls(
-            codename=arguments.get('codename', False),
-            id=arguments.get('id', False),
-            like=arguments.get('like', False),
-            pretty=arguments.get('pretty', False),
-            simplified=arguments.get('simplified', False),
-            version=arguments.get('version', False),
-        )
-        command.shell_completion = arguments.get('completion', False)
-        return command
+def add_parser(subparsers: _SubParsersAction) -> ArgumentParser:
+    """Register the osinfo subcommand with a parent subparsers group"""
+    p = subparsers.add_parser(
+        'osinfo',
+        description='Display basic info about your OS',
+        help='display basic info about your OS',
+    )
+    _configure_parser(p)
+    return p
 
-    def validate(self) -> None:
-        keys = ('codename', 'id', 'like', 'pretty', 'simplified', 'version')
-        given_options = [k for k in keys if getattr(self, k, False) is True]
-        if len(given_options) > 1:
-            raise ValidationError(self.name, "You're only allowed to choose a single option.")
 
-    def _execute(self) -> None:
-        if self.version:
-            print(version())
-        elif self.id:
-            print(id())
-        elif self.like:
-            print(' '.join(id_like()))
-        elif self.simplified:
-            print(ostype())
-        elif self.codename:
-            print(codename())
-        elif self.pretty:
-            print(pretty_name())
-        else:
-            print(name())
+def cmd_osinfo(args: Namespace) -> None:
+    """Handle the `dotfiles osinfo` command"""
+    keys = ('codename', 'id', 'like', 'pretty', 'simplified', 'version')
+    given = [k for k in keys if getattr(args, k, False)]
+    if len(given) > 1:
+        print("error: only one option may be specified at a time", file=sys.stderr)
+        sys.exit(1)
+
+    if args.version:
+        print(version())
+    elif args.id:
+        print(id())
+    elif args.like:
+        print(' '.join(id_like()))
+    elif args.simplified:
+        print(ostype())
+    elif args.codename:
+        print(codename())
+    elif args.pretty:
+        print(pretty_name())
+    else:
+        print(name())
+

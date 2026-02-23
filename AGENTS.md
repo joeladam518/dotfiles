@@ -55,11 +55,22 @@ shell/
 A Python 3 CLI module invoked via `bin/dotfiles`. Uses argparse with subcommands:
 
 - `dotfiles osinfo` — OS information
-- `dotfiles install {composer|php}` — install dev tools
-- `dotfiles uninstall {composer|php}` — uninstall dev tools
-- `dotfiles repo` — manage repo directory aliases (reads `~/.repo-aliases`)
+- `dotfiles install php [version]` — install PHP (with optional `--composer [DIR]`)
+- `dotfiles uninstall php [version]` — uninstall PHP (with optional `--composer`)
+- `dotfiles repos` — manage repo directory aliases (reads `~/.repo-aliases`)
 
-Entry point: `main.py:cli()`. Commands extend `cli.py:Command` base class.
+Entry point: `main.py:cli()`. Uses argparse's `set_defaults(handler=fn)` idiom — each
+subcommand is a plain function `def cmd_X(args: Namespace) -> None`. No base classes.
+
+To add a new command:
+1. In the command's module, place `_configure_parser(p)` and `add_parser(subparsers)`
+   **directly above** the `cmd_X(args)` handler function they belong to.
+2. Call `add_parser(subparsers)` from `main.py:_build_parser()` to register it.
+
+See `python/dotfiles/README.md` for a full example.
+
+Key files: `main.py` (parser + dispatch), `php.py` (install/uninstall + composer),
+`repos.py` (repo aliases), `osinfo.py` (OS detection helpers), `utils.py` (shared helpers).
 
 ### Utility Scripts (`bin/`)
 

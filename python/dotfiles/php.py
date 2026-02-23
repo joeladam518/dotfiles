@@ -12,7 +12,7 @@ from urllib import request
 from dotfiles import console, osinfo, run
 from dotfiles.errors import ValidationError
 from dotfiles.paths import home_path
-from dotfiles.utils import unique, is_cmd_installed
+from dotfiles.utils import array_unique, is_cmd_installed
 
 
 _DESKTOP_EXTENSIONS: Tuple[str, ...] = (
@@ -47,7 +47,7 @@ def _get_extensions(env: str) -> Tuple[str, ...]:
     if env == 'desktop':
         return _DESKTOP_EXTENSIONS
     if env == 'server':
-        return unique((*_DESKTOP_EXTENSIONS, *_SERVER_EXTENSIONS))
+        return array_unique((*_DESKTOP_EXTENSIONS, *_SERVER_EXTENSIONS))
     return ()
 
 
@@ -126,7 +126,7 @@ def _get_uninstallable_versions() -> Tuple[str, ...]:
         lambda package: re.search(r'php(\d\.\d)?.*', package).group(1),
         _get_installed_php_packages()
     )
-    return unique(tuple(filter(bool, list(versions))))
+    return array_unique(tuple(filter(bool, list(versions))))
 
 
 def _find_composer_installations() -> List[str]:

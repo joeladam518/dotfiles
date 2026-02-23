@@ -40,7 +40,7 @@ Entry point: `main.py:cli()` → `args.handler(args)`
 | `php.py` | `cmd_install_php()`, `cmd_uninstall_php()`, composer helpers |
 | `repos.py` | `cmd_repos()`, `_get_repo_aliases()` |
 | `osinfo.py` | OS detection helpers (`id()`, `codename()`, `ostype()`, …) |
-| `utils.py` | `installed()`, `unique()`, `wrap()`, `exclude()` |
+| `utils.py` | `installed()`, `array_unique()`, `array_wrap()`, `array_exclude()` |
 | `console.py` | Colorized output, `confirm()`, `choice()` |
 | `run.py` | `command()` / `script()` subprocess helpers |
 | `paths.py` | `home_path()`, `get_os_root_directory()` |

@@ -40,6 +40,15 @@ def _get_repo_aliases(repos_directory: str, aliases_file: str) -> dict:
     return OrderedDict(sorted(aliases.items()))
 
 
+def cmd_repos_completion(args: Namespace) -> None:
+    """Print shell completion tokens for the `dotfiles repos` command"""
+    aliases = _get_repo_aliases(
+        args.repos_path,
+        args.file_path,
+    )
+    print(*aliases.keys(), sep=' ')
+
+
 def _configure_parser(p: ArgumentParser) -> None:
     """Add repos arguments to a parser or subparser"""
     p.add_argument(

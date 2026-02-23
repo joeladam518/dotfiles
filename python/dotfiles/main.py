@@ -7,7 +7,7 @@ from dotfiles.errors import ValidationError
 from dotfiles.osinfo import add_parser as _add_osinfo_parser
 from dotfiles.php import add_install_parser as _add_php_install_parser
 from dotfiles.php import add_uninstall_parser as _add_php_uninstall_parser
-from dotfiles.repos import _get_repo_aliases, add_parser as _add_repos_parser
+from dotfiles.repos import cmd_repos_completion as _cmd_repos_completion, add_parser as _add_repos_parser
 
 
 class _HelpFormatter(RawDescriptionHelpFormatter):
@@ -89,11 +89,7 @@ def _handle_completion(args: Namespace) -> None:
     elif command == 'uninstall':
         print('php')
     elif command == 'repos':
-        aliases = _get_repo_aliases(
-            args.repos_path,
-            args.file_path,
-        )
-        print(*aliases.keys(), sep=' ')
+        _cmd_repos_completion(args)
 
     sys.exit(0)
 
@@ -118,6 +114,9 @@ def cli() -> None:
     except KeyboardInterrupt:
         sys.exit(console.CTRL_C)
 
+__all__ = [
+    'cli',
+]
 
 if __name__ == '__main__':
     cli()

@@ -89,6 +89,10 @@ Executable scripts added to `$PATH` by the bashrc files:
 - `tmux/.tmux.conf` — tmux with `Ctrl+a` prefix, vim-style navigation
 - `terminals/.alacritty.toml` — Alacritty terminal config
 
+## User Preferences
+
+- **Git prompt**: Prefer `bash-git-prompt` (`$HOME/.bash-git-prompt/gitprompt.sh`) over any native zsh solution (e.g. `vcs_info`, oh-my-zsh `git-prompt` plugin). Do not replace or suggest replacing it.
+
 ## Code Style
 
 - 4-space indentation (2-space for YAML)

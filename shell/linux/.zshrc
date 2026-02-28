@@ -43,7 +43,7 @@ fi
 
 # Load custom zsh completions
 if [ -d "${DOTFILES_DIR}/zsh-completion" ]; then
-    fpath=(${DOTFILES_DIR}/zsh-completion $fpath)
+    fpath=("${DOTFILES_DIR}/zsh-completion" $fpath)
 fi
 
 # Oh-my-zsh

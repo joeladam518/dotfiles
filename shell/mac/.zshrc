@@ -4,8 +4,9 @@
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 HOMEBREW_DIR="/opt/homebrew"
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# Prompt
+PROMPT='%T %F{12}%~%f%(#.#.$) '
+RPROMPT=''
 
 # Auto-deduplicate PATH entries
 typeset -U PATH path
@@ -24,10 +25,15 @@ setopt SHARE_HISTORY
 # Globbing
 setopt EXTENDED_GLOB
 
-# GPG signing
-export GPG_TTY="$(tty)"
+# Shell expansion
+setopt PROMPT_SUBST
 
-# Load custom zsh completions
+# Preferred editor for local and remote sessions
+if command -v vim >/dev/null 2>&1; then
+    export EDITOR=vim
+fi
+
+# Load custom zsh completions before oh-my-zsh calls compinit
 if [ -d "${DOTFILES_DIR}/zsh-completion" ]; then
     fpath=("${DOTFILES_DIR}/zsh-completion" $fpath)
 fi
@@ -39,13 +45,7 @@ export ZSH="${HOME}/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
-
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+ZSH_THEME=""
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -102,32 +102,30 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    git                      # git aliases + prompt info (replaces bash-git-prompt)
+    git                      # git aliases & functions
+    #git-prompt               # prompt info (replaces bash-git-prompt)
     fzf                      # fzf key bindings + completions
     nvm                      # lazy-loads nvm (replaces manual NVM sourcing + bash_completion)
-    z                        # jump to frecently-used directories
-    zsh-autosuggestions      # fish-style inline suggestions (install separately)
+    #z                        # jump to frecently-used directories
+    #zsh-autosuggestions      # fish-style inline suggestions (install separately)
     zsh-syntax-highlighting  # colors valid/invalid commands (install separately)
-    you-should-use           # reminds you to use aliases (install separately)
+    #you-should-use           # reminds you to use aliases (install separately)
     zsh-bat                  # wraps cat with bat (install separately)
 )
 
 . "${ZSH}/oh-my-zsh.sh"
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-if command -v vim >/dev/null 2>&1; then
-    export EDITOR=vim
+# bash-git-prompt
+if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
+    precmd() {
+        eval $PROMPT_COMMAND
+    }
+    __GIT_PROMPT_DIR="$HOME/.bash-git-prompt"
+    GIT_PROMPT_EXECUTABLE="git"
+    GIT_PROMPT_ONLY_IN_REPO=1
+    GIT_PROMPT_FETCH_REMOTE_STATUS=1
+    . "$HOME/.bash-git-prompt/gitprompt.sh"
 fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
 
 # Include the user's bin dir in PATH
 if [ -d "${HOME}/bin" ]; then
@@ -148,18 +146,6 @@ if [ -d "${HOMEBREW_DIR}/bin" ]; then
     export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 fi
 
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
 # Load aliases
 if [ -f "${DOTFILES_DIR}/shell/mac/aliases.sh" ]; then
     . "${DOTFILES_DIR}/shell/mac/aliases.sh"
@@ -173,7 +159,7 @@ fi
 # .fzf command line fuzzy finder
 # Note: run `fzf --zsh` to generate ~/.fzf.zsh (requires fzf >= 0.48)
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
 
 # Java
 if [ -d "/opt/homebrew/opt/openjdk@17" ]; then

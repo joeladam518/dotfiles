@@ -3,7 +3,7 @@
 # bash completions for the repo function
 
 # Load if the repo command exists and we have and aliases file
-if command -v "repo" >/dev/null 2>&1; then
+if command -v "dotfiles" >/dev/null 2>&1 && command -v "repo" >/dev/null 2>&1; then
     __repo()
     {
         local CURRENT OPTS

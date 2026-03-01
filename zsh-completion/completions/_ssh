@@ -1,12 +1,14 @@
 #compdef ssh
 
-if [[ -f "${HOME}/.ssh/config" && -r "${HOME}/.ssh/config" ]]; then
-    _ssh()
-    {
-        local -a opts
+_ssh()
+{
+    local -a opts
+    if [[ -f "${HOME}/.ssh/config" && -r "${HOME}/.ssh/config" ]]; then
         opts=( $(grep '^Host' ~/.ssh/config 2>/dev/null | grep -v '[?*]' | cut -d ' ' -f 2-) )
-        compadd -a opts
-    }
+    else
+        opts=()
+    fi
+    compadd -a opts
+}
 
-    _ssh "$@"
-fi
+_ssh "$@"

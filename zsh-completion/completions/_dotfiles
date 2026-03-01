@@ -1,33 +1,33 @@
 #compdef dotfiles
 
-if command -v dotfiles >/dev/null 2>&1; then
-    _dotfiles()
-    {
-        local -a opts
+_dotfiles()
+{
+    local -a opts
 
+    if command -v dotfiles >/dev/null 2>&1; then
         case $CURRENT in
             2)
                 opts=( $(dotfiles --completion) )
-                compadd -a opts
                 ;;
             3)
                 case "${words[2]}" in
-                    "install")
-                        opts=( $(dotfiles --completion install) )
-                        compadd -a opts
-                        ;;
                     "repos")
                         opts=( $(dotfiles --completion repos) )
-                        compadd -a opts
+                        ;;
+                    "install")
+                        opts=( $(dotfiles --completion install) )
                         ;;
                     "uninstall")
                         opts=( $(dotfiles --completion uninstall) )
-                        compadd -a opts
                         ;;
                 esac
                 ;;
         esac
-    }
+    else
+        opts=()
+    fi
 
-    _dotfiles "$@"
-fi
+    compadd -a opts
+}
+
+_dotfiles "$@"

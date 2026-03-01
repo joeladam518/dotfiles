@@ -1,12 +1,15 @@
 #compdef repo
 
-if command -v dotfiles >/dev/null 2>&1; then
-    _repo()
-    {
-        local -a opts
+_repo()
+{
+    local -a opts
+    if command -v dotfiles >/dev/null 2>&1; then
         opts=( $(dotfiles repos --list-keys --sep=" ") )
-        compadd -a opts
-    }
+    else
+        opts=()
+    fi
 
-    _repo "$@"
-fi
+    compadd -a opts
+}
+
+_repo "$@"

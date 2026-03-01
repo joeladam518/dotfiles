@@ -5,8 +5,17 @@
 [[ $- != *i* ]] && return
 
 DOTFILES_DIR="${HOME}/repos/dotfiles"
-ZSHRC_DIR="${DOTFILES_DIR}/zshrc"
-LINUX_ZSHRC_DIR="${ZSHRC_DIR}/linux"
+ZSH_DIR="${HOME}/.zsh"
+
+# Prompt
+PROMPT='${debian_chroot:+(${debian_chroot})}%B%F{green}%n@%m%b%f:%B%F{blue}%~%b%f%# '
+RPROMPT=''
+
+# Shell expansion (required by bash-git-prompt)
+setopt PROMPT_SUBST
+
+# Colors
+autoload -U colors && colors
 
 # Auto-deduplicate PATH entries
 typeset -U PATH path
@@ -36,52 +45,49 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 # Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# Set variable identifying the chroot you work in (used in the prompt below)
+# Set variable identifying the chroot you work in (used in the prompt above)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# Load custom zsh completions
-if [ -d "${DOTFILES_DIR}/zsh-completion" ]; then
-    fpath=("${DOTFILES_DIR}/zsh-completion" $fpath)
-fi
+# PATH
+[ -d "${HOME}/bin" ]         && export PATH="${HOME}/bin:${PATH}"
+[ -d "${HOME}/.local/bin" ]  && export PATH="${HOME}/.local/bin:${PATH}"
+[ -d "${DOTFILES_DIR}/bin" ] && export PATH="${DOTFILES_DIR}/bin:${PATH}"
 
-# Oh-my-zsh
-export ZSH="${HOME}/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
-
-plugins=(
-    git                      # git aliases + prompt info (replaces bash-git-prompt)
-    fzf                      # fzf key bindings + completions
-    nvm                      # lazy-loads nvm (replaces manual NVM sourcing)
-    z                        # jump to frecently-used directories
-    zsh-autosuggestions      # fish-style inline suggestions (install separately)
-    zsh-syntax-highlighting  # colors valid/invalid commands (install separately)
-    you-should-use           # reminds you to use aliases (install separately)
-    zsh-bat                  # wraps cat with bat (install separately)
-)
-
-. "${ZSH}/oh-my-zsh.sh"
-
-# if the dotfiles bin folder exists, add it to PATH
-if [ -d "${DOTFILES_DIR}/bin" ]; then
-    PATH="${PATH}:${DOTFILES_DIR}/bin"
-fi
+# zsh completions
+# point git zsh completion to ~/.git-completion.bash (if present)
+[ -f "${HOME}/.git-completion.bash" ] && \
+    zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
+# load custom completions, additional fpath dirs, and run compinit
+[ -f "${DOTFILES_DIR}/zsh-completion/zsh_completion" ] && \
+    . "${DOTFILES_DIR}/zsh-completion/zsh_completion"
 
 # Load aliases
-if [ -f "${DOTFILES_DIR}/shell/linux/aliases.sh" ]; then
+[ -f "${DOTFILES_DIR}/shell/linux/aliases.sh" ] && \
     . "${DOTFILES_DIR}/shell/linux/aliases.sh"
-fi
 
 # Load functions
-if [ -f "${DOTFILES_DIR}/shell/linux/functions.sh" ]; then
+[ -f "${DOTFILES_DIR}/shell/linux/functions.sh" ] && \
     . "${DOTFILES_DIR}/shell/linux/functions.sh"
-fi
 
-# .fzf command line fuzzy finder
-# Note: run `fzf --zsh` to generate ~/.fzf.zsh (requires fzf >= 0.48)
+# fzf
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-. <(fzf --zsh)
+[ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
+
+# nvm (lazy load for faster startup)
+export NVM_DIR="${HOME}/.nvm"
+if [ -d "${NVM_DIR}" ]; then
+    _nvm_load() {
+        unset -f nvm node npm npx _nvm_load
+        [ -s "${NVM_DIR}/nvm.sh" ]          && \. "${NVM_DIR}/nvm.sh"
+        [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"
+    }
+    nvm()  { _nvm_load; nvm  "$@"; }
+    node() { _nvm_load; node "$@"; }
+    npm()  { _nvm_load; npm  "$@"; }
+    npx()  { _nvm_load; npx  "$@"; }
+fi
 
 # Bun
 if [ -r "${HOME}/.bun" ]; then
@@ -104,8 +110,25 @@ if [ -d "/usr/local/go/bin" ]; then
 fi
 
 # Rust
-if [ -f "${HOME}/.cargo/env" ]; then
+[ -f "${HOME}/.cargo/env" ] && \
     . "${HOME}/.cargo/env"
+
+# bash-git-prompt
+if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
+    precmd() { eval $PROMPT_COMMAND; }
+    __GIT_PROMPT_DIR="${HOME}/.bash-git-prompt"
+    GIT_PROMPT_EXECUTABLE="git"
+    GIT_PROMPT_ONLY_IN_REPO=1
+    GIT_PROMPT_FETCH_REMOTE_STATUS=1
+    . "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
 
-unset DOTFILES_DIR ZSHRC_DIR LINUX_ZSHRC_DIR
+# zsh-bat (wraps cat with bat)
+[ -f "${ZSH_DIR}/plugins/zsh-bat/zsh-bat.plugin.zsh" ] && \
+    . "${ZSH_DIR}/plugins/zsh-bat/zsh-bat.plugin.zsh"
+
+# zsh-syntax-highlighting — must be sourced last
+[ -f "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && \
+    . "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+unset DOTFILES_DIR ZSH_DIR

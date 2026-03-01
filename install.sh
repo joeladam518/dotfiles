@@ -166,6 +166,7 @@ else
 fi
 
 rc_src="${DOTFILES_DIR}/shell/${env}/${rcfile}"
+
 if [ ! -f "$rc_src" ]; then
     cmsg -r "Error: ${rc_src} does not exist"
     exit 1
@@ -180,8 +181,7 @@ if [ "$shell_type" = "zsh" ]; then
 else
     other_rcfile=".zshrc"
 fi
-if [ -L "${HOME}/${other_rcfile}" ] && \
-   [[ "$(readlink "${HOME}/${other_rcfile}")" == "${DOTFILES_DIR}/shell/"* ]]; then
+if [ -L "${HOME}/${other_rcfile}" ] && [[ "$(readlink "${HOME}/${other_rcfile}")" == "${DOTFILES_DIR}/shell/"* ]]; then
     rm "${HOME}/${other_rcfile}"
     cmsg -g "Removed old ${other_rcfile} symlink"
 fi
@@ -197,7 +197,6 @@ elif [ -d "${HOME}/.vim" ]; then
 else
     ln -s "${DOTFILES_DIR}/vimrc/.vim" "${HOME}/.vim"
 fi
-
 if [ -L "${HOME}/.vimrc" ]; then
     cmsg -y "Found an existing .vimrc symlink"
 elif [ -f "${HOME}/.vimrc" ]; then
@@ -215,8 +214,9 @@ else
     ln -s "${DOTFILES_DIR}/tmux/.tmux.conf" "${HOME}/.tmux.conf"
 fi
 
-# Copy git config (not for server)
+# Non-server environments
 if [ "$env" != "server" ]; then
+    # Copy git config (not for server)
     if [ -L "${HOME}/.gitconfig" ]; then
         cmsg -y "Found an existing .gitconfig symlink"
     elif [ -f "${HOME}/.gitconfig" ]; then
@@ -224,9 +224,12 @@ if [ "$env" != "server" ]; then
     else
         cp "${DOTFILES_DIR}/git/.gitconfig" "${HOME}/.gitconfig"
     fi
-fi
 
-# Install git completion scripts
-git_completions_args=()
-[ "$shell_type" = "zsh" ] && git_completions_args+=("--zsh")
-bash "${DOTFILES_DIR}/install-git-completions.sh" "${git_completions_args[@]}"
+    # Make the zsh directories if using zsh (not for server)
+    if [ "$shell_type" = "zsh" ]; then
+        [ -d "${HOME}/.zsh" ] || mkdir -p "${HOME}/.zsh"
+        [ -d "${HOME}/.zsh/cache" ] || mkdir -p "${HOME}/.zsh/cache"
+        [ -d "${HOME}/.zsh/completion" ] || mkdir -p "${HOME}/.zsh/completion"
+        [ -d "${HOME}/.zsh/plugins" ] || mkdir -p "${HOME}/.zsh/plugins"
+    fi
+fi

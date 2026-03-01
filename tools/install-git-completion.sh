@@ -14,7 +14,7 @@ usage() {
     echo ""
     echo "options:"
     echo "  -h, --help   Display this help message"
-    echo "  --zsh        Also download git-completion.zsh → ~/.zsh/completions/_git"
+    echo "  --zsh        Also download git-completion.zsh → ~/.zsh/completion/_git"
     echo ""
 }
 
@@ -51,9 +51,9 @@ echo "Downloading git-completion.bash → ~/.git-completion.bash"
 download "${GIT_COMPLETION_BASE_URL}/git-completion.bash" "${HOME}/.git-completion.bash"
 
 if [ "$install_zsh" -eq 1 ]; then
-    mkdir -p "${HOME}/.zsh/completions"
-    echo "Downloading git-completion.zsh → ~/.zsh/completions/_git"
-    download "${GIT_COMPLETION_BASE_URL}/git-completion.zsh" "${HOME}/.zsh/completions/_git"
+    mkdir -p "${HOME}/.zsh/completion"
+    echo "Downloading git-completion.zsh → ~/.zsh/completion/_git"
+    download "${GIT_COMPLETION_BASE_URL}/git-completion.zsh" "${HOME}/.zsh/completion/_git"
 fi
 
 echo "Done."

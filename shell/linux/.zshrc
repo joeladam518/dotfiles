@@ -56,12 +56,24 @@ fi
 [ -d "${DOTFILES_DIR}/bin" ] && export PATH="${DOTFILES_DIR}/bin:${PATH}"
 
 # zsh completions
-# point git zsh completion to ~/.git-completion.bash (if present)
+# Point git zsh completion scrip to this .git-completion.bash
 [ -f "${HOME}/.git-completion.bash" ] && \
     zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
-# load custom completions, additional fpath dirs, and run compinit
+# Additional completion directories
+DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
+    "${ZSH_DIR}/completions"
+    "${HOMEBREW_DIR}/share/zsh/site-functions"
+)
+# add
 [ -f "${DOTFILES_DIR}/zsh-completion/zsh_completion" ] && \
     . "${DOTFILES_DIR}/zsh-completion/zsh_completion"
+# load zsh completions
+autoload -Uz compinit
+if [ -d "${HOME}/.zsh/cache" ]; then
+    compinit -d "${HOME}/.zsh/cache/.zcompdump-${HOST}"
+else
+    compinit -d "${HOME}/.zcompdump-${HOST}"
+fi
 
 # Load aliases
 [ -f "${DOTFILES_DIR}/shell/linux/aliases.sh" ] && \

@@ -12,8 +12,4 @@ for i in "${DOTFILES_ZSH_COMPLETION_DIRECTORIES[@]}"; do
     fi
 done
 
-autoload -Uz compinit
-[ -d "$ZSH_CACHE_DIR" ] || mkdir -p "$ZSH_CACHE_DIR"
-compinit -d "${ZSH_CACHE_DIR}/.zcompdump-${HOST}"
-
 unset DOTFILES_ZSH_COMPLETION_DIR DOTFILES_ZSH_COMPLETION_DIRECTORIES i

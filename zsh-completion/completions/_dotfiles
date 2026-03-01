@@ -1,31 +1,33 @@
 #compdef dotfiles
-# zsh completions for the dotfiles command
 
-if ! command -v dotfiles >/dev/null 2>&1; then
-    return 1
-fi
+if command -v dotfiles >/dev/null 2>&1; then
+    _dotfiles()
+    {
+        local -a opts
 
-local -a opts
-
-case $CURRENT in
-    2)
-        opts=( $(dotfiles --completion) )
-        compadd -a opts
-        ;;
-    3)
-        case "${words[2]}" in
-            "install")
-                opts=( $(dotfiles --completion install) )
+        case $CURRENT in
+            2)
+                opts=( $(dotfiles --completion) )
                 compadd -a opts
                 ;;
-            "repos")
-                opts=( $(dotfiles --completion repos) )
-                compadd -a opts
-                ;;
-            "uninstall")
-                opts=( $(dotfiles --completion uninstall) )
-                compadd -a opts
+            3)
+                case "${words[2]}" in
+                    "install")
+                        opts=( $(dotfiles --completion install) )
+                        compadd -a opts
+                        ;;
+                    "repos")
+                        opts=( $(dotfiles --completion repos) )
+                        compadd -a opts
+                        ;;
+                    "uninstall")
+                        opts=( $(dotfiles --completion uninstall) )
+                        compadd -a opts
+                        ;;
+                esac
                 ;;
         esac
-        ;;
-esac
+    }
+
+    _dotfiles "$@"
+fi

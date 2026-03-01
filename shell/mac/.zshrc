@@ -26,7 +26,8 @@ setopt SHARE_HISTORY
 # Globbing
 setopt EXTENDED_GLOB
 
-# Shell expansion (required by bash-git-prompt)
+# Have zsh re-evaluate and re-excute commands in the PROMPT. By default,
+# zsh doesn't do this. This is required for bash-git-prompt to work.
 setopt PROMPT_SUBST
 
 # Colors
@@ -45,17 +46,24 @@ fi
 [ -d "${HOMEBREW_DIR}/bin" ] && export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 
 # zsh completions
-# point git zsh completion scrip to this .git-completion.bash
+# Point git zsh completion scrip to this .git-completion.bash
 [ -f "${HOME}/.git-completion.bash" ] && \
     zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
-# additional completion directories
+# Additional completion directories
 DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
     "${ZSH_DIR}/completions"
     "${HOMEBREW_DIR}/share/zsh/site-functions"
 )
-# load zsh completions
+# add 
 [ -f "${DOTFILES_DIR}/zsh-completion/zsh_completion" ] && \
     . "${DOTFILES_DIR}/zsh-completion/zsh_completion"
+# load zsh completions
+autoload -Uz compinit
+if [ -d "${HOME}/.zsh/cache" ]; then
+    compinit -d "${HOME}/.zsh/cache/.zcompdump-${HOST}"
+else
+    compinit -d "${HOME}/.zcompdump-${HOST}"
+fi
 
 # Load aliases
 [ -f "${DOTFILES_DIR}/shell/mac/aliases.sh" ] && \
@@ -69,18 +77,11 @@ DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
 
-# nvm (lazy load for faster startup)
-export NVM_DIR="${HOME}/.nvm"
-if [ -d "${NVM_DIR}" ]; then
-    _nvm_load() {
-        unset -f nvm node npm npx _nvm_load
-        [ -s "${NVM_DIR}/nvm.sh" ]          && \. "${NVM_DIR}/nvm.sh"
-        [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"
-    }
-    nvm()  { _nvm_load; nvm  "$@"; }
-    node() { _nvm_load; node "$@"; }
-    npm()  { _nvm_load; npm  "$@"; }
-    npx()  { _nvm_load; npx  "$@"; }
+# nvm
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 fi
 
 # Java

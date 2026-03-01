@@ -30,9 +30,9 @@ if command -v "vim" >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
-# Force the localization
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
+# force the localization
+# export LANG="en_US.UTF-8"
+# export LC_ALL="en_US.UTF-8"
 
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -88,6 +88,19 @@ if [ -d "${DOTFILES_DIR}/bin" ] && [[ ! "$PATH" =~ (^|:)"${DOTFILES_DIR}/bin"(:|
     PATH="${PATH}:${DOTFILES_DIR}/bin"
 fi
 
+# Enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+# Only turns on completion if we're not in POSIX mode (You shouldn't be).,
+# to avoid issues with non-interactive shells.
+if ! shopt -oq posix; then
+    if [ -f "/usr/share/bash-completion/bash_completion" ]; then
+        . "/usr/share/bash-completion/bash_completion"
+    elif [ -f "/etc/bash_completion" ]; then
+        . "/etc/bash_completion"
+    fi
+fi
+
 # Load aliases
 if [ -f "${DOTFILES_DIR}/shell/server/aliases.sh" ]; then
     . "${DOTFILES_DIR}/shell/server/aliases.sh"
@@ -98,26 +111,15 @@ if [ -f "${DOTFILES_DIR}/shell/server/functions.sh" ]; then
     . "${DOTFILES_DIR}/shell/server/functions.sh"
 fi
 
+# .fzf command line fuzzy finder
+export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
+[ -f "${HOME}/.fzf.bash" ] && source "${HOME}/.fzf.bash"
+
 # Bash-Git-Prompt
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_FETCH_REMOTE_STATUS=1
     . "${HOME}/.bash-git-prompt/gitprompt.sh"
-fi
-
-# .fzf command line fuzzy finder
-export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
-eval "$(fzf --bash)"
-
-# Enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-    if [ -f "/usr/share/bash-completion/bash_completion" ]; then
-        . "/usr/share/bash-completion/bash_completion"
-    elif [ -f "/etc/bash_completion" ]; then
-        . "/etc/bash_completion"
-    fi
 fi
 
 unset DOTFILES_DIR

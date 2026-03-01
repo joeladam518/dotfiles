@@ -138,9 +138,15 @@ if [ -f "${HOME}/.sdb/.sdb-completion.bash" ]; then
     . "${HOME}/.sdb/.sdb-completion.bash"
 fi
 
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+# Rust
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
 
-[ -f "$HOME/.docker/init-bash.sh" ] && . "${HOME}/.docker/init-bash.sh"
+# Docker
+if [ -f "$HOME/.docker/init-bash.sh" ]; then
+    . "$HOME/.docker/init-bash.sh"
+fi
 
 # Unset any variables that were used in this script
 unset DOTFILES_DIR HOMEBREW_DIR

@@ -1,0 +1,19 @@
+#  -*- shell-script -*-
+# source completion directory definitions
+
+ZSH_CACHE_DIR="${ZSH_CACHE_DIR:-"${HOME}/.zsh/cache"}"
+DOTFILES_DIR="${DOTFILES_DIR:-"${HOME}/repos/dotfiles"}"
+DOTFILES_ZSH_COMPLETION_DIR="${DOTFILES_DIR}/zsh-completion/completions"
+DOTFILES_ZSH_COMPLETION_DIRECTORIES=("$DOTFILES_ZSH_COMPLETION_DIR" "${DOTFILES_ZSH_COMPLETIONS[@]}")
+
+for i in "${DOTFILES_ZSH_COMPLETION_DIRECTORIES[@]}"; do
+    if [[ -n "$i" && -d "$i" && -r "$i" && -x "$i" ]]; then
+        fpath=("$i" "${fpath[@]}")
+    fi
+done
+
+autoload -Uz compinit
+[ -d "$ZSH_CACHE_DIR" ] || mkdir -p "$ZSH_CACHE_DIR"
+compinit -d "${ZSH_CACHE_DIR}/.zcompdump-${HOST}"
+
+unset DOTFILES_ZSH_COMPLETION_DIR DOTFILES_ZSH_COMPLETION_DIRECTORIES i

@@ -9,13 +9,8 @@ alias ..='cd ..'
 #alias ....='cd ../../..'
 #alias .....='cd ../../../..'
 
-# Reload shell config
-if [ -n "$ZSH_VERSION" ]; then
-    alias reload-zshrc='source ~/.zshrc;'
-elif [ -n "$BASH_VERSION" ]; then
-    alias reload-bashrc='source ~/.bashrc;'
-fi
-alias reload-shell='exec ${SHELL}; echo "shell reloaded";'
+# Reload shell
+alias reload='exec ${SHELL}'
 
 # Osinfo
 alias osinfo='dotfiles osinfo'

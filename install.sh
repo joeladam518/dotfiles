@@ -224,12 +224,4 @@ if [ "$env" != "server" ]; then
     else
         cp "${DOTFILES_DIR}/git/.gitconfig" "${HOME}/.gitconfig"
     fi
-
-    # Make the zsh directories if using zsh (not for server)
-    if [ "$shell_type" = "zsh" ]; then
-        [ -d "${HOME}/.zsh" ] || mkdir -p "${HOME}/.zsh"
-        [ -d "${HOME}/.zsh/cache" ] || mkdir -p "${HOME}/.zsh/cache"
-        [ -d "${HOME}/.zsh/completion" ] || mkdir -p "${HOME}/.zsh/completion"
-        [ -d "${HOME}/.zsh/plugins" ] || mkdir -p "${HOME}/.zsh/plugins"
-    fi
 fi

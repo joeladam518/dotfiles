@@ -1,13 +1,12 @@
 # -*- shell-script -*-
 # ~/.zshrc: executed by zsh(1) for interactive shells on macOS
 
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 HOMEBREW_DIR="/opt/homebrew"
 ZSH_DIR="${HOME}/.zsh"
-
-# Prompt
-PROMPT='%T %F{12}%~%f%(#.#.$) '
-RPROMPT=''
 
 # Auto-deduplicate PATH entries
 typeset -U PATH path
@@ -39,6 +38,10 @@ if command -v vim >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
+# Prompt
+PROMPT='%T %F{12}%~%f%(#.#.$) '
+RPROMPT=''
+
 # PATH
 [ -d "${HOME}/bin" ]         && export PATH="${HOME}/bin:${PATH}"
 [ -d "${HOME}/.local/bin" ]  && export PATH="${HOME}/.local/bin:${PATH}"
@@ -54,7 +57,7 @@ DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
     "${ZSH_DIR}/completions"
     "${HOMEBREW_DIR}/share/zsh/site-functions"
 )
-# add 
+# add zsh completions to fpath
 [ -f "${DOTFILES_DIR}/zsh-completion/zsh_completion" ] && \
     . "${DOTFILES_DIR}/zsh-completion/zsh_completion"
 # load zsh completions

@@ -3,7 +3,7 @@
 # Shared development aliases — sourced by both bash and zsh
 
 # git aliases
-alias st='git status'
+alias gst='git status'
 alias gp='git push'
 
 # vagrant aliases

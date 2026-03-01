@@ -7,16 +7,6 @@
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 ZSH_DIR="${HOME}/.zsh"
 
-# Prompt
-PROMPT='${debian_chroot:+(${debian_chroot})}%B%F{green}%n@%m%b%f:%B%F{blue}%~%b%f%# '
-RPROMPT=''
-
-# Shell expansion (required by bash-git-prompt)
-setopt PROMPT_SUBST
-
-# Colors
-autoload -U colors && colors
-
 # Auto-deduplicate PATH entries
 typeset -U PATH path
 
@@ -34,21 +24,30 @@ setopt SHARE_HISTORY
 # Globbing
 setopt EXTENDED_GLOB
 
+# Have zsh re-evaluate and re-excute commands in the PROMPT. By default,
+# zsh doesn't do this. This is required for bash-git-prompt to work.
+setopt PROMPT_SUBST
+
+# Colors
+autoload -U colors && colors
+export CLICOLOR=1
+
 # Set the editor
 if command -v vim >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
 # Colored GCC warnings and errors
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# Make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01;34:quote=01'
 
 # Set variable identifying the chroot you work in (used in the prompt above)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
+
+# Prompt
+PROMPT='${debian_chroot:+(${debian_chroot})}%B%F{green}%n@%m%b%f:%B%F{blue}%~%b%f%(#.#.$) '
+RPROMPT=''
 
 # PATH
 [ -d "${HOME}/bin" ]         && export PATH="${HOME}/bin:${PATH}"
@@ -57,8 +56,8 @@ fi
 
 # zsh completions
 # Point git zsh completion scrip to this .git-completion.bash
-[ -f "${HOME}/.git-completion.bash" ] && \
-    zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
+# [ -f "${HOME}/.git-completion.bash" ] && \
+#     zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
 # Additional completion directories
 DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
     "${ZSH_DIR}/completions"
@@ -83,22 +82,19 @@ fi
 [ -f "${DOTFILES_DIR}/shell/linux/functions.sh" ] && \
     . "${DOTFILES_DIR}/shell/linux/functions.sh"
 
+# Make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
 # fzf
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
 
 # nvm (lazy load for faster startup)
-export NVM_DIR="${HOME}/.nvm"
-if [ -d "${NVM_DIR}" ]; then
-    _nvm_load() {
-        unset -f nvm node npm npx _nvm_load
-        [ -s "${NVM_DIR}/nvm.sh" ]          && \. "${NVM_DIR}/nvm.sh"
-        [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"
-    }
-    nvm()  { _nvm_load; nvm  "$@"; }
-    node() { _nvm_load; node "$@"; }
-    npm()  { _nvm_load; npm  "$@"; }
-    npx()  { _nvm_load; npx  "$@"; }
+# nvm
+if [ -d "${HOME}/.nvm" ]; then
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 fi
 
 # Bun

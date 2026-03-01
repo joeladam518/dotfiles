@@ -3,6 +3,7 @@
 
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 HOMEBREW_DIR="/opt/homebrew"
+ZSH_DIR="${HOME}/.zsh"
 
 # Prompt
 PROMPT='%T %F{12}%~%f%(#.#.$) '
@@ -25,141 +26,62 @@ setopt SHARE_HISTORY
 # Globbing
 setopt EXTENDED_GLOB
 
-# Shell expansion
+# Shell expansion (required by bash-git-prompt)
 setopt PROMPT_SUBST
+
+# Colors
+autoload -U colors && colors
+export CLICOLOR=1
 
 # Preferred editor for local and remote sessions
 if command -v vim >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
-# Load custom zsh completions before oh-my-zsh calls compinit
-if [ -d "${DOTFILES_DIR}/zsh-completion" ]; then
-    fpath=("${DOTFILES_DIR}/zsh-completion" $fpath)
-fi
+# PATH
+[ -d "${HOME}/bin" ]         && export PATH="${HOME}/bin:${PATH}"
+[ -d "${HOME}/.local/bin" ]  && export PATH="${HOME}/.local/bin:${PATH}"
+[ -d "${DOTFILES_DIR}/bin" ] && export PATH="${DOTFILES_DIR}/bin:${PATH}"
+[ -d "${HOMEBREW_DIR}/bin" ] && export PATH="${HOMEBREW_DIR}/bin:${PATH}"
 
-# Path to your Oh My Zsh installation.
-export ZSH="${HOME}/.oh-my-zsh"
-
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME=""
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-    git                      # git aliases & functions
-    #git-prompt               # prompt info (replaces bash-git-prompt)
-    fzf                      # fzf key bindings + completions
-    nvm                      # lazy-loads nvm (replaces manual NVM sourcing + bash_completion)
-    #z                        # jump to frecently-used directories
-    #zsh-autosuggestions      # fish-style inline suggestions (install separately)
-    zsh-syntax-highlighting  # colors valid/invalid commands (install separately)
-    #you-should-use           # reminds you to use aliases (install separately)
-    zsh-bat                  # wraps cat with bat (install separately)
+# zsh completions
+# point git zsh completion scrip to this .git-completion.bash
+[ -f "${HOME}/.git-completion.bash" ] && \
+    zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
+# additional completion directories
+DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
+    "${ZSH_DIR}/completions"
+    "${HOMEBREW_DIR}/share/zsh/site-functions"
 )
-
-. "${ZSH}/oh-my-zsh.sh"
-
-# bash-git-prompt
-if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
-    precmd() {
-        eval $PROMPT_COMMAND
-    }
-    __GIT_PROMPT_DIR="$HOME/.bash-git-prompt"
-    GIT_PROMPT_EXECUTABLE="git"
-    GIT_PROMPT_ONLY_IN_REPO=1
-    GIT_PROMPT_FETCH_REMOTE_STATUS=1
-    . "$HOME/.bash-git-prompt/gitprompt.sh"
-fi
-
-# Include the user's bin dir in PATH
-if [ -d "${HOME}/bin" ]; then
-    export PATH="${HOME}/bin:${PATH}"
-fi
-
-if [ -d "${HOME}/.local/bin" ]; then
-    export PATH="${HOME}/.local/bin:${PATH}"
-fi
-
-# if the dotfiles bin folder exists, add it to PATH
-if [ -d "${DOTFILES_DIR}/bin" ]; then
-    export PATH="${DOTFILES_DIR}/bin:${PATH}"
-fi
-
-# Include brew's bin dir in PATH
-if [ -d "${HOMEBREW_DIR}/bin" ]; then
-    export PATH="${HOMEBREW_DIR}/bin:${PATH}"
-fi
+# load zsh completions
+[ -f "${DOTFILES_DIR}/zsh-completion/zsh_completion" ] && \
+    . "${DOTFILES_DIR}/zsh-completion/zsh_completion"
 
 # Load aliases
-if [ -f "${DOTFILES_DIR}/shell/mac/aliases.sh" ]; then
+[ -f "${DOTFILES_DIR}/shell/mac/aliases.sh" ] && \
     . "${DOTFILES_DIR}/shell/mac/aliases.sh"
-fi
 
 # Load functions
-if [ -f "${DOTFILES_DIR}/shell/mac/functions.sh" ]; then
+[ -f "${DOTFILES_DIR}/shell/mac/functions.sh" ] && \
     . "${DOTFILES_DIR}/shell/mac/functions.sh"
-fi
 
-# .fzf command line fuzzy finder
-# Note: run `fzf --zsh` to generate ~/.fzf.zsh (requires fzf >= 0.48)
+# fzf
 export FZF_DEFAULT_COMMAND="set -o pipefail; find . | cut -b3-"
 [ -f ~/.fzf.zsh ] && . ~/.fzf.zsh
+
+# nvm (lazy load for faster startup)
+export NVM_DIR="${HOME}/.nvm"
+if [ -d "${NVM_DIR}" ]; then
+    _nvm_load() {
+        unset -f nvm node npm npx _nvm_load
+        [ -s "${NVM_DIR}/nvm.sh" ]          && \. "${NVM_DIR}/nvm.sh"
+        [ -s "${NVM_DIR}/bash_completion" ] && \. "${NVM_DIR}/bash_completion"
+    }
+    nvm()  { _nvm_load; nvm  "$@"; }
+    node() { _nvm_load; node "$@"; }
+    npm()  { _nvm_load; npm  "$@"; }
+    npx()  { _nvm_load; npx  "$@"; }
+fi
 
 # Java
 if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
@@ -193,9 +115,29 @@ if [ -d "${HOME}/tizen-studio" ]; then
 fi
 
 # Rust
-[ -f "${HOME}/.cargo/env" ] && . "${HOME}/.cargo/env"
+[ -f "${HOME}/.cargo/env" ] && \
+    . "${HOME}/.cargo/env"
 
 # Docker Desktop
-[ -f "${HOME}/.docker/init-zsh.sh" ] && . "${HOME}/.docker/init-zsh.sh"
+[ -f "${HOME}/.docker/init-zsh.sh" ] && \
+    . "${HOME}/.docker/init-zsh.sh"
 
-unset DOTFILES_DIR HOMEBREW_DIR
+# bash-git-prompt
+if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
+    precmd() { eval $PROMPT_COMMAND; }
+    __GIT_PROMPT_DIR="$HOME/.bash-git-prompt"
+    GIT_PROMPT_EXECUTABLE="git"
+    GIT_PROMPT_ONLY_IN_REPO=1
+    GIT_PROMPT_FETCH_REMOTE_STATUS=1
+    . "${HOME}/.bash-git-prompt/gitprompt.sh"
+fi
+
+# zsh-bat (wraps cat with bat)
+[ -f "${ZSH_DIR}/plugins/zsh-bat/zsh-bat.plugin.zsh" ] && \
+    . "${ZSH_DIR}/plugins/zsh-bat/zsh-bat.plugin.zsh"
+
+# zsh-syntax-highlighting — must be sourced last
+[ -f "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && \
+    . "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+unset DOTFILES_DIR HOMEBREW_DIR ZSH_DIR

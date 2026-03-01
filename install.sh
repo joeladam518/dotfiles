@@ -225,3 +225,8 @@ if [ "$env" != "server" ]; then
         cp "${DOTFILES_DIR}/git/.gitconfig" "${HOME}/.gitconfig"
     fi
 fi
+
+# Install git completion scripts
+git_completions_args=()
+[ "$shell_type" = "zsh" ] && git_completions_args+=("--zsh")
+bash "${DOTFILES_DIR}/install-git-completions.sh" "${git_completions_args[@]}"

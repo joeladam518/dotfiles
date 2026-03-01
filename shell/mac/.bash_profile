@@ -133,6 +133,11 @@ if [ -d "${HOME}/tizen-studio" ]; then
     export PATH="${PATH}:${HOME}/tizen-studio/tools/ide/bin"
 fi
 
+# Enable programmable Samsung tizen sdb completion features.
+if [ -f "${HOME}/.sdb/.sdb-completion.bash" ]; then
+    . "${HOME}/.sdb/.sdb-completion.bash"
+fi
+
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 [ -f "$HOME/.docker/init-bash.sh" ] && . "${HOME}/.docker/init-bash.sh"

@@ -54,8 +54,8 @@ RPROMPT=''
     zstyle ':completion:*:*:git:*' script "${HOME}/.git-completion.bash"
 # Additional completion directories
 DOTFILES_ZSH_COMPLETION_DIRECTORIES=(
-    "${ZSH_DIR}/completions"
     "${HOMEBREW_DIR}/share/zsh/site-functions"
+    "${ZSH_DIR}/completion"
 )
 # add zsh completions to fpath
 [ -f "${DOTFILES_DIR}/zsh-completion/zsh_completion" ] && \

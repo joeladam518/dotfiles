@@ -38,6 +38,9 @@ if command -v vim >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
+bindkey "^A" beginning-of-line
+bindkey "^E" end-of-line
+
 # Prompt
 PROMPT='%T %F{12}%~%f%(#.#.$) '
 RPROMPT=''

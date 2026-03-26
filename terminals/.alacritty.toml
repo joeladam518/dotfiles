@@ -1,3 +1,4 @@
+[general]
 live_config_reload = true
 
 [window]
@@ -14,7 +15,7 @@ history = 100000
 multiplier = 3
 
 [font]
-size = 16.0
+size = 20
 
 [font.normal]
 family = "CommitMono Nerd Font"

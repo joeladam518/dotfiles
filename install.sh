@@ -3,7 +3,7 @@
 set -Eeo pipefail
 
 DOTFILES_REPO="https://github.com/joeladam518/dotfiles.git"
-REPOS_DIR="${HOME}/repos"
+REPOS_DIR="$(cd "${HOME}/repos" > /dev/null 2>&1 && pwd -P)"
 DOTFILES_DIR="${REPOS_DIR}/dotfiles"
 
 # Clone the repo if it doesn't exist (supports running via curl/wget pipe)

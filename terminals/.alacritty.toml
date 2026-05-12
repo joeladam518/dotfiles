@@ -12,7 +12,7 @@ history = 100000
 multiplier = 3
 
 [font]
-size = 18
+size = 16
 
 [font.normal]
 family = "CommitMono Nerd Font"

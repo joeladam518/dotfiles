@@ -18,7 +18,7 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # ls aliases
-alias ls='ls --color=auto --group-directories-first'
+alias ls='ls --color=auto --group-directories-first --sort=name'
 alias l='ls -lhpv'    # ll without hidden files/directories
 alias ll='ls -Alphv'    # Detailed ls with hidden files/directories
 # alias lm='ll | more'    # Pipe through 'more'

@@ -52,7 +52,7 @@ fi
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+    xterm-color|*-256color|alacritty*) color_prompt=yes;;
 esac
 
 # Uncomment for a colored prompt, if the terminal has the capability; turned

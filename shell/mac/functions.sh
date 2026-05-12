@@ -33,7 +33,7 @@ Arguments:
     theme       The theme to build or run the dev command for"
     build_theme=0
     default_instance="satellite"
-    repo_root="${HOME}/repos/ondeck-app"
+    repo_root="${HOME}/repos/cruisedirector-mobile"
     run_dev=1
     swap_env=1
     theme=""
@@ -45,7 +45,7 @@ Arguments:
 
     while :; do
         case "${1-}" in
-            -h | --help)
+            -h | --help | h | help)
                 echo "$usage"
                 return 0
                 ;;

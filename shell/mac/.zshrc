@@ -91,9 +91,8 @@ if [ -d "${HOME}/.nvm" ]; then
 fi
 
 # Java
-if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
-    export PATH="/opt/homebrew/opt/openjdk@17/bin:${PATH}"
-    export CPPFLAGS="-I/opt/homebrew/opt/openjdk@17/include"
+if [ -d "/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home" ]; then
+    export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home"
 fi
 
 # Android development
@@ -146,5 +145,8 @@ fi
 # zsh-syntax-highlighting — must be sourced last
 [ -f "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && \
     . "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# ruby fix? 2026-03-27
+#export CFLAGS="-Wno-error=default-const-init-field-unsafe"
 
 unset DOTFILES_DIR HOMEBREW_DIR ZSH_DIR

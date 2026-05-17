@@ -28,3 +28,4 @@ fi
 if command -v subl > /dev/null; then
     alias sublit='subl "$(fzf -m)";'
 fi
+

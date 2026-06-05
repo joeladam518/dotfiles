@@ -126,4 +126,3 @@ log_level = "OFF"
 persistent_logging = false
 print_events = false
 render_timer = false
-

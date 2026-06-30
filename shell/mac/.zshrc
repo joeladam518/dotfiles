@@ -130,7 +130,11 @@ fi
 
 # bash-git-prompt
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
-    precmd() { eval $PROMPT_COMMAND; }
+    # zsh has no PROMPT_COMMAND hook, so drive bash-git-prompt's prompt
+    # builder from precmd. No KSH_ARRAYS needed: the prompt scripts use
+    # base-agnostic ${array[@]:offset:length} slices that work with zsh's
+    # native 1-based arrays (and the $fg[...] color subscripts they rely on).
+    precmd() { eval "$PROMPT_COMMAND"; }
     __GIT_PROMPT_DIR="$HOME/.bash-git-prompt"
     GIT_PROMPT_EXECUTABLE="git"
     GIT_PROMPT_ONLY_IN_REPO=1

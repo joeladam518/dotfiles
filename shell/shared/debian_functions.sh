@@ -2,10 +2,9 @@
 # shellcheck shell=bash
 # Shared desktop/server functions — sourced by both bash and zsh
 
+# Update your computer
 auu()
 {
-    # Update your computer
-
     if [ "$(id -u)" -eq "0" ]; then
         #apt update && apt upgrade -y && apt autoremove -y
         apt-get update && apt-get upgrade -y
@@ -15,10 +14,9 @@ auu()
     fi
 }
 
+# Show the current and closest dns resolver on the network
 showdns()
 {
-    # Show the current and closest dns resolver on the network
-
     local NAMESERVER
     NAMESERVER="$( ( nmcli dev list || nmcli dev show ) 2> /dev/null | grep DNS | tr -s '[:space:]' | cut -d' ' -f2 )"
 

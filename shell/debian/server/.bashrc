@@ -102,13 +102,13 @@ if ! shopt -oq posix; then
 fi
 
 # Load aliases
-if [ -f "${DOTFILES_DIR}/shell/server/aliases.sh" ]; then
-    . "${DOTFILES_DIR}/shell/server/aliases.sh"
+if [ -f "${DOTFILES_DIR}/shell/debian/server/aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/debian/server/aliases.sh"
 fi
 
 # Load functions
-if [ -f "${DOTFILES_DIR}/shell/server/functions.sh" ]; then
-    . "${DOTFILES_DIR}/shell/server/functions.sh"
+if [ -f "${DOTFILES_DIR}/shell/debian/server/functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/debian/server/functions.sh"
 fi
 
 # .fzf command line fuzzy finder

@@ -2,10 +2,9 @@
 # shellcheck shell=bash
 # Shared functions — sourced by both bash and zsh
 
+# Ask a yes or no question
 confirm()
 {
-    # Ask a yes or no question
-
     local CONFIRM_PROMPT CONFIRM_ANSWER CONFIRM_RESPONSE
 
     CONFIRM_PROMPT="$(cmsg -g "$* ")"
@@ -27,10 +26,9 @@ confirm()
     return 1
 }
 
+# Handy Extract function
 extract()
 {
-    # Handy Extract function
-
     local FILE_PATH
     FILE_PATH="${1:-""}"
 
@@ -57,19 +55,17 @@ extract()
     return "$?"
 }
 
+# Creates an archive (*.tar.gz) from given directory
 tarthis()
 {
-    # Creates an archive (*.tar.gz) from given directory
-
     tar -cvzf "${1%%/}.tar.gz" "${1%%/}/"
     return "$?"
 }
 
+# Fill in the most common arguments I use when starting tmux if I don't
+# provide any specific args.
 tmux()
 {
-    # Fill in the most common arguments I use when starting tmux if I don't
-    # provide any specific args.
-
     if [ "$#" -eq 0 ]; then
         command tmux new -A -s 'jh' -n ' '
     else

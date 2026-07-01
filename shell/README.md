@@ -35,10 +35,10 @@ Symlink the appropriate entry point(s) to your home directory:
 
 ```sh
 # Linux (bash)
-ln -sf ~/repos/dotfiles/shell/linux/.bashrc ~/.bashrc
+ln -sf ~/repos/dotfiles/shell/debian/pc/.bashrc ~/.bashrc
 
 # Linux (zsh)
-ln -sf ~/repos/dotfiles/shell/linux/.zshrc ~/.zshrc
+ln -sf ~/repos/dotfiles/shell/debian/pc/.zshrc ~/.zshrc
 
 # Mac (bash)
 ln -sf ~/repos/dotfiles/shell/mac/.bash_profile ~/.bash_profile

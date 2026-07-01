@@ -78,12 +78,12 @@ else
 fi
 
 # Load aliases
-[ -f "${DOTFILES_DIR}/shell/linux/aliases.sh" ] && \
-    . "${DOTFILES_DIR}/shell/linux/aliases.sh"
+[ -f "${DOTFILES_DIR}/shell/debian/pc/aliases.sh" ] && \
+    . "${DOTFILES_DIR}/shell/debian/pc/aliases.sh"
 
 # Load functions
-[ -f "${DOTFILES_DIR}/shell/linux/functions.sh" ] && \
-    . "${DOTFILES_DIR}/shell/linux/functions.sh"
+[ -f "${DOTFILES_DIR}/shell/debian/pc/functions.sh" ] && \
+    . "${DOTFILES_DIR}/shell/debian/pc/functions.sh"
 
 # Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"

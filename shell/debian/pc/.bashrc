@@ -102,13 +102,13 @@ if [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
 fi
 
 # Load aliases
-if [ -f "${DOTFILES_DIR}/shell/linux/aliases.sh" ]; then
-    . "${DOTFILES_DIR}/shell/linux/aliases.sh"
+if [ -f "${DOTFILES_DIR}/shell/debian/pc/aliases.sh" ]; then
+    . "${DOTFILES_DIR}/shell/debian/pc/aliases.sh"
 fi
 
 # Load functions
-if [ -f "${DOTFILES_DIR}/shell/linux/functions.sh" ]; then
-    . "${DOTFILES_DIR}/shell/linux/functions.sh"
+if [ -f "${DOTFILES_DIR}/shell/debian/pc/functions.sh" ]; then
+    . "${DOTFILES_DIR}/shell/debian/pc/functions.sh"
 fi
 
 # Bash-Git-Prompt

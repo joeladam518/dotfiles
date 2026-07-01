@@ -150,7 +150,10 @@ fi
 [ -f "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && \
     . "${ZSH_DIR}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
-# ruby fix? 2026-03-27
-#export CFLAGS="-Wno-error=default-const-init-field-unsafe"
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/jhaker/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
 
 unset DOTFILES_DIR HOMEBREW_DIR ZSH_DIR

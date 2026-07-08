@@ -107,7 +107,7 @@ action = "ReceiveChar"
 [[keyboard.bindings]]
 key = "Return"
 mods = "Shift"
-chars = "\u001b\n"
+chars = "\u001b\r"
 
 [[keyboard.bindings]]
 key = "G"

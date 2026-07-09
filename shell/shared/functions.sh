@@ -67,7 +67,7 @@ tarthis()
 tmux()
 {
     if [ "$#" -eq 0 ]; then
-        command tmux new -A -s 'jh' -n ' '
+        command tmux new -A -s 'jh' -n ''
     else
         command tmux "$@"
     fi

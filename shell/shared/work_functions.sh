@@ -7,7 +7,7 @@
 #   - runs the dev:[theme] command
 oda()
 {
-    local build_theme cwd default_instance repo_root run_dev swap_env theme usage
+    local build_theme cwd default_instance key repo_root run_dev swap_env theme usage
     cwd="$(pwd -P)"
     usage="Usage: oda [-h] [-d] [-t] [-e] {theme}
 
@@ -103,6 +103,19 @@ Arguments:
         sed -i '' 's/^SENTRY_DSN=.*/SENTRY_DSN=/' .env
         sed -i '' 's/^SENTRY_TRACING_ORIGINS=.*/SENTRY_TRACING_ORIGINS=/' .env
         sed -i '' "s/^DEFAULT_INSTANCE=.*/DEFAULT_INSTANCE=\"${default_instance}\"/" .env
+
+        # Always off locally. Set or append: a missing key isn't always false
+        # (ENABLE_VERSION_UPDATE_SCREEN defaults to on in src/env.ts).
+        if [ -n "$(tail -c1 .env)" ]; then
+            echo >> .env
+        fi
+        for key in FCM_ENABLED ENABLE_ECS_EVENTS ENABLE_VERSION_UPDATE_SCREEN; do
+            if grep -q "^${key}=" .env; then
+                sed -i '' "s/^${key}=.*/${key}=false/" .env
+            else
+                echo "${key}=false" >> .env
+            fi
+        done
 
         cmsg -g "Swapped .env file for ${theme}" 1>&2
     fi

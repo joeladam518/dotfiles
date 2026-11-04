@@ -1,9 +1,9 @@
 [window]
 decorations = "Full"
 decorations_theme_variant = "Dark"
-dynamic_padding = false
+dynamic_padding = true
 resize_increments = false
-padding = { x = 3, y = 2 }
+padding = { x = 0, y = 0 }
 position = { x = 0, y = 0 }
 title = "Terminal"
 
@@ -12,7 +12,9 @@ history = 100000
 multiplier = 3
 
 [font]
-size = 20
+size = 22
+offset = { x = 0, y = 2 }
+glyph_offset = { x = 0, y = 1 }
 
 [font.normal]
 family = "CommitMono Nerd Font Mono"

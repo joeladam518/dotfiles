@@ -233,6 +233,18 @@ filetype indent plugin on
 " Use dark mode
 set background=dark
 
+" Match the background to alacritty's (terminals/.alacritty.toml -> colors.primary.background)
+let g:PaperColor_Theme_Options = {
+    \   'theme': {
+    \     'default.dark': {
+    \       'override': {
+    \         'color00': ['#1a1a1a', '234'],
+    \         'linenumber_bg': ['#1a1a1a', '234']
+    \       }
+    \     }
+    \   }
+    \ }
+
 " Set the colorshceme
 colorscheme pablo
 colorscheme PaperColor
@@ -288,6 +300,9 @@ set ruler
  
 " Always display the status line, even if only one window is displayed
 set laststatus=2
+
+" Same as the default statusline (with 'ruler'), but with 1 column of padding on each side
+let &statusline = ' %<%f %h%m%r%=%-14.(%l,%c%V%) %P '
 
 " Use visual bell instead of beeping when doing something wrong
 set visualbell

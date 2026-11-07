@@ -29,10 +29,6 @@ if command -v "vim" >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
-# force the localization
-# export LANG="en_US.UTF-8"
-# export LC_ALL="en_US.UTF-8"
-
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth
@@ -91,31 +87,31 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc.
 if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
+    \. /usr/share/bash-completion/bash_completion
 elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
+    \. /etc/bash_completion
 fi
 
 # Load custom bash completeions
-if [ -r "${HOME}/repos/dotfiles/bash-completion/bash_completion" ]; then
-    . "${HOME}/repos/dotfiles/bash-completion/bash_completion"
+if [ -f "${DOTFILES_DIR}/bash-completion/bash_completion" ]; then
+    \. "${DOTFILES_DIR}/bash-completion/bash_completion"
 fi
 
 # Load aliases
 if [ -f "${DOTFILES_DIR}/shell/debian/pc/aliases.sh" ]; then
-    . "${DOTFILES_DIR}/shell/debian/pc/aliases.sh"
+    \. "${DOTFILES_DIR}/shell/debian/pc/aliases.sh"
 fi
 
 # Load functions
 if [ -f "${DOTFILES_DIR}/shell/debian/pc/functions.sh" ]; then
-    . "${DOTFILES_DIR}/shell/debian/pc/functions.sh"
+    \. "${DOTFILES_DIR}/shell/debian/pc/functions.sh"
 fi
 
 # Bash-Git-Prompt
 if [ -f "${HOME}/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_FETCH_REMOTE_STATUS=1
-    . "${HOME}/.bash-git-prompt/gitprompt.sh"
+    \. "${HOME}/.bash-git-prompt/gitprompt.sh"
 fi
 
 # .fzf command line fuzzy finder

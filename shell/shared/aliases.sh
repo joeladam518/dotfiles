@@ -10,7 +10,7 @@ alias ..='cd ..'
 #alias .....='cd ../../../..'
 
 # Reload shell
-alias reload='exec ${SHELL}'
+alias reload='exec $SHELL;'
 
 # Osinfo
 alias osinfo='dotfiles osinfo'

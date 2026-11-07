@@ -23,10 +23,6 @@ if command -v "vim" >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
-# Force the localization
-# export LANG="en_US.UTF-8"
-# export LC_ALL="en_US.UTF-8"
-
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth

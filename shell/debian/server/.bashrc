@@ -8,7 +8,6 @@ case $- in
       *) return;;
 esac
 
-# bashrc directory
 DOTFILES_DIR="${HOME}/repos/dotfiles"
 
 # Cmdhist
@@ -30,10 +29,6 @@ if command -v "vim" >/dev/null 2>&1; then
     export EDITOR=vim
 fi
 
-# force the localization
-# export LANG="en_US.UTF-8"
-# export LC_ALL="en_US.UTF-8"
-
 # Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 export HISTCONTROL=ignoreboth
@@ -53,7 +48,7 @@ fi
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+    xterm-color|*-256color|alacritty*) color_prompt=yes;;
 esac
 
 # Uncomment for a colored prompt, if the terminal has the capability; turned

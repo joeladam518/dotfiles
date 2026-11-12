@@ -114,6 +114,9 @@ if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
     export PATH="${PATH}:${HOME}/.config/yarn/global/node_modules/.bin"
 fi
 
+# Github packages token
+export GITHUB_PACKAGES_TOKEN=$(sed -n 's#^//npm.pkg.github.com/:_authToken=##p' ~/.npmrc)
+
 # Tizen Studio
 if [ -d "${HOME}/tizen-studio" ]; then
     export PATH="${PATH}:${HOME}/tizen-studio/tools/"

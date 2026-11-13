@@ -115,7 +115,11 @@ if [ -d "${HOME}/.config/yarn/global/node_modules/.bin" ]; then
 fi
 
 # Github packages token
-export GITHUB_PACKAGES_TOKEN=$(sed -n 's#^//npm.pkg.github.com/:_authToken=##p' ~/.npmrc)
+if [ -f "${HOME}/.npmrc" ]; then
+    _gh_token="$(sed -n 's#^//npm.pkg.github.com/:_authToken=##p' "${HOME}/.npmrc")"
+    [ -n "$_gh_token" ] && export GITHUB_PACKAGES_TOKEN="$_gh_token"
+    unset _gh_token
+fi
 
 # Tizen Studio
 if [ -d "${HOME}/tizen-studio" ]; then
